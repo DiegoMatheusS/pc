@@ -121,7 +121,13 @@ function verificarCompatibilidade() {
         carregador.load('modelos/processador.glb', function(gltf) {
             console.log("✅ Processador carregado!");
             modeloProcessadorReal = gltf.scene;
-            modeloProcessadorReal.position.copy(slotProcessador.position); 
+            // modeloProcessadorReal.position.copy(slotProcessador.position); 
+
+// Sintonia fina manual: (X, Y, Z)
+// X = Esquerda / Direita
+// Y = Cima / Baixo (É aqui que vamos fazer ele descer para a placa)
+// Z = Frente / Trás
+            modeloProcessadorReal.position.set(0, 0.05, -0.5);
             modeloProcessadorReal.scale.set(0.5, 0.5, 0.5); 
             cena.add(modeloProcessadorReal);
             slotProcessador.material.opacity = 0; 
