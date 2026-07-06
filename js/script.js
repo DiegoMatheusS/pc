@@ -116,34 +116,22 @@ function verificarCompatibilidade() {
     }
 
     // 2. CARREGA O PROCESSADOR
-    if (processador !== "" && modeloProcessadorReal === null) {
-        console.log("⏳ Carregando o Processador...");
-        carregador.load('modelos/processador.glb', function(gltf) {
-            console.log("✅ Processador carregado!");
-            modeloProcessadorReal = gltf.scene;
-            
-            // Posição inicial aproximada
-            modeloProcessadorReal.position.set(0, 0.2, -0.5); 
-            modeloProcessadorReal.scale.set(0.5, 0.5, 0.5); 
-            cena.add(modeloProcessadorReal);
-            slotProcessador.material.opacity = 0; 
+if (processador !== "" && modeloProcessadorReal === null) {
+    console.log("⏳ Carregando o Processador...");
+    carregador.load('modelos/processador.glb', function(gltf) {
+        console.log("✅ Processador carregado!");
+        modeloProcessadorReal = gltf.scene;
+        
+        // Sintonia fina manual: O 0.01 faz ele descer até a altura da placa.
+        modeloProcessadorReal.position.set(0, 0.01, -0.5); 
+        modeloProcessadorReal.scale.set(0.5, 0.5, 0.5); 
+        cena.add(modeloProcessadorReal);
+        slotProcessador.material.opacity = 0; 
 
-            // --- INSTALAÇÃO DO PAINEL VISUAL AQUI ---
-            const gui = new dat.GUI();
-            const pastaPosicao = gui.addFolder('Ajuste do Processador');
-            
-            // Cria barras que variam de -2 a 2 de 0.01 em 0.01 milímetros
-            pastaPosicao.add(modeloProcessadorReal.position, 'x', -2, 2, 0.01).name('Esquerda/Direita (X)');
-            pastaPosicao.add(modeloProcessadorReal.position, 'y', -1, 1, 0.01).name('Altura (Y)');
-            pastaPosicao.add(modeloProcessadorReal.position, 'z', -2, 2, 0.01).name('Frente/Trás (Z)');
-            
-            pastaPosicao.open(); // Já abre a caixinha aberta na tela
-            // ----------------------------------------
-
-        }, undefined, function(erro) {
-            console.error("❌ ERRO NO PROCESSADOR:", erro);
-        });
-    }
+    }, undefined, function(erro) {
+        console.error("❌ ERRO NO PROCESSADOR:", erro);
+    });
+}
 
     // 3. VERIFICA A COMPATIBILIDADE
     if (placaMae !== "" && processador !== "") {
