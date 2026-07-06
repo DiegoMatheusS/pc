@@ -26,11 +26,6 @@ controles.dampingFactor = 0.05;
 // ==========================================================================
 // 2. SISTEMA DE CARREGAMENTO DE MODELOS REAIS (GLTF/GLB)
 // ==========================================================================
-const carregador = new THREE.GLTFLoader();
-
-let modeloPlacaReal = null;
-let modeloProcessadorReal = null;
-
 // ==========================================================================
 // 3. CRIANDO OS "ESPAÇOS FANTASMAS" (Hitboxes)
 // ==========================================================================
@@ -47,7 +42,26 @@ slotProcessador.position.set(0, 0.2, -0.5);
 slotProcessador.userData = { tipo: 'processador', nome: 'Slot do Processador' };
 cena.add(slotProcessador);
 
-const objetosInterativos = [slotPlacaMae, slotProcessador];
+// --- NOVOS ESPAÇOS ---
+
+// RAM: Um bloco fino e alto, ao lado direito do processador (eixo X)
+const geoRam = new THREE.BoxGeometry(0.2, 0.6, 1.5);
+const matRam = new THREE.MeshBasicMaterial({ color: 0x2ecc71, transparent: true, opacity: 0.3, wireframe: true });
+const slotRam = new THREE.Mesh(geoRam, matRam);
+slotRam.position.set(0.8, 0.3, -0.5); 
+slotRam.userData = { tipo: 'ram', nome: 'Slots de Memória RAM' };
+cena.add(slotRam);
+
+// PLACA DE VÍDEO (GPU): Um bloco comprido, mais para a frente da placa (eixo Z)
+const geoGpu = new THREE.BoxGeometry(2.5, 0.6, 0.4);
+const matGpu = new THREE.MeshBasicMaterial({ color: 0xe67e22, transparent: true, opacity: 0.3, wireframe: true });
+const slotGpu = new THREE.Mesh(geoGpu, matGpu);
+slotGpu.position.set(0, 0.4, 0.8); 
+slotGpu.userData = { tipo: 'gpu', nome: 'Slot PCIe (Placa de Vídeo)' };
+cena.add(slotGpu);
+
+// Agora o mouse precisa enxergar as 4 peças!
+const objetosInterativos = [slotPlacaMae, slotProcessador, slotRam, slotGpu];
 
 // ==========================================================================
 // 4. O SENSOR DO MOUSE (Raycaster)
@@ -76,8 +90,23 @@ window.addEventListener('click', (evento) => {
         menu.style.top = (evento.clientY + 15) + 'px';
         document.getElementById('menu-titulo').innerText = objetoAtingido.userData.nome;
 
+      // Esconde todos os menus primeiro
         document.getElementById('grupo-placa-mae').style.display = 'none';
         document.getElementById('grupo-processador').style.display = 'none';
+        document.getElementById('grupo-ram').style.display = 'none';
+        document.getElementById('grupo-gpu').style.display = 'none';
+
+        // Mostra só o menu da peça que o mouse atingiu
+        if (objetoAtingido.userData.tipo === 'placa-mae') {
+            document.getElementById('grupo-placa-mae').style.display = 'block';
+        } else if (objetoAtingido.userData.tipo === 'processador') {
+            document.getElementById('grupo-processador').style.display = 'block';
+        } else if (objetoAtingido.userData.tipo === 'ram') {
+            document.getElementById('grupo-ram').style.display = 'block';
+        } else if (objetoAtingido.userData.tipo === 'gpu') {
+            document.getElementById('grupo-gpu').style.display = 'block';
+        }
+        
 
         if (objetoAtingido.userData.tipo === 'placa-mae') {
             document.getElementById('grupo-placa-mae').style.display = 'block';

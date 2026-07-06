@@ -30,6 +30,25 @@
                 <option value="am5">AMD Ryzen 7 7800X3D</option>
             </select>
         </div>
+        
+        <div class="grupo-hardware" id="grupo-ram" style="display: none;">
+            <label>Escolha a Memória RAM:</label>
+            <select id="ram" onchange="verificarCompatibilidade()">
+                <option value="">-- Selecione --</option>
+                <option value="ddr5">Corsair Vengeance RGB (iCue Sync)</option>
+                <option value="ddr4">Kingston Fury Beast (DDR4)</option>
+            </select>
+        </div>
+
+        <div class="grupo-hardware" id="grupo-gpu" style="display: none;">
+            <label>Escolha a Placa de Vídeo:</label>
+            <select id="gpu" onchange="verificarCompatibilidade()">
+                <option value="">-- Selecione --</option>
+                <option value="rtx5070ti">NVIDIA GeForce RTX 5070 Ti</option>
+                <option value="rx9070xt">AMD Radeon RX 9070 XT</option>
+                <option value="rx9060xt">AMD Radeon RX 9060 XT</option>
+            </select>
+        </div>
     </div>
 
     <div id="alerta-tela"></div>
