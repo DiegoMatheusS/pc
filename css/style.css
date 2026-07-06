@@ -1,0 +1,101 @@
+/* ==========================================================================
+   1. RESET E CONFIGURAÇÃO DA PÁGINA
+   ========================================================================== */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Bloqueia barras de rolagem para parecer um jogo/aplicação */
+    background-color: #0f1115; /* Fundo escuro premium */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #e3e6ed;
+}
+
+/* ==========================================================================
+   2. CONTAINER DO MOTOR 3D (TELA CHEIA)
+   ========================================================================== */
+#container-3d {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1; /* Fica na camada de trás */
+}
+
+/* ==========================================================================
+   3. INTERFACE INTERATIVA (MENU FLUTUANTE)
+   ========================================================================== */
+#menu-flutuante {
+    position: absolute;
+    z-index: 10; /* Fica na camada da frente, sobrepondo o 3D */
+    
+    /* Inicialmente escondido. O JavaScript vai mudar para 'block' e ditar a posição */
+    display: none; 
+    
+    background-color: rgba(20, 24, 33, 0.95); /* Fundo escuro semi-transparente */
+    backdrop-filter: blur(4px); /* Efeito de vidro fosco moderno */
+    border: 1px solid #2f3542;
+    border-radius: 8px;
+    padding: 20px;
+    width: 260px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+#menu-flutuante h3 {
+    margin: 0 0 15px 0;
+    font-size: 14pt;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #535c68; /* Cor neutra para o título do menu */
+    border-bottom: 1px solid #2f3542;
+    padding-bottom: 8px;
+}
+
+/* Estilização dos seletores dentro do menu */
+.grupo-hardware {
+    margin-bottom: 10px;
+}
+
+.grupo-hardware label {
+    display: block;
+    font-size: 10pt;
+    margin-bottom: 5px;
+    color: #9c88ff; /* Tom sutil para as labels */
+}
+
+.grupo-hardware select {
+    width: 100%;
+    padding: 10px;
+    background-color: #1e272e;
+    border: 1px solid #3d4852;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 11pt;
+    outline: none;
+    cursor: pointer;
+}
+
+.grupo-hardware select:focus {
+    border-color: #718093;
+}
+
+/* ==========================================================================
+   4. SISTEMA DE ALERTAS EM TELA (NOTIFICAÇÕES CHROME)
+   ========================================================================== */
+#alerta-tela {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%); /* Centraliza perfeitamente no topo */
+    z-index: 11;
+    
+    display: none; /* Só aparece quando houver um erro ou acerto */
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 11pt;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PC Builder 3D - Imersão Total</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div id="container-3d"></div>
+
+    <div id="menu-flutuante">
+        <h3 id="menu-titulo">Selecione o Hardware</h3>
+        
+        <div id="grupo-placa-mae" class="grupo-hardware">
+            <label>Escolha o modelo:</label>
+            <select id="placa-mae" onchange="verificarCompatibilidade()">
+                <option value="">-- Selecione --</option>
+                <option value="am5">Gigabyte B650 (Soquete AM5)</option>
+                <option value="lga1700">Asus Z790 (Soquete LGA1700)</option>
+            </select>
+        </div>
+
+        <div id="grupo-processador" class="grupo-hardware">
+            <label>Escolha o modelo:</label>
+            <select id="processador" onchange="verificarCompatibilidade()">
+                <option value="">-- Selecione --</option>
+                <option value="lga1700">Intel Core i9-14900K</option>
+                <option value="am5">AMD Ryzen 7 7800X3D</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="alerta-tela"></div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>
