@@ -1,3 +1,6 @@
+"use strict";
+(function() {
+	
 // ==========================================================================
 // 1. CONFIGURAÇÃO BÁSICA DO AMBIENTE
 // ==========================================================================
@@ -211,6 +214,11 @@ radiador360.position.set(0, 4.40, 0);
 radiador360.visible = false;
 radiador360.userData = { tipo: 'cooler', nome: 'Radiador (360mm)' };
 cena.add(radiador360);
+
+
+
+
+
 
 // 🔴 NOVO: O BOTÃO POWER 3D NO GABINETE
 const geoBotao = new THREE.CylinderGeometry(0.1, 0.1, 0.05, 16);
@@ -557,9 +565,32 @@ function verificarCompatibilidade() {
 
     processarSlotRam(ram1, vRam1); processarSlotRam(ram2, vRam2); processarSlotRam(ram3, vRam3); processarSlotRam(ram4, vRam4);
 
+// --- PREENCHIMENTO VISUAL (TORNA AS PEÇAS SÓLIDAS QUANDO INSTALADAS) ---
     // Ajustes do SSD
     slotSsd.material.wireframe = (armazenamento !== "ssd-sata");
     if(slotM2) slotM2.material.wireframe = (armazenamento !== "ssd-m2");
+    if (slotPlacaMae) slotPlacaMae.material.wireframe = (placaMaeValue === "");
+    if (slotProcessador) slotProcessador.material.wireframe = (processador === "");
+    if (slotGpu) slotGpu.material.wireframe = (gpu === "");
+    if (slotFonte) slotFonte.material.wireframe = (fonte === "");
+    if (slotCooler) slotCooler.material.wireframe = (cooler === "");
+	// Forçando a pintura dos Radiadores com cor mais CLARA para destacar:
+    let usaWC240 = (cooler === "wc240");
+    let usaWC360 = (cooler === "wc360");
+    let usaWaterCooler = (usaWC240 || usaWC360);
+
+    if (radiador240) {
+        radiador240.material.wireframe = !usaWC240; 
+        if (usaWC240) radiador240.material.color.setHex(0xbdc3c7); // Prata Claro (Destaque)
+    }
+    
+    if (radiador360) {
+        radiador360.material.wireframe = !usaWC360;
+        if (usaWC360) radiador360.material.color.setHex(0xbdc3c7); // Prata Claro (Destaque)
+    }
+	
+	
+	
 
     // --- ADICIONAR ERROS DE RAM NO PAINEL ---
     if (misturouGeracao || misturouFrequencia) {
@@ -733,3 +764,4 @@ function animar() {
     renderizador.render(cena, camera);
 }
 animar();
+})();
