@@ -2,325 +2,124 @@
    1. RESET E CONFIGURAÇÃO DA PÁGINA
    ========================================================================== */
 html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden; /* Bloqueia barras de rolagem para parecer um jogo/aplicação */
-    background-color: #0f1115; /* Fundo escuro premium */
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden; 
+    background-color: #0f1115; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #e3e6ed;
 }
 
-/* ==========================================================================
-   2. CONTAINER DO MOTOR 3D (TELA CHEIA)
-   ========================================================================== */
 #container-3d {
-    width: 100vw;
-    height: 100vh;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1; /* Fica na camada de trás */
+    width: 100vw; height: 100vh;
+    position: absolute; top: 0; left: 0; z-index: 1;
 }
 
 /* ==========================================================================
-   3. INTERFACE INTERATIVA (MENU FLUTUANTE)
+   2. INTERFACE FLUTUANTE E TOOLTIP
    ========================================================================== */
-/* MENU FLUTUANTE (AO LADO DO MOUSE) */
 #menu-flutuante {
     position: absolute;
     background: rgba(15, 15, 15, 0.95);
     border: 1px solid #00ffff;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    pointer-events: auto;
+    color: white; padding: 12px;
+    border-radius: 8px; pointer-events: auto;
     box-shadow: 0px 4px 15px rgba(0, 255, 255, 0.2);
-    z-index: 200;
-    min-width: 220px;
+    z-index: 2000; min-width: 220px;
     backdrop-filter: blur(4px);
 }
 
-#menu-flutuante h3 {
-    margin: 0 0 10px 0;
-    font-size: 14px;
-    color: #00ffff;
-    border-bottom: 1px solid #333;
-    padding-bottom: 5px;
+#menu-flutuante h3 { font-size: 14px; color: #00ffff; }
+
+#select-flutuante {
+    width: 100%; background: #2c3e50; color: white;
+    border: 1px solid #00ffff; padding: 6px;
+    border-radius: 4px; font-size: 13px; outline: none; cursor: pointer;
 }
 
-/* Estilização dos seletores dentro do menu */
-.grupo-hardware {
-    margin-bottom: 10px;
-}
-
-.grupo-hardware label {
-    display: block;
-    font-size: 10pt;
-    margin-bottom: 5px;
-    color: #9c88ff; /* Tom sutil para as labels */
-}
-
-.grupo-hardware select {
-    width: 100%;
-    padding: 10px;
-    background-color: #1e272e;
-    border: 1px solid #3d4852;
-    border-radius: 4px;
-    color: #ffffff;
-    font-size: 11pt;
-    outline: none;
-    cursor: pointer;
-}
-
-.grupo-hardware select:focus {
-    border-color: #718093;
+#tooltip-3d {
+    position: absolute; background: rgba(10, 10, 10, 0.9); color: #1abc9c;
+    padding: 8px 12px; border-radius: 4px; font-size: 14px; font-weight: bold;
+    border: 1px solid #1abc9c; box-shadow: 0 0 10px rgba(26, 188, 156, 0.3);
+    pointer-events: none; z-index: 2500; display: none;
 }
 
 /* ==========================================================================
-   4. SISTEMA DE ALERTAS EM TELA (NOTIFICAÇÕES CHROME)
+   3. PAINEL DE LOGS
    ========================================================================== */
-/* PAINEL DE LOGS NA DIREITA */
 #painel-logs {
-    position: fixed;
-    right: 20px;
-    top: 20px;
-    width: 320px;
-    background: rgba(20, 20, 20, 0.85);
-    color: #ffffff;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 15px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    max-height: 80vh;
-    overflow-y: auto;
-    z-index: 100;
-    backdrop-filter: blur(5px);
+    position: fixed; right: 20px; top: 20px; width: 320px;
+    background: rgba(20, 20, 20, 0.85); color: #ffffff;
+    border: 1px solid #444; border-radius: 8px; padding: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.6); max-height: 80vh;
+    overflow-y: auto; z-index: 100; backdrop-filter: blur(5px);
 }
 
-#painel-logs h3 {
-    margin-top: 0;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #555;
-    padding-bottom: 6px;
-    color: #bdc3c7;
-    font-size: 16px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* ESTILOS DOS CARDS DE LOG */
-.log-erro {
-    color: #ff4d4d;
-    background: rgba(255, 77, 77, 0.1);
-    padding: 10px;
-    border-left: 4px solid #ff4d4d;
-    margin-bottom: 10px;
-    font-size: 13px;
-    border-radius: 4px;
-    line-height: 1.4;
-}
-
-.log-alerta {
-    color: #f1c40f;
-    background: rgba(241, 196, 15, 0.1);
-    padding: 10px;
-    border-left: 4px solid #f1c40f;
-    margin-bottom: 10px;
-    font-size: 13px;
-    border-radius: 4px;
-    line-height: 1.4;
-}
-
-.log-sucesso {
-    color: #2ecc71;
-    background: rgba(46, 204, 113, 0.1);
-    padding: 10px;
-    border-left: 4px solid #2ecc71;
-    margin-bottom: 10px;
-    font-size: 13px;
-    border-radius: 4px;
-    line-height: 1.4;
-}
+#painel-logs h3 { margin-top: 0; border-bottom: 1px solid #555; padding-bottom: 6px; color: #bdc3c7; font-size: 16px; text-transform: uppercase; }
+.log-erro { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); padding: 10px; border-left: 4px solid #ff4d4d; margin-bottom: 10px; font-size: 13px; border-radius: 4px; }
+.log-alerta { color: #f1c40f; background: rgba(241, 196, 15, 0.1); padding: 10px; border-left: 4px solid #f1c40f; margin-bottom: 10px; font-size: 13px; border-radius: 4px; }
+.log-sucesso { color: #2ecc71; background: rgba(46, 204, 113, 0.1); padding: 10px; border-left: 4px solid #2ecc71; margin-bottom: 10px; font-size: 13px; border-radius: 4px; }
 
 /* ==========================================================================
-   BARRA INFERIOR DE COMPONENTES (ROLAMENTO VERTICAL)
+   4. MENU INFERIOR E BOTÃO POWER
    ========================================================================== */
 #menu-inferior {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 95%; 
-    max-width: 1400px;
-    background: rgba(20, 20, 20, 0.85);
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 15px; 
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
-    z-index: 100;
-    backdrop-filter: blur(5px);
-    
-    /* A Mágica da Grelha Vertical */
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); /* Cria colunas automáticas */
-    gap: 12px;
-    max-height: 220px; /* Altura limite para ativar o rolamento para baixo */
-    overflow-y: auto; /* Ativa o scroll vertical */
-    overflow-x: hidden; /* Remove o scroll lateral */
-    transition: transform 0.5s ease;
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    width: 95%; max-width: 1400px; background: rgba(20, 20, 20, 0.85);
+    border: 1px solid #444; border-radius: 8px; padding: 15px; 
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.6); z-index: 100; backdrop-filter: blur(5px);
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+    max-height: 20vh; overflow-y: auto; overflow-x: hidden; transition: transform 0.5s ease;
 }
 
-/* Oculta o menu deslizando para baixo (Modo Foco) */
-.esconder-menu {
-    transform: translate(-50%, 150%) !important;
-}
+/* BLINDAGEM DA TRANSIÇÃO (Força o menu a esconder) */
+#menu-inferior.esconder-manual, #menu-inferior.esconder-menu { transform: translate(-50%, 150%) !important; }
 
-/* Customizando a barra de rolagem VERTICAL */
-#menu-inferior::-webkit-scrollbar {
-    width: 8px; /* Agora usamos width porque é vertical */
-}
-#menu-inferior::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-}
-#menu-inferior::-webkit-scrollbar-thumb {
-    background: #00ffff;
-    border-radius: 4px;
-}
+#menu-inferior::-webkit-scrollbar { width: 8px; }
+#menu-inferior::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+#menu-inferior::-webkit-scrollbar-thumb { background: #00ffff; border-radius: 4px; }
 
-/* CAIXAS DE HARDWARE */
-#menu-inferior .grupo-hardware {
-    margin-bottom: 0;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 4px;
-    transition: all 0.3s ease;
+.grupo-hardware {
+    min-width: 140px; padding: 6px; background: rgba(255, 255, 255, 0.03); border-radius: 4px;
 }
+.grupo-hardware label { display: block; font-size: 11px; color: #95a5a6; margin-bottom: 4px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.grupo-hardware select { width: 100%; background: #2c3e50; color: white; border: 1px solid #34495e; padding: 4px; border-radius: 4px; font-size: 11px; height: 26px; outline: none; cursor: pointer; }
 
-#menu-inferior .grupo-hardware label {
-    display: block;
-    font-size: 11px;
-    color: #95a5a6;
-    margin-bottom: 5px;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#menu-inferior .grupo-hardware select {
-    width: 100%;
-    background: #2c3e50;
-    color: white;
-    border: 1px solid #34495e;
-    padding: 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    outline: none;
-    cursor: pointer;
-}
-
-/* CAIXAS DE HARDWARE MENORES E COMPACTAS */
-#menu-inferior .grupo-hardware {
-    min-width: 150px; /* Largura fina para caber mais itens */
-    flex-shrink: 0; /* Impede de amassar as caixas */
-    margin-bottom: 0;
-    padding: 6px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 4px;
-    transition: all 0.3s ease;
-}
-
-#menu-inferior .grupo-hardware label {
-    font-size: 11px; /* Fonte menor */
-    margin-bottom: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Põe "..." se o texto for muito longo */
-}
-
-#menu-inferior .grupo-hardware select {
-    padding: 4px; /* Mais fino */
-    font-size: 11px; 
-    height: 26px; /* Tamanho exato */
-	
-}
-/* ESTILO DO SELETOR FLUTUANTE (Sem bugar o HTML) */
-#select-flutuante {
-    width: 100%;
-    background: #2c3e50;
-    color: white;
-    border: 1px solid #00ffff;
-    padding: 6px;
-    border-radius: 4px;
-    font-size: 13px;
-    outline: none;
-    cursor: pointer;
-}
-
-/* EFEITO DE FOCO INTELIGENTE QUANDO CLICA NO 3D */
-.grupo-focado {
-    border: 1px solid #00ffff !important;
-    background: rgba(0, 255, 255, 0.1) !important;
-    animation: piscaFoco 0.8s ease backwards;
-}
-
-@keyframes piscaFoco {
-    0% { background: rgba(0, 255, 255, 0.3); }
-    50% { background: rgba(0, 255, 255, 0.05); }
-    100% { background: rgba(0, 255, 255, 0.1); }
-}
-
-
-/* --- ESTILOS DO BOTÃO POWER --- */
 #btn-power {
-    position: absolute;
-    bottom: 30px;
-    right: 30px;
-    padding: 15px 30px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: white;
-    background-color: #222;
-    border: 2px solid #555;
-    border-radius: 8px;
-    cursor: not-allowed;
-    transition: all 0.3s ease;
-    z-index: 1000;
+    position: absolute; bottom: 25vh; right: 30px; padding: 15px 30px;
+    font-size: 1.2rem; font-weight: bold; color: white; background-color: #222;
+    border: 2px solid #555; border-radius: 8px; cursor: not-allowed; transition: all 0.3s ease; z-index: 1000;
 }
+#btn-power.btn-pronto { background-color: #1abc9c; border-color: #16a085; box-shadow: 0 0 20px #1abc9c; cursor: pointer; text-shadow: 0 0 5px white; }
+#btn-power.btn-ligado { background-color: #e74c3c; border-color: #c0392b; box-shadow: 0 0 30px #e74c3c; cursor: pointer; }
 
-#btn-power.btn-pronto {
-    background-color: #1abc9c;
-    border-color: #16a085;
-    box-shadow: 0 0 20px #1abc9c;
-    cursor: pointer;
-    text-shadow: 0 0 5px white;
+/* ==========================================================================
+   5. BOTÃO MODO CINEMA (SETA)
+   ========================================================================== */
+#btn-toggle-menu {
+    position: fixed; bottom: 23vh; left: 50%; transform: translateX(-50%);
+    background: rgba(15, 17, 21, 0.9); color: #00ffff; border: 1px solid #444; border-bottom: none;
+    padding: 6px 20px; border-radius: 8px 8px 0 0; cursor: pointer; z-index: 3100; font-size: 12px; font-weight: bold; transition: all 0.5s ease; backdrop-filter: blur(5px);
 }
+.botao-descido { bottom: 0 !important; background: #00ffff !important; color: #000 !important; border-radius: 8px 8px 0 0 !important; }
 
-#btn-power.btn-ligado {
-    background-color: #e74c3c;
-    border-color: #c0392b;
-    box-shadow: 0 0 30px #e74c3c;
-    cursor: pointer;
-}
-
-
-/* --- ESTILOS DO TOOLTIP 3D --- */
-#tooltip-3d {
-    position: absolute;
-    background: rgba(10, 10, 10, 0.9);
-    color: #1abc9c; /* Ciano para dar um tom tecnológico */
-    padding: 8px 12px;
-    border-radius: 4px;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid #1abc9c;
-    box-shadow: 0 0 10px rgba(26, 188, 156, 0.3);
-    pointer-events: none; /* Impede que o tooltip bloqueie os seus cliques no 3D */
-    z-index: 2500;
-    display: none; /* Escondido por padrão */
+/* ==========================================================================
+   6. RESPONSIVIDADE (SMARTPHONE E TABLET)
+   ========================================================================== */
+@media (max-width: 768px) {
+    #menu-inferior {
+        display: grid !important; width: 95% !important; padding: 10px !important; bottom: 15px !important;
+        max-height: 20vh !important; grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important;
+        -webkit-overflow-scrolling: touch !important; z-index: 3000 !important;
+    }
+    #btn-power { bottom: auto !important; top: 15px !important; right: 15px !important; padding: 10px 15px !important; font-size: 14px !important; z-index: 2000 !important; }
+    
+    #painel-logs {
+        width: 45% !important; left: 10px !important; right: auto !important; top: 10px !important; transform: none !important;
+        max-height: 15vh !important; padding: 8px !important; background: rgba(10, 10, 10, 0.4) !important; border: 1px solid #333 !important;
+    }
+    #painel-logs h3 { font-size: 10px !important; margin-bottom: 4px !important; }
+    .log-erro, .log-alerta, .log-sucesso { font-size: 9px !important; padding: 4px !important; margin-bottom: 4px !important; line-height: 1.1 !important; }
+    #menu-flutuante { min-width: 180px !important; padding: 10px !important; }
+    #btn-toggle-menu { bottom: 23vh !important; }
 }
