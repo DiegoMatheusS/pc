@@ -243,7 +243,34 @@ objetosInterativos.forEach(obj => {
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-window.addEventListener('click', (evento) => {
+// Variáveis para guardar onde o dedo/rato tocou primeiro
+let toqueInicialX = 0;
+let toqueInicialY = 0;
+
+// 1. Regista o ponto de partida do toque
+window.addEventListener('pointerdown', (evento) => {
+    toqueInicialX = evento.clientX;
+    toqueInicialY = evento.clientY;
+});
+
+// 2. Só dispara o laser quando o dedo SOLTAR a tela
+window.addEventListener('pointerup', (evento) => {
+    
+    // Calcula quantos pixels o dedo escorregou no ecrã
+    const moveuX = Math.abs(evento.clientX - toqueInicialX);
+    const moveuY = Math.abs(evento.clientY - toqueInicialY);
+
+    // Se moveu mais de 5 pixels, o utilizador estava a rodar o PC! 
+    // Ignora o clique e para a função por aqui.
+    if (moveuX > 5 || moveuY > 5) {
+        return; 
+    }
+
+    // ========================================================
+    // SE CHEGOU AQUI, FOI UM CLIQUE PERFEITO! 
+    // (O seu código antigo continua exatamente igual abaixo)
+    // ========================================================
+    
     const menuPrincipal = document.getElementById('menu-inferior');
     const menuFlutuante = document.getElementById('menu-flutuante');
     const logsPanel = document.getElementById('painel-logs');
@@ -762,6 +789,29 @@ function animar() {
         });
     }
     renderizador.render(cena, camera);
+}
+
+
+// ==========================================================================
+// 6. BOTÃO DE ESCONDER/MOSTRAR MENU (MODO CINEMA)
+// ==========================================================================
+const btnToggle = document.getElementById('btn-toggle-menu');
+const menuPrincipalUI = document.getElementById('menu-inferior');
+
+if (btnToggle && menuPrincipalUI) {
+    btnToggle.addEventListener('click', (evento) => {
+        evento.stopPropagation(); // Impede que o clique ative o laser 3D das peças sem querer
+        
+        menuPrincipalUI.classList.toggle('esconder-manual');
+        btnToggle.classList.toggle('botao-descido');
+        
+        // Alterna o texto e a seta
+        if (menuPrincipalUI.classList.contains('esconder-manual')) {
+            btnToggle.innerHTML = '▲ Mostrar Menu';
+        } else {
+            btnToggle.innerHTML = '▼ Esconder Menu';
+        }
+    });
 }
 animar();
 })();
