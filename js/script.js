@@ -546,8 +546,7 @@ function verificarCompatibilidade() {
         });
     }
 
-    // --- 🎯 O NOVO CÉREBRO DAS VENTOINHAS (.GLB) ---
-    // Fixamos o array para não rebentar com o código ao procurar pela palavra "in" no menu
+   // --- 🎯 O NOVO CÉREBRO DAS VENTOINHAS (.GLB) ---
     let fansIn = 0, fansOut = 0, totalFans = 0;
     [fTras, fFrente1, fFrente2, fFrente3, fTeto1, fTeto2, fTeto3].forEach(f => { 
         if (f.includes('in')) fansIn++; 
@@ -562,43 +561,44 @@ function verificarCompatibilidade() {
         if (!modeloFanBase) return;
 
         function aplicarFan(chave, arame, valorMenu, localMontagem) {
-            // 1. Limpa o modelo 3D antigo se existir
             if (modelosFansInstalados[chave]) {
                 cena.remove(modelosFansInstalados[chave]);
                 modelosFansInstalados[chave] = null;
             }
 
-            // 2. Se a pessoa tirou a fan no menu, o arame azul volta a aparecer
             if (valorMenu === "" || arame.visible === false) {
                 arame.material.opacity = 0.8;
+                arame.userData.opacidadeOriginal = 0.8;
+                arame.material.wireframe = true;
                 return;
             }
 
-            // 3. Clona o modelo base
             let novaFan = modeloFanBase.clone();
             novaFan.position.copy(arame.position);
-            novaFan.scale.set(0.3, 0.3, 0.3); // Calibrado para o seu gabinete
-            novaFan.rotation.set(0, 0, 0); // Zera tudo
+            
+            // 🚀 O RAIO DE CRESCIMENTO (Com o centro já corrigido)
+            let tamanhoFan = 3.5; 
+            novaFan.scale.set(tamanhoFan, tamanhoFan, tamanhoFan); 
+            novaFan.rotation.set(0, 0, 0); 
 
-            // 4. Lógica de Rotação (Parede vs Teto)
+            // Lógica de Rotação (Parede vs Teto)
             if (localMontagem === 'teto') {
-                novaFan.rotateX(Math.PI / 2); // Deita a ventoinha contra o teto
-            } else {
-                // Se for frente ou trás, não precisa rodar o X, ela já nasce de pé.
+                novaFan.rotateX(Math.PI / 2); 
             }
 
-            // 5. Lógica de Fluxo de Ar (Exaustão vs Injeção)
+            // Lógica de Fluxo de Ar
             if (valorMenu.includes("out")) {
-                novaFan.rotateY(Math.PI); // Dá meia volta (180 graus) para jogar vento para fora
+                novaFan.rotateY(Math.PI); 
             } else if (valorMenu.includes("in")) {
-                novaFan.rotateY(0); // Fica virada de frente para chupar o vento
+                novaFan.rotateY(0); 
             }
 
             cena.add(novaFan);
             modelosFansInstalados[chave] = novaFan;
 
-            // 6. Esconde o arame azul!
             arame.material.opacity = 0;
+            arame.userData.opacidadeOriginal = 0; 
+            arame.material.wireframe = false;
         }
 
         aplicarFan('fanTras', fanTras, fTras, 'parede');
@@ -610,15 +610,31 @@ function verificarCompatibilidade() {
         aplicarFan('fanTeto3', fanTeto3, fTeto3, 'teto');
     }
 
-    // Se precisamos de fans e ainda não as baixámos:
+    // CARREGAMENTO DA FAN BASE
     if (precisaDeFan && modeloFanBase === null) {
         telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
         carregador.load('modelos/fan.glb', function(gltf) {
-            modeloFanBase = gltf.scene;
-            distribuirFans3D(); // Assim que terminar o download, distribui as cópias
+            
+            // 🚨 O GRANDE TRUQUE DO PIVÔ: Centralizar o modelo à força!
+            let modeloOriginal = gltf.scene;
+            
+            // 1. Calcula o centro de massa da ventoinha original
+            let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
+            let centroReal = caixaContorno.getCenter(new THREE.Vector3());
+            
+            // 2. Empurra a ventoinha de volta para o Zero Absoluto
+            modeloOriginal.position.sub(centroReal); 
+            
+            // 3. Cria uma "caixa vazia" e coloca a ventoinha perfeitamente no meio
+            let envelope = new THREE.Group();
+            envelope.add(modeloOriginal);
+            
+            // 4. O nosso modelo base agora é este envelope perfeitamente centrado!
+            modeloFanBase = envelope; 
+            
+            distribuirFans3D(); 
         });
     } else if (modeloFanBase !== null) {
-        // Se o ficheiro já estava em memória, distribui logo! (Ultra rápido)
         distribuirFans3D();
     }
     // --------------------------------------------------
