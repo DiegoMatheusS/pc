@@ -582,7 +582,7 @@ function verificarCompatibilidade() {
             novaFan.position.copy(arame.position);
             
             // 🚀 O RAIO DE CRESCIMENTO (Com o centro já corrigido)
-            let tamanhoFan = 3.5; 
+            let tamanhoFan = 4; 
             novaFan.scale.set(tamanhoFan, tamanhoFan, tamanhoFan); 
             novaFan.rotation.set(0, 0, 0); 
 
