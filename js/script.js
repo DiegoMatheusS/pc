@@ -5,6 +5,9 @@
 // 1. CONFIGURAÇÃO BÁSICA DO AMBIENTE
 // ==========================================================================
 const cena = new THREE.Scene();
+
+// 🎨 NOVO: Define o fundo inicial como Cinza Escuro
+cena.background = new THREE.Color(0x333333); 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(5, 2.3, 0); 
 
@@ -161,7 +164,9 @@ const listaFans = [];
 // 1. Fan Traseiro
 const fanTras = new THREE.Mesh(geoFan, criarMatFan());
 fanTras.rotation.x = Math.PI / 2;
-fanTras.position.set(-0.6, 3.6, 2.15); 
+// 🎯 CORREÇÃO DE POSIÇÃO: 
+// X = -1.15 (Encosta na lateral esquerda) | Y = 3.5 (Altura do CPU) | Z = 0.4 (Empurra para a grelha do fundo)
+fanTras.position.set(0.10, 3.5, 2); 
 fanTras.userData = { tipo: 'fan-tras', nome: 'Ventoinha Traseira' };
 cena.add(fanTras);
 listaFans.push(fanTras);
@@ -819,7 +824,9 @@ function alternarEnergia() {
         if(btnUI) { btnUI.className = "btn-ligado"; btnUI.innerText = "🔴 DESLIGAR PC"; }
         botaoPower3D.material.color.setHex(0x1abc9c); 
         
-        cena.background = new THREE.Color(0x050505);
+        // 🎨 MUDE AQUI: Cinza um pouco mais claro (simulando a luz do PC a bater no fundo)
+        cena.background = new THREE.Color(0x444444); 
+        
         objetosInterativos.forEach(obj => {
             if (obj !== botaoPower3D) { 
                 obj.material.wireframe = false;
@@ -830,7 +837,9 @@ function alternarEnergia() {
         if(btnUI) { btnUI.className = "btn-pronto"; btnUI.innerText = "⚡ LIGAR PC"; }
         botaoPower3D.material.color.setHex(0xff0000); 
         
-        cena.background = new THREE.Color(0x000000); 
+        // 🎨 MUDE AQUI: Volta para o Cinza Escuro inicial quando desliga
+        cena.background = new THREE.Color(0x333333); 
+        
         objetosInterativos.forEach(obj => {
             if (obj !== botaoPower3D) {
                 obj.material.wireframe = true;
