@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montando Pc</title>
     <link rel="stylesheet" href="css/style.css">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' data: blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' data: blob:;">
 </head>
 <body>
-	<!-- TELA DE CARREGAMENTO -->
+    <!-- TELA DE CARREGAMENTO -->
     <div id="tela-carregamento">
         <div class="loader-conteudo">
             <div class="spinner"></div>
@@ -24,10 +24,10 @@
         <h3 id="menu-titulo">Peça</h3>
         <select id="select-flutuante"></select>
     </div>
-	
-	<button id="btn-toggle-menu">▼ Esconder Menu</button>
-	
-   <div id="menu-inferior">
+    
+    <button id="btn-toggle-menu">▼ Esconder Menu</button>
+    
+    <div id="menu-inferior">
         
         <div id="grupo-placa-mae" class="grupo-hardware">
             <label>Placa-Mãe:</label>
@@ -48,7 +48,7 @@
             </select>
         </div>
         
-		<div class="grupo-hardware" id="grupo-ram">
+        <div class="grupo-hardware" id="grupo-ram">
             <label>Memória RAM (Por Slot):</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px;">
                 <select id="ram1" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;">
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-		<div class="grupo-hardware" id="grupo-gpu">
+        <div class="grupo-hardware" id="grupo-gpu">
             <label>Placa de Vídeo (GPU):</label>
             <select id="gpu" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
@@ -101,7 +101,7 @@
             </select>
         </div>
 
-       <div class="grupo-hardware" id="grupo-cooler">
+        <div class="grupo-hardware" id="grupo-cooler">
             <label>Refrigeração CPU:</label>
             <select id="cooler" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
@@ -110,9 +110,8 @@
                 <option value="wc360">Water Cooler Extremo (360mm - 3 Fans)</option>
             </select>
         </div>
-			
-			
-			<div class="grupo-hardware" id="grupo-teto">
+            
+        <div class="grupo-hardware" id="grupo-teto">
             <label>Painel Superior (Teto):</label>
             <select id="teto" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
@@ -121,12 +120,18 @@
             </select>
         </div>
 
+        <!-- ========================================== -->
+        <!-- SISTEMA DE REFRIGERAÇÃO DO CHASSI (FANS)   -->
+        <!-- ========================================== -->
+
         <div class="grupo-hardware" id="grupo-fan-teto1">
             <label>Teto (Frente):</label>
             <select id="fan-teto1" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="out">120mm - Exaustão (Para fora --->)</option>
-                <option value="in">120mm - Injeção (Para dentro <---)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
 
@@ -134,8 +139,10 @@
             <label>Teto (Meio):</label>
             <select id="fan-teto2" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="out">120mm - Exaustão (Para fora --->)</option>
-                <option value="in">120mm - Injeção (Para dentro <---)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
 
@@ -143,8 +150,10 @@
             <label>Teto (Traseira):</label>
             <select id="fan-teto3" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="out">120mm - Exaustão (Para fora --->)</option>
-                <option value="in">120mm - Injeção (Para dentro <---)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
 
@@ -152,8 +161,10 @@
             <label>Ventoinha Traseira:</label>
             <select id="fan-tras" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="out">120mm - Exaustão (Para fora <---)</option>
-                <option value="in">120mm - Injeção (Para dentro --->)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
 
@@ -161,8 +172,10 @@
             <label>Frente (Topo):</label>
             <select id="fan-frente1" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="in">120mm - Injeção (Para dentro <---)</option>
-                <option value="out">120mm - Exaustão (Para fora --->)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
 
@@ -170,8 +183,10 @@
             <label>Frente (Meio):</label>
             <select id="fan-frente2" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="in">120mm - Injeção (Para dentro <---)</option>
-                <option value="out">120mm - Exaustão (Para fora --->)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
 
@@ -179,12 +194,14 @@
             <label>Frente (Baixo):</label>
             <select id="fan-frente3" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
-                <option value="in">120mm - Injeção (Para dentro <---)</option>
-                <option value="out">120mm - Exaustão (Para fora --->)</option>
+                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
+                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
+                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
+                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
             </select>
         </div>
-		
-		<div class="grupo-hardware" id="grupo-armazenamento">
+        
+        <div class="grupo-hardware" id="grupo-armazenamento">
             <label>Armazenamento:</label>
             <select id="armazenamento" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
@@ -193,17 +210,20 @@
             </select>
         </div>
     </div>
-    </div> <div id="painel-logs">
+
+    <div id="painel-logs">
         <h3>Logs do Sistema</h3>
         <div id="conteudo-logs">Aguardando seleção de componentes...</div>
     </div>
-	<div id="tooltip-3d"></div>
-	<button id="btn-power" class="btn-desligado" disabled>🔌 LIGAR PC</button>
+    <div id="tooltip-3d"></div>
+    <button id="btn-power" class="btn-desligado" disabled>🔌 LIGAR PC</button>
 
-    <script src= "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity= "sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin= "anonymous" ></script>
-    <script src= "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" integrity= "sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" crossorigin= "anonymous" ></script>
-    <script src= "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity= "sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin= "anonymous" ></script>
-   <script src= "https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js" integrity= "sha384-bXBR7wGBv71dkw7jwxbXO7wf4BrHzvRw0k9Mjn2jiYDYAhha8LYez1xkYTtHeLc4" crossorigin= "anonymous" ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js" integrity="sha384-bXBR7wGBv71dkw7jwxbXO7wf4BrHzvRw0k9Mjn2jiYDYAhha8LYez1xkYTtHeLc4" crossorigin="anonymous"></script>
+    
+    <!-- Link para o nosso super ficheiro de lógica! -->
     <script src="js/script.js"></script>
 </body>
 </html>
