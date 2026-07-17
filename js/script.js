@@ -1,6 +1,6 @@
 "use strict";
 (function() {
-	
+    
 // ==========================================================================
 // 1. CONFIGURAÇÃO BÁSICA DO AMBIENTE
 // ==========================================================================
@@ -44,6 +44,12 @@ let modeloPlacaReal = null; let modeloProcessadorReal = null; let modeloGpuReal 
 // O modelo base da fan vai servir para clonarmos para todos os slots
 let modeloFanBase = null;
 
+// 🧠 O NOVO HUB DE VENTOINHAS (Para controlar os clones .glb sem poluir a cena)
+let modelosFansInstalados = {
+    'fanTras': null, 'fanFrente1': null, 'fanFrente2': null, 'fanFrente3': null,
+    'fanTeto1': null, 'fanTeto2': null, 'fanTeto3': null
+};
+
 
 // ==========================================================================
 // 2. MAQUETE FÍSICA: GABINETE SUPERFRAME DRAKOR
@@ -81,7 +87,6 @@ const matRamPadrão = new THREE.MeshBasicMaterial({ color: 0x9b59b6, wireframe: 
 
 const ram1 = new THREE.Mesh(geoRam, matRamPadrão.clone());
 ram1.position.set(-1.05, 3.4, 0.50);
-// AQUI ESTAVA O ERRO: Faltava o idHtml: 'ram1' para ligar ao menu certo!
 ram1.userData = { tipo: 'ram', idHtml: 'ram1', nome: 'Slot RAM 1 (Canal A1)' };
 cena.add(ram1);
 
@@ -106,10 +111,8 @@ const matM2 = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true });
 const slotM2 = new THREE.Mesh(geoM2, matM2);
 
 slotM2.position.set(-1.05, 2.6, 1.0); 
-// Aproveitei e garanti que o M.2 também tem o seu ID correto
 slotM2.userData = { tipo: 'armazenamento', idHtml: 'armazenamento', nome: 'Slot M.2 NVMe' };
 cena.add(slotM2);
-
 
 const geoGpu = new THREE.BoxGeometry(1.4, 0.6, 2.6);
 const matGpu = new THREE.MeshBasicMaterial({ color: 0xe67e22, transparent: true, opacity: 0.3, wireframe: true });
@@ -133,19 +136,14 @@ slotFonte.userData = { tipo: 'fonte', nome: 'Espaço da Fonte' };
 cena.add(slotFonte);
 
 // --- SLOT DE ARMAZENAMENTO (SSD SATA) ---
-// Redesenhado para ficar fino (0.15 no eixo X) e deitado de lado
 const geoSsd = new THREE.BoxGeometry(0.15, 1.0, 0.7); 
 const matSsd = new THREE.MeshBasicMaterial({ color: 0xffa500, wireframe: true }); 
 const slotSsd = new THREE.Mesh(geoSsd, matSsd);
-
-// X = -1.35 empurra o SSD para TRÁS da bandeja da Placa-Mãe!
-// Y = 2.5 (Meia altura do gabinete) e Z = 1.0 (Alinhado com a parte de trás)
 slotSsd.position.set(-1.35, 2.5, 1.0); 
 slotSsd.userData = { tipo: 'armazenamento', nome: 'Compartimento Traseiro SSD SATA' };
 cena.add(slotSsd);
 
 // --- ____________________ ---
-
 
 const geoTeto = new THREE.BoxGeometry(2.4, 0.1, 4.5);
 const matTeto = new THREE.MeshBasicMaterial({ color: 0x9b59b6, transparent: true, opacity: 0.3, wireframe: true });
@@ -155,7 +153,7 @@ slotTeto.userData = { tipo: 'teto', nome: 'Painel Superior (Teto)' };
 cena.add(slotTeto);
 
 
-// --- VENTOINHAS INDIVIDUAIS ---
+// --- VENTOINHAS INDIVIDUAIS (ARAMES RESERVAS) ---
 const geoFan = new THREE.CylinderGeometry(0.5, 0.5, 0.15, 16);
 const criarMatFan = () => new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true, transparent: true, opacity: 0.8 });
 const listaFans = []; 
@@ -168,24 +166,24 @@ fanTras.userData = { tipo: 'fan-tras', nome: 'Ventoinha Traseira' };
 cena.add(fanTras);
 listaFans.push(fanTras);
 
-// 2. Fans Frontais (Posições ajustadas para não bater no PSU Cover)
+// 2. Fans Frontais
 const fanFrente1 = new THREE.Mesh(geoFan, criarMatFan());
 fanFrente1.rotation.x = Math.PI / 2;
-fanFrente1.position.set(0, 3.9, -2.15); // Subiu de 3.8 para 3.9
+fanFrente1.position.set(0, 3.9, -2.15);
 fanFrente1.userData = { tipo: 'fan-frente1', nome: 'Ventoinha Frontal (Topo)' };
 cena.add(fanFrente1);
 listaFans.push(fanFrente1);
 
 const fanFrente2 = new THREE.Mesh(geoFan, criarMatFan());
 fanFrente2.rotation.x = Math.PI / 2;
-fanFrente2.position.set(0, 2.8, -2.15); // Subiu de 2.7 para 2.8
+fanFrente2.position.set(0, 2.8, -2.15); 
 fanFrente2.userData = { tipo: 'fan-frente2', nome: 'Ventoinha Frontal (Meio)' };
 cena.add(fanFrente2);
 listaFans.push(fanFrente2);
 
 const fanFrente3 = new THREE.Mesh(geoFan, criarMatFan());
 fanFrente3.rotation.x = Math.PI / 2;
-fanFrente3.position.set(0, 1.7, -2.15); // Subiu de 1.6 para 1.7 (Livre da colisão!)
+fanFrente3.position.set(0, 1.7, -2.15); 
 fanFrente3.userData = { tipo: 'fan-frente3', nome: 'Ventoinha Frontal (Baixo)' };
 cena.add(fanFrente3);
 listaFans.push(fanFrente3);
@@ -229,20 +227,13 @@ radiador360.visible = false;
 radiador360.userData = { tipo: 'cooler', nome: 'Radiador (360mm)' };
 cena.add(radiador360);
 
-
-
-
-
-
 // 🔴 NOVO: O BOTÃO POWER 3D NO GABINETE
 const geoBotao = new THREE.CylinderGeometry(0.1, 0.1, 0.05, 16);
-const matBotao = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Vermelho vivo
+const matBotao = new THREE.MeshBasicMaterial({ color: 0xff0000 }); 
 const botaoPower3D = new THREE.Mesh(geoBotao, matBotao);
-botaoPower3D.position.set(0.8, 4.6, -2.1); // No teto, à direita, bem na frente
+botaoPower3D.position.set(0.8, 4.6, -2.1); 
 botaoPower3D.userData = { tipo: 'botao-power', nome: 'Botão Power do Gabinete' };
 cena.add(botaoPower3D);
-
-// Atualizamos a lista de peças no radar para incluir os radiadores e o NOVO BOTÃO!
 
 const objetosInterativos = [slotPlacaMae, slotProcessador, ram1, ram2, ram3, ram4, slotGpu, slotFonte, slotCooler, slotTeto, slotSsd, slotM2, fanTras, fanFrente1, fanFrente2, fanFrente3, fanTeto1, fanTeto2, fanTeto3, radiador240, radiador360, botaoPower3D];
 
@@ -252,38 +243,23 @@ objetosInterativos.forEach(obj => {
 });
 
 // ==========================================================================
-// 3. SENSOR DO MOUSE (MODO FOCO ATUALIZADO)
+// 3. SENSOR DO MOUSE E TOOLTIP
 // ==========================================================================
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
-
-// Variáveis para guardar onde o dedo/rato tocou primeiro
 let toqueInicialX = 0;
 let toqueInicialY = 0;
 
-// 1. Regista o ponto de partida do toque
 window.addEventListener('pointerdown', (evento) => {
     toqueInicialX = evento.clientX;
     toqueInicialY = evento.clientY;
 });
 
-// 2. Só dispara o laser quando o dedo SOLTAR a tela
 window.addEventListener('pointerup', (evento) => {
-    
-    // Calcula quantos pixels o dedo escorregou no ecrã
     const moveuX = Math.abs(evento.clientX - toqueInicialX);
     const moveuY = Math.abs(evento.clientY - toqueInicialY);
 
-    // Se moveu mais de 5 pixels, o utilizador estava a rodar o PC! 
-    // Ignora o clique e para a função por aqui.
-    if (moveuX > 5 || moveuY > 5) {
-        return; 
-    }
-
-    // ========================================================
-    // SE CHEGOU AQUI, FOI UM CLIQUE PERFEITO! 
-    // (O seu código antigo continua exatamente igual abaixo)
-    // ========================================================
+    if (moveuX > 5 || moveuY > 5) return; 
     
     const menuPrincipal = document.getElementById('menu-inferior');
     const menuFlutuante = document.getElementById('menu-flutuante');
@@ -303,45 +279,37 @@ window.addEventListener('pointerup', (evento) => {
     const intersecoes = raycaster.intersectObjects(objetosInterativos);
 
     if (intersecoes.length > 0) {
-        // --- MODO FOCO ATIVADO ---
         if (menuPrincipal) menuPrincipal.classList.add('esconder-menu'); 
         
         const objetoAtingido = intersecoes[0].object;
         const alvoId = objetoAtingido.userData.idHtml || objetoAtingido.userData.tipo;
-		const tipo = objetoAtingido.userData.tipo;
+        const tipo = objetoAtingido.userData.tipo;
 
-        // ⚡ NOVO: INTERCEPTA O CLIQUE NO BOTÃO POWER 3D
         if (tipo === 'botao-power') {
             let btnUI = document.getElementById('btn-power');
             if (btnUI && !btnUI.disabled) {
-                alternarEnergia(); // LIGA/DESLIGA O PC!
+                alternarEnergia();
             } else {
-                // EFEITO DE ERRO: O botão pisca escuro e o painel dá um "pulo"
                 botaoPower3D.material.color.setHex(0x550000);
                 setTimeout(() => botaoPower3D.material.color.setHex(0xff0000), 200);
-                
-                const logsPanel = document.getElementById('painel-logs');
                 if(logsPanel) {
                     logsPanel.style.transition = "transform 0.1s";
                     logsPanel.style.transform = "scale(1.05)";
                     setTimeout(() => logsPanel.style.transform = "scale(1)", 150);
                 }
             }
-            return; // Interrompe o código aqui para não abrir o modo foco nem menus!
+            return; 
         }
-        // 🎇 EFEITO DE LUZ: Apaga todo o PC
+
         objetosInterativos.forEach(obj => {
             obj.material.color.setHex(0x1a1a1a);
             obj.material.opacity = 0.1;
         });
-        // Acende apenas a peça clicada
         objetoAtingido.material.color.setHex(0x00ffff);
         objetoAtingido.material.opacity = 0.8;
         
         const elementoMenu = document.getElementById(`grupo-${alvoId}`);
-        if (elementoMenu) {
-            elementoMenu.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        if (elementoMenu) elementoMenu.scrollIntoView({ behavior: 'smooth', block: 'center' });
         
         document.getElementById('menu-titulo').innerText = objetoAtingido.userData.nome;
         const selectFlutuante = document.getElementById('select-flutuante');
@@ -367,11 +335,9 @@ window.addEventListener('pointerup', (evento) => {
         }
 
     } else {
-        // --- MODO VISÃO GERAL ---
         if (menuPrincipal) menuPrincipal.classList.remove('esconder-menu'); 
         if (menuFlutuante) menuFlutuante.style.display = 'none'; 
         
-        // 🎇 RESTAURA AS LUZES
         objetosInterativos.forEach(obj => {
             obj.material.color.setHex(obj.userData.corOriginal);
             obj.material.opacity = obj.userData.opacidadeOriginal;
@@ -387,59 +353,38 @@ document.getElementById('select-flutuante').addEventListener('change', function(
         selectOriginal.value = this.value; 
         verificarCompatibilidade(); 
     }
-}); // <-- AQUI FECHA O EVENTO DO MENU FLUTUANTE!
+});
 
-// ==========================================================================
-// --- TOOLTIP (HOVER) DO MOUSE (Agora independente!) ---
-// ==========================================================================
 const tooltip3D = document.getElementById('tooltip-3d');
-
 window.addEventListener('mousemove', (evento) => {
-    // 1. Converte a posição do rato para o formato do Motor 3D
     mouse.x = (evento.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(evento.clientY / window.innerHeight) * 2 + 1;
-
-    // 2. Trava o laser a partir da câmera
     raycaster.setFromCamera(mouse, camera);
 
-    // 3. Se o menu de opções estiver aberto, esconde o tooltip para não poluir o ecrã
     if (typeof menuFlutuante !== 'undefined' && menuFlutuante && menuFlutuante.style.display === 'block') {
         if (tooltip3D) tooltip3D.style.display = 'none';
         return;
     }
 
-    // 4. Verifica em que peça o laser está a bater
     const intersecoes = raycaster.intersectObjects(objetosInterativos);
-
     if (intersecoes.length > 0) {
         const objetoAtingido = intersecoes[0].object;
-        
-        // Se a peça tiver um nome configurado, exibe a caixa!
         if (objetoAtingido.userData.nome && tooltip3D) {
             tooltip3D.innerText = objetoAtingido.userData.nome;
             tooltip3D.style.display = 'block';
-            
-            // Posiciona o tooltip 15px ao lado e abaixo do rato para não o tapar
             tooltip3D.style.left = (evento.clientX + 15) + 'px';
             tooltip3D.style.top = (evento.clientY + 15) + 'px';
-            
-            document.body.style.cursor = 'pointer'; // Muda a setinha para a "Mão" de clicar
+            document.body.style.cursor = 'pointer';
         }
     } else {
-        // Se bateu no vazio, esconde o tooltip
         if (tooltip3D) tooltip3D.style.display = 'none';
-        document.body.style.cursor = 'default'; // Volta à setinha normal
+        document.body.style.cursor = 'default'; 
     }
-	
-	
-	
 });
 
 
-
-
 // ==========================================================================
-// 4. LÓGICA, COMPATIBILIDADE E ANÁLISE DE FREQUÊNCIA (MHz)
+// 4. LÓGICA, COMPATIBILIDADE E SISTEMA DE VENTOINHAS (.GLB)
 // ==========================================================================
 function verificarCompatibilidade() {
     let placaMaeValue = document.getElementById('placa-mae') ? document.getElementById('placa-mae').value : "";
@@ -448,12 +393,10 @@ function verificarCompatibilidade() {
     let fonte = document.getElementById('fonte') ? document.getElementById('fonte').value : "";
     let armazenamento = document.getElementById('armazenamento') ? document.getElementById('armazenamento').value : "";
     
-    // Captura dos Slots Individuais de RAM
     let vRam1 = document.getElementById('ram1') ? document.getElementById('ram1').value : "";
     let vRam2 = document.getElementById('ram2') ? document.getElementById('ram2').value : "";
     let vRam3 = document.getElementById('ram3') ? document.getElementById('ram3').value : "";
     let vRam4 = document.getElementById('ram4') ? document.getElementById('ram4').value : "";
-    
     let totalRamNum = (vRam1 !== "" ? 1 : 0) + (vRam2 !== "" ? 1 : 0) + (vRam3 !== "" ? 1 : 0) + (vRam4 !== "" ? 1 : 0);
 
     let selectCooler = document.getElementById('cooler');
@@ -466,16 +409,16 @@ function verificarCompatibilidade() {
     // --- CÉREBRO DOS RADIADORES E TETO ---
     if (cooler === 'wc240') {
         if (selectTeto) { selectTeto.innerHTML = '<option value="radiador">[ Ocupado pelo Radiador 240mm ]</option>'; selectTeto.disabled = true; }
-        if (selectTeto1) { selectTeto1.value = "out"; selectTeto1.disabled = true; selectTeto1.parentElement.style.display = 'block'; }
-        if (selectTeto2) { selectTeto2.value = "out"; selectTeto2.disabled = true; selectTeto2.parentElement.style.display = 'block'; }
+        if (selectTeto1) { selectTeto1.value = "risemode_out"; selectTeto1.disabled = true; selectTeto1.parentElement.style.display = 'block'; }
+        if (selectTeto2) { selectTeto2.value = "risemode_out"; selectTeto2.disabled = true; selectTeto2.parentElement.style.display = 'block'; }
         if (selectTeto3) { selectTeto3.value = ""; selectTeto3.parentElement.style.display = 'none'; }
         fanTeto1.visible = true; fanTeto2.visible = true; fanTeto3.visible = false;
         radiador240.visible = true; radiador360.visible = false;
     } else if (cooler === 'wc360') {
         if (selectTeto) { selectTeto.innerHTML = '<option value="radiador">[ Ocupado pelo Radiador 360mm ]</option>'; selectTeto.disabled = true; }
-        if (selectTeto1) { selectTeto1.value = "out"; selectTeto1.disabled = true; selectTeto1.parentElement.style.display = 'block'; }
-        if (selectTeto2) { selectTeto2.value = "out"; selectTeto2.disabled = true; selectTeto2.parentElement.style.display = 'block'; }
-        if (selectTeto3) { selectTeto3.value = "out"; selectTeto3.disabled = true; selectTeto3.parentElement.style.display = 'block'; }
+        if (selectTeto1) { selectTeto1.value = "risemode_out"; selectTeto1.disabled = true; selectTeto1.parentElement.style.display = 'block'; }
+        if (selectTeto2) { selectTeto2.value = "risemode_out"; selectTeto2.disabled = true; selectTeto2.parentElement.style.display = 'block'; }
+        if (selectTeto3) { selectTeto3.value = "risemode_out"; selectTeto3.disabled = true; selectTeto3.parentElement.style.display = 'block'; }
         fanTeto1.visible = true; fanTeto2.visible = true; fanTeto3.visible = true;
         radiador240.visible = false; radiador360.visible = true;
     } else {
@@ -518,34 +461,36 @@ function verificarCompatibilidade() {
     let errosDeMontagem = [];
     let alertasDeMontagem = [];
 
-    // Descobrir as propriedades do soquete da Placa-Mãe
     let socketPlaca = "", tamanhoPlaca = "";
     if (placaMaeValue !== "") {
         let partes = placaMaeValue.split("-");
-        socketPlaca = partes[0]; // ex: "am4", "lga1700"
+        socketPlaca = partes[0]; 
         tamanhoPlaca = partes[1];
     }
 
-    // --- CARREGAMENTOS 3D DOS SEUS ARQUIVOS (.GLB) ---
+   // --- CARREGAMENTOS 3D DOS SEUS ARQUIVOS (.GLB) ---
+    
     // 1. A Placa-Mãe (placa.glb)
     if (placaMaeValue !== "" && modeloPlacaReal === null) {
         telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; 
         carregador.load('modelos/placa.glb', function(gltf) {
             modeloPlacaReal = gltf.scene; 
             
-            // Centraliza o modelo no exato local da caixa azul
-            modeloPlacaReal.position.copy(slotPlacaMae.position); 
+            // ESCALA DA PLACA-MÃE
+            let s = 0.8; 
+            modeloPlacaReal.scale.set(s, s, s);
             
-            // ⚠️ ROTAÇÃO: Se a placa ficar deitada ou virada para trás, altere aqui.
-            // Math.PI / 2 equivale a rodar 90 graus. Tente -Math.PI / 2 se ficar invertida.
+            // ROTAÇÃO
             modeloPlacaReal.rotation.set(0, Math.PI / 2, 0); 
             
-            // ⚠️ ESCALA: Se ela aparecer gigante, mude para 0.1 ou 0.05. 
-            // Se ela ficar invisível de tão pequena, mude para 10 ou 50.
-            modeloPlacaReal.scale.set(1, 1, 1); 
+            // POSIÇÃO 
+            let placaX = -1.05; 
+            let placaY = 3.4;   
+            let placaZ = 0.5;   
+            modeloPlacaReal.position.set(placaX, placaY, placaZ); 
             
             cena.add(modeloPlacaReal); 
-            slotPlacaMae.material.opacity = 0; // Esconde a caixa azul fantasma
+            slotPlacaMae.material.opacity = 0; 
         });
     }
 
@@ -554,11 +499,24 @@ function verificarCompatibilidade() {
         telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
         carregador.load('modelos/processador.glb', function(gltf) {
             modeloProcessadorReal = gltf.scene; 
-            modeloProcessadorReal.position.set(-1.10, 3.4, 1.0); 
-            modeloProcessadorReal.rotation.set(0, Math.PI / 2, 0); 
-            modeloProcessadorReal.scale.set(0.4, 0.4, 0.4); 
+            
+            // ESCALA (Acabando com o "tapete")
+            let sProc = 0.80; 
+            modeloProcessadorReal.scale.set(sProc, sProc, sProc); 
+            
+            // ROTAÇÃO (O duplo giro que o deitou na posição certa)
+            modeloProcessadorReal.rotation.set(1.55, 1.5, 0); 
+            modeloProcessadorReal.rotateX(Math.PI / 2); 
+            modeloProcessadorReal.rotateY(Math.PI / 2); 
+            
+            // POSIÇÃO 
+            let posX = -0.90; 
+            let posY = 3.5;   
+            let posZ = 1.0;   
+            modeloProcessadorReal.position.set(posX, posY, posZ); 
+            
             cena.add(modeloProcessadorReal); 
-            slotProcessador.material.opacity = 0; // Esconde a caixa vermelha
+            slotProcessador.material.opacity = 0; 
         });
     }
 
@@ -567,16 +525,104 @@ function verificarCompatibilidade() {
         telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
         carregador.load('modelos/placavideo.glb', function(gltf) {
             modeloGpuReal = gltf.scene; 
-            modeloGpuReal.position.copy(slotGpu.position); 
-            // Ajuste estes valores de escala se a placa vier gigante ou minúscula
-            modeloGpuReal.scale.set(1, 1, 1); 
+            
+            // ESCALA (O raio encolhedor)
+            let sGpu = 0.30; 
+            modeloGpuReal.scale.set(sGpu, sGpu, sGpu);
+
+            // ROTAÇÃO (Barriga para baixo)
+            modeloGpuReal.rotation.set(0, 0, 0); 
+            modeloGpuReal.rotateX(Math.PI / 2); 
+            modeloGpuReal.rotateZ(Math.PI / 2);
+
+            // POSIÇÃO 
+            let gpuX = 0;  
+            let gpuY = 2.2;   
+            let gpuZ = 0.80;   
+            modeloGpuReal.position.set(gpuX, gpuY, gpuZ); 
+            
             cena.add(modeloGpuReal); 
-            slotGpu.material.opacity = 0; // Esconde a caixa laranja
+            slotGpu.material.opacity = 0; 
         });
     }
 
-    // --- INTERPRETADOR TÉCNICO DAS MEMÓRIAS RAM ---
-    // Mapeamento de limites de hardware reais com base no Ecossistema/Soquete escolhido
+    // --- 🎯 O NOVO CÉREBRO DAS VENTOINHAS (.GLB) ---
+    // Fixamos o array para não rebentar com o código ao procurar pela palavra "in" no menu
+    let fansIn = 0, fansOut = 0, totalFans = 0;
+    [fTras, fFrente1, fFrente2, fFrente3, fTeto1, fTeto2, fTeto3].forEach(f => { 
+        if (f.includes('in')) fansIn++; 
+        if (f.includes('out')) fansOut++; 
+        if (f !== "") totalFans++; 
+    });
+
+    let precisaDeFan = totalFans > 0;
+
+    // A função mestre que clona a fan original e distribui pelos arames azuis
+    function distribuirFans3D() {
+        if (!modeloFanBase) return;
+
+        function aplicarFan(chave, arame, valorMenu, localMontagem) {
+            // 1. Limpa o modelo 3D antigo se existir
+            if (modelosFansInstalados[chave]) {
+                cena.remove(modelosFansInstalados[chave]);
+                modelosFansInstalados[chave] = null;
+            }
+
+            // 2. Se a pessoa tirou a fan no menu, o arame azul volta a aparecer
+            if (valorMenu === "" || arame.visible === false) {
+                arame.material.opacity = 0.8;
+                return;
+            }
+
+            // 3. Clona o modelo base
+            let novaFan = modeloFanBase.clone();
+            novaFan.position.copy(arame.position);
+            novaFan.scale.set(0.3, 0.3, 0.3); // Calibrado para o seu gabinete
+            novaFan.rotation.set(0, 0, 0); // Zera tudo
+
+            // 4. Lógica de Rotação (Parede vs Teto)
+            if (localMontagem === 'teto') {
+                novaFan.rotateX(Math.PI / 2); // Deita a ventoinha contra o teto
+            } else {
+                // Se for frente ou trás, não precisa rodar o X, ela já nasce de pé.
+            }
+
+            // 5. Lógica de Fluxo de Ar (Exaustão vs Injeção)
+            if (valorMenu.includes("out")) {
+                novaFan.rotateY(Math.PI); // Dá meia volta (180 graus) para jogar vento para fora
+            } else if (valorMenu.includes("in")) {
+                novaFan.rotateY(0); // Fica virada de frente para chupar o vento
+            }
+
+            cena.add(novaFan);
+            modelosFansInstalados[chave] = novaFan;
+
+            // 6. Esconde o arame azul!
+            arame.material.opacity = 0;
+        }
+
+        aplicarFan('fanTras', fanTras, fTras, 'parede');
+        aplicarFan('fanFrente1', fanFrente1, fFrente1, 'parede');
+        aplicarFan('fanFrente2', fanFrente2, fFrente2, 'parede');
+        aplicarFan('fanFrente3', fanFrente3, fFrente3, 'parede');
+        aplicarFan('fanTeto1', fanTeto1, fTeto1, 'teto');
+        aplicarFan('fanTeto2', fanTeto2, fTeto2, 'teto');
+        aplicarFan('fanTeto3', fanTeto3, fTeto3, 'teto');
+    }
+
+    // Se precisamos de fans e ainda não as baixámos:
+    if (precisaDeFan && modeloFanBase === null) {
+        telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
+        carregador.load('modelos/fan.glb', function(gltf) {
+            modeloFanBase = gltf.scene;
+            distribuirFans3D(); // Assim que terminar o download, distribui as cópias
+        });
+    } else if (modeloFanBase !== null) {
+        // Se o ficheiro já estava em memória, distribui logo! (Ultra rápido)
+        distribuirFans3D();
+    }
+    // --------------------------------------------------
+
     let ddrSuportadoPelaPlaca = "ddr5";
     let mhzMaximoDaPlaca = 5600;
     let mhzMaximoNativoDoCpu = 5200;
@@ -599,7 +645,6 @@ function verificarCompatibilidade() {
     let erroMhzExcedidoPlaca = false;
     let alertaMhzOverclockCpu = false;
 
-    // Função interna para pintar as memórias e extrair as especificações
     function processarSlotRam(pente, valor) {
         if (valor === "") {
             pente.material.wireframe = true; pente.material.color.setHex(0x9b59b6);
@@ -608,31 +653,28 @@ function verificarCompatibilidade() {
         }
         pente.material.wireframe = false;
         
-        let info = valor.split("-"); // ex: ["ddr4", "8gb", "3200"]
+        let info = valor.split("-"); 
         let geracao = info[0];
         let mhz = parseInt(info[2]);
 
-        // Verifica se o usuário está misturando pentes diferentes nos slots
         if (ddrDetectado !== "" && ddrDetectado !== geracao) misturouGeracao = true;
         if (mhzDetectado !== 0 && mhzDetectado !== mhz) misturouFrequencia = true;
         ddrDetectado = geracao;
         mhzDetectado = mhz;
 
-        // Pintura estética baseada no modelo técnico
         if (geracao === "ddr4") {
-            pente.material.color.setHex(0x2c3e50); // Cinza Escuro Metálico
+            pente.material.color.setHex(0x2c3e50); 
             pente.userData.modelo = "ddr4";
         } else {
             if (mhz >= 6000) {
-                pente.material.color.setHex(0x9b59b6); // Base para o efeito RGB dinâmico
+                pente.material.color.setHex(0x9b59b6); 
                 pente.userData.modelo = "rgb";
             } else {
-                pente.material.color.setHex(0xecf0f1); // Branco Neve para DDR5 padrão
+                pente.material.color.setHex(0xecf0f1); 
                 pente.userData.modelo = "ddr5";
             }
         }
 
-        // Valida contra as especificações da Placa e Processador
         if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdrIncompativel = true;
         if (placaMaeValue !== "" && mhz > mhzMaximoDaPlaca) erroMhzExcedidoPlaca = true;
         if (processador !== "" && mhz > mhzMaximoNativoDoCpu && mhz <= mhzMaximoDaPlaca) alertaMhzOverclockCpu = true;
@@ -640,8 +682,6 @@ function verificarCompatibilidade() {
 
     processarSlotRam(ram1, vRam1); processarSlotRam(ram2, vRam2); processarSlotRam(ram3, vRam3); processarSlotRam(ram4, vRam4);
 
-// --- PREENCHIMENTO VISUAL (TORNA AS PEÇAS SÓLIDAS QUANDO INSTALADAS) ---
-    // Ajustes do SSD
     slotSsd.material.wireframe = (armazenamento !== "ssd-sata");
     if(slotM2) slotM2.material.wireframe = (armazenamento !== "ssd-m2");
     if (slotPlacaMae) slotPlacaMae.material.wireframe = (placaMaeValue === "");
@@ -649,25 +689,20 @@ function verificarCompatibilidade() {
     if (slotGpu) slotGpu.material.wireframe = (gpu === "");
     if (slotFonte) slotFonte.material.wireframe = (fonte === "");
     if (slotCooler) slotCooler.material.wireframe = (cooler === "");
-	// Forçando a pintura dos Radiadores com cor mais CLARA para destacar:
+    
     let usaWC240 = (cooler === "wc240");
     let usaWC360 = (cooler === "wc360");
-    let usaWaterCooler = (usaWC240 || usaWC360);
 
     if (radiador240) {
         radiador240.material.wireframe = !usaWC240; 
-        if (usaWC240) radiador240.material.color.setHex(0xbdc3c7); // Prata Claro (Destaque)
+        if (usaWC240) radiador240.material.color.setHex(0xbdc3c7); 
     }
     
     if (radiador360) {
         radiador360.material.wireframe = !usaWC360;
-        if (usaWC360) radiador360.material.color.setHex(0xbdc3c7); // Prata Claro (Destaque)
+        if (usaWC360) radiador360.material.color.setHex(0xbdc3c7); 
     }
-	
-	
-	
 
-    // --- ADICIONAR ERROS DE RAM NO PAINEL ---
     if (misturouGeracao || misturouFrequencia) {
         errosDeMontagem.push("Incompatibilidade Crítica de RAM: Não misture frequências (MHz) ou gerações (DDR4/DDR5) diferentes. Isso causa queima de circuitos ou instabilidade fatal.");
     }
@@ -681,13 +716,11 @@ function verificarCompatibilidade() {
         alertasDeMontagem.push(`Aviso de Overclock (XMP/EXPO): A velocidade de ${mhzDetectado}MHz está acima do suporte padrão do processador (${mhzMaximoDaPlaca === 3600 ? '3200MHz' : '5200MHz'}). O computador vai ligar, mas operará em overclock estável através do perfil XMP/EXPO na BIOS.`);
     }
 
-    // Regras de Performance (Canais de memória)
     if (totalRamNum > 0 && !misturouGeracao && !misturouFrequencia) {
         if (totalRamNum === 1) alertasDeMontagem.push("Gargalo de Banda: Apenas 1 canal ativo (Single Channel). Seu processador perderá até 30% de desempenho em jogos.");
         if (totalRamNum === 2 && (vRam2 === "" || vRam4 === "")) alertasDeMontagem.push("Otimização Pendente: Para habilitar o Dual Channel verdadeiro com 2 pentes, mude-os para os slots alternados 2 e 4.");
     }
 
-    // --- RESTO DAS VALIDAÇÕES DO COMPUTADOR ---
     if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. O CPU não encaixa.");
     if (tamanhoPlaca === "eatx") errosDeMontagem.push("Falta de Espaço Crítica: Placas E-ATX não cabem fisicamente neste chassi.");
     
@@ -699,7 +732,6 @@ function verificarCompatibilidade() {
     }
     if (processador !== "" && cooler === "") errosDeMontagem.push("Risco de Superaquecimento: Falta refrigeração no CPU.");
 
-    // GPU Clearance Fixo
     if (gpu === "rx9060xt") slotGpu.scale.set(1, 1, 1);
     else if (gpu === "rtx5070ti") slotGpu.scale.set(1, 1, 1.35);
     else if (gpu === "rx9070xt") slotGpu.scale.set(1, 1, 1.7);
@@ -708,15 +740,12 @@ function verificarCompatibilidade() {
     if (gpu === "rx9070xt") errosDeMontagem.push("Erro de Gabinete Pequeno: A RX 9070 XT colide fisicamente com a ventoinha frontal pré-instalada.");
     else if (gpu === "rtx5070ti") alertasDeMontagem.push("Aviso de Espaço (Clearance): A RTX 5070 Ti ficará a poucos milímetros da ventoinha frontal.");
 
-    // Fluxo de ar resumido
-    let fansIn = 0, fansOut = 0, totalFans = 0;
-    [fTras, fFrente1, fFrente2, fFrente3, fTeto1, fTeto2, fTeto3].forEach(f => { if (f === 'in') fansIn++; if (f === 'out') fansOut++; if (f !== "") totalFans++; });
     if (totalFans > 0) {
-        if (fTras === 'in') errosDeMontagem.push("Erro: A ventoinha traseira deve ser Exaustor.");
-        if (fFrente1 === 'out' || fFrente2 === 'out' || fFrente3 === 'out') errosDeMontagem.push("Erro: Ventoinhas frontais devem ser Injeção.");
+        // Agora as opções chamam-se risemode_in e risemode_out, então verificamos .includes()
+        if (fTras.includes('in')) errosDeMontagem.push("Erro: A ventoinha traseira deve ser Exaustor.");
+        if (fFrente1.includes('out') || fFrente2.includes('out') || fFrente3.includes('out')) errosDeMontagem.push("Erro: Ventoinhas frontais devem ser Injeção.");
     }
 
-    // Verificação de peças essenciais para boot
     let faltaHardwareEssencial = (placaMaeValue === "" || processador === "" || totalRamNum === 0 || fonte === "" || armazenamento === "");
     if (faltaHardwareEssencial && (placaMaeValue !== "" || processador !== "" || totalRamNum > 0 || gpu !== "" || fonte !== "" || cooler !== "" || armazenamento !== "" || totalFans > 0)) {
         let listaFaltantes = [];
@@ -764,27 +793,26 @@ window.verificarCompatibilidade = verificarCompatibilidade;
 let sistemaLigado = false;
 let tempoRGB = 0; 
 
-// A FUNÇÃO MESTRE QUE LIGA O PC (Pode ser chamada pelo HTML ou pelo 3D)
 function alternarEnergia() {
     let btnUI = document.getElementById('btn-power');
-    if (btnUI && btnUI.disabled) return; // Trava de segurança
+    if (btnUI && btnUI.disabled) return; 
     
     sistemaLigado = !sistemaLigado; 
     
     if (sistemaLigado) {
         if(btnUI) { btnUI.className = "btn-ligado"; btnUI.innerText = "🔴 DESLIGAR PC"; }
-        botaoPower3D.material.color.setHex(0x1abc9c); // O botão 3D fica Ciano/Verde!
+        botaoPower3D.material.color.setHex(0x1abc9c); 
         
         cena.background = new THREE.Color(0x050505);
         objetosInterativos.forEach(obj => {
-            if (obj !== botaoPower3D) { // Não altera o wireframe do botão
+            if (obj !== botaoPower3D) { 
                 obj.material.wireframe = false;
                 obj.material.opacity = 0.95;
             }
         });
     } else {
         if(btnUI) { btnUI.className = "btn-pronto"; btnUI.innerText = "⚡ LIGAR PC"; }
-        botaoPower3D.material.color.setHex(0xff0000); // O botão 3D volta a ser Vermelho!
+        botaoPower3D.material.color.setHex(0xff0000); 
         
         cena.background = new THREE.Color(0x000000); 
         objetosInterativos.forEach(obj => {
@@ -797,7 +825,6 @@ function alternarEnergia() {
     }
 }
 
-// O botão do HTML ativa a função
 document.getElementById('btn-power').addEventListener('click', alternarEnergia);
 
 window.addEventListener('resize', () => {
@@ -822,7 +849,7 @@ function animar() {
                 fan.material.color.setRGB(r, g, b); 
             }
         });
-        // Efeito de energia (Só pisca RGB se o pente for da categoria RGB!)
+        
         [ram1, ram2, ram3, ram4].forEach(pente => {
             if (!pente.material.wireframe && pente.userData.modelo === 'rgb') { 
                 pente.material.color.setRGB(r, g, b); 
@@ -839,7 +866,6 @@ function animar() {
     renderizador.render(cena, camera);
 }
 
-
 // ==========================================================================
 // 6. BOTÃO DE ESCONDER/MOSTRAR MENU (MODO CINEMA)
 // ==========================================================================
@@ -848,12 +874,11 @@ const menuPrincipalUI = document.getElementById('menu-inferior');
 
 if (btnToggle && menuPrincipalUI) {
     btnToggle.addEventListener('click', (evento) => {
-        evento.stopPropagation(); // Impede que o clique ative o laser 3D das peças sem querer
+        evento.stopPropagation(); 
         
         menuPrincipalUI.classList.toggle('esconder-manual');
         btnToggle.classList.toggle('botao-descido');
         
-        // Alterna o texto e a seta
         if (menuPrincipalUI.classList.contains('esconder-manual')) {
             btnToggle.innerHTML = '▲ Mostrar Menu';
         } else {
