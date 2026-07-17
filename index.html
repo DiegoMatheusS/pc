@@ -28,11 +28,21 @@
     <button id="btn-toggle-menu">▼ Esconder Menu</button>
     
     <div id="menu-inferior">
+	
+		<div id="grupo-gabinete" class="grupo-hardware">
+            <label>Tamanho do Gabinete:</label>
+            <select id="gabinete" onchange="verificarCompatibilidade()">
+                <option value="mid-tower">Mid-Tower (Padrão - Pichau HX710L mATX, Mini-ITX)</option>
+                <option value="compacto">Compacto (Mini-ITX / mATX)</option>
+                <option value="full-tower">Full-Tower (Gigante - Suporta E-ATX)</option>
+            </select>
+        </div>
         
         <div id="grupo-placa-mae" class="grupo-hardware">
             <label>Placa-Mãe:</label>
             <select id="placa-mae" onchange="verificarCompatibilidade()">
                 <option value="">-- Selecione --</option>
+                <option value="am4-matx">ASUS B550 (AM4 - Micro-ATX)</option>
                 <option value="am5-atx">Gigabyte B650 (AM5 - ATX Padrão)</option>
                 <option value="lga1700-matx">Asus Z790M (LGA1700 - Micro-ATX)</option>
                 <option value="am5-eatx">ASRock X670E Taichi (AM5 - E-ATX)</option>
@@ -43,6 +53,7 @@
             <label>Processador (CPU):</label>
             <select id="processador" onchange="verificarCompatibilidade()">
                 <option value="">-- Selecione --</option>
+                <option value="am4">AMD Ryzen 7 5700X</option>
                 <option value="am5">AMD Ryzen 5 7600X</option>
                 <option value="lga1700">Intel Core i5-13600K</option>
             </select>
@@ -106,7 +117,7 @@
             <select id="cooler" onchange="verificarCompatibilidade()">
                 <option value="">-- Vazio --</option>
                 <option value="aircooler">Air Cooler Torre</option>
-                <option value="wc240">Water Cooler (240mm - 2 Fans)</option>
+                <option value="wc240">Water Cooler Sangue Frio 2 (240mm - 2 Fans)</option>
                 <option value="wc360">Water Cooler Extremo (360mm - 3 Fans)</option>
             </select>
         </div>
@@ -210,11 +221,14 @@
             </select>
         </div>
     </div>
-
-    <div id="painel-logs">
+	<div id="painel-logs">
         <h3>Logs do Sistema</h3>
         <div id="conteudo-logs">Aguardando seleção de componentes...</div>
     </div>
+    
+    <!-- 🎯 NOVO: Painel de Consumo movido para fora dos logs -->
+    <div id="consumo-watts">Consumo: 0 W</div>
+
     <div id="tooltip-3d"></div>
     <button id="btn-power" class="btn-desligado" disabled>🔌 LIGAR PC</button>
 

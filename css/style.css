@@ -5,7 +5,7 @@ html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden; 
-    background-color: #b8b8b9; 
+    background-color: #0f1115; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #e3e6ed;
 }
@@ -20,7 +20,7 @@ html, body {
    ========================================================================== */
 #menu-flutuante {
     position: absolute;
-    background: rgba(145, 145, 145, 0.95);
+    background: rgba(15, 15, 15, 0.95);
     border: 1px solid #00ffff;
     color: white; padding: 12px;
     border-radius: 8px; pointer-events: auto;
@@ -122,4 +122,25 @@ html, body {
     .log-erro, .log-alerta, .log-sucesso { font-size: 9px !important; padding: 4px !important; margin-bottom: 4px !important; line-height: 1.1 !important; }
     #menu-flutuante { min-width: 180px !important; padding: 10px !important; }
     #btn-toggle-menu { bottom: 23vh !important; }
+}
+
+
+/* --- PAINEL DE CONSUMO FLUTUANTE HUD --- */
+#consumo-watts {
+    position: fixed;
+    /* 🚀 O SEGREDO ESTÁ AQUI: Aumentámos de 20px para 300px para o levantar! */
+    bottom: 300px; 
+    right: 20px;  
+    
+    background-color: rgba(20, 20, 20, 0.85); 
+    border-left: 4px solid #f1c40f; 
+    color: #f1c40f; 
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 4px;
+    z-index: 9999; /* Aumentei o z-index para garantir que não fica atrás de nada */
+    display: none; 
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
 }

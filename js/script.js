@@ -46,6 +46,7 @@ const carregador = new THREE.GLTFLoader(gerenciador);
 let modeloPlacaReal = null; let modeloProcessadorReal = null; let modeloGpuReal = null; 
 // O modelo base da fan vai servir para clonarmos para todos os slots
 let modeloFanBase = null;
+let carregandoFan = false; // 🚦 NOVO: Semáforo para não deixar o sistema engasgar
 
 // 🧠 O NOVO HUB DE VENTOINHAS (Para controlar os clones .glb sem poluir a cena)
 let modelosFansInstalados = {
@@ -392,11 +393,13 @@ window.addEventListener('mousemove', (evento) => {
 // 4. LÓGICA, COMPATIBILIDADE E SISTEMA DE VENTOINHAS (.GLB)
 // ==========================================================================
 function verificarCompatibilidade() {
+	let gabineteValue = document.getElementById('gabinete') ? document.getElementById('gabinete').value : "mid-tower";
     let placaMaeValue = document.getElementById('placa-mae') ? document.getElementById('placa-mae').value : "";
     let processador = document.getElementById('processador') ? document.getElementById('processador').value : "";
     let gpu = document.getElementById('gpu') ? document.getElementById('gpu').value : "";
     let fonte = document.getElementById('fonte') ? document.getElementById('fonte').value : "";
     let armazenamento = document.getElementById('armazenamento') ? document.getElementById('armazenamento').value : "";
+
     
     let vRam1 = document.getElementById('ram1') ? document.getElementById('ram1').value : "";
     let vRam2 = document.getElementById('ram2') ? document.getElementById('ram2').value : "";
@@ -466,11 +469,47 @@ function verificarCompatibilidade() {
     let errosDeMontagem = [];
     let alertasDeMontagem = [];
 
+    // 1. PRIMEIRO: Descobrir qual é o tamanho da placa selecionada no menu!
     let socketPlaca = "", tamanhoPlaca = "";
     if (placaMaeValue !== "") {
         let partes = placaMaeValue.split("-");
         socketPlaca = partes[0]; 
-        tamanhoPlaca = partes[1];
+        tamanhoPlaca = partes[1]; // O sistema agora sabe se é atx, matx ou eatx
+    }
+
+    // =======================================================
+    // 📏 MOTOR DE FÍSICA E DIMENSÕES (O GABINETE)
+    // =======================================================
+    
+    // O Processador, RAM e SSD entram sempre, pois são peças pequenas!
+    // Mas as peças grandes sofrem bloqueio dependendo do Gabinete:
+
+    if (gabineteValue === "compacto") {
+        // Gabinete Pequeno: Sofre muito com peças grandes
+        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") {
+            errosDeMontagem.push(`Erro de Chassi: Uma placa-mãe ${tamanhoPlaca.toUpperCase()} é muito alta e larga. Ela não entra num gabinete Compacto.`);
+        }
+        if (gpu === "rtx5070ti" || gpu === "rx9070xt") {
+            errosDeMontagem.push("Colisão Física: Esta Placa de Vídeo é massiva! Ela vai bater na fonte ou impedir a tampa de vidro de fechar num chassi Compacto.");
+        }
+        if (cooler === "wc360") {
+            errosDeMontagem.push("Erro de Teto: Um radiador de 360mm é comprido demais para o teto de um gabinete Compacto (limite máximo é 240mm).");
+        }
+        
+    } else if (gabineteValue === "mid-tower") {
+        // Gabinete Pichau HX710L (Limite: mATX / Mini-ITX)
+        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") {
+            errosDeMontagem.push("Falta de Espaço: O Pichau HX710L suporta no máximo placas Micro-ATX (mATX). Uma placa ATX ou E-ATX não vai caber neste aquário.");
+        }
+        if (gpu === "rx9070xt") {
+            errosDeMontagem.push("Erro de Comprimento: A RX 9070 XT colide fisicamente com as ventoinhas frontais neste chassi.");
+        }
+        
+    } else if (gabineteValue === "full-tower") {
+        // Gabinete Gigante: Cabe absolutamente tudo!
+        if (tamanhoPlaca === "matx") {
+            alertasDeMontagem.push("Estética: Você colocou uma placa-mãe minúscula (Micro-ATX) num gabinete gigante (Full-Tower). Vai sobrar muito espaço vazio, mas funciona perfeitamente.");
+        }
     }
 
    // --- CARREGAMENTOS 3D DOS SEUS ARQUIVOS (.GLB) ---
@@ -615,30 +654,36 @@ function verificarCompatibilidade() {
         aplicarFan('fanTeto3', fanTeto3, fTeto3, 'teto');
     }
 
-    // CARREGAMENTO DA FAN BASE
-    if (precisaDeFan && modeloFanBase === null) {
+    // =======================================================
+    // 🛡️ CARREGAMENTO SEGURO DA FAN BASE
+    // =======================================================
+    if (precisaDeFan && modeloFanBase === null && !carregandoFan) {
+        carregandoFan = f; // 🔴 Fecha o semáforo
         telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
+        
         carregador.load('modelos/fan.glb', function(gltf) {
-            
-            // 🚨 O GRANDE TRUQUE DO PIVÔ: Centralizar o modelo à força!
             let modeloOriginal = gltf.scene;
             
-            // 1. Calcula o centro de massa da ventoinha original
+            // Centralização perfeita
             let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
-            let centroReal = caixaContorno.getCenter(new THREE.Vector3());
+            let centroReal = new THREE.Vector3();
+            caixaContorno.getCenter(centroReal);
+            modeloOriginal.position.set(-centroReal.x, -centroReal.y, -centroReal.z); 
             
-            // 2. Empurra a ventoinha de volta para o Zero Absoluto
-            modeloOriginal.position.sub(centroReal); 
-            
-            // 3. Cria uma "caixa vazia" e coloca a ventoinha perfeitamente no meio
             let envelope = new THREE.Group();
             envelope.add(modeloOriginal);
             
-            // 4. O nosso modelo base agora é este envelope perfeitamente centrado!
             modeloFanBase = envelope; 
+            carregandoFan = false; // 🟢 Abre o semáforo
             
+            console.log("✅ Ventoinha 3D carregada com sucesso!");
             distribuirFans3D(); 
+            
+        }, undefined, function(erro) {
+            console.error("❌ ERRO: O ficheiro fan.glb não foi encontrado na pasta 'modelos/'", erro);
+            carregandoFan = false; // Abre o semáforo mesmo se der erro
         });
+        
     } else if (modeloFanBase !== null) {
         distribuirFans3D();
     }
@@ -745,11 +790,56 @@ function verificarCompatibilidade() {
     if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. O CPU não encaixa.");
     if (tamanhoPlaca === "eatx") errosDeMontagem.push("Falta de Espaço Crítica: Placas E-ATX não cabem fisicamente neste chassi.");
     
-    if (gpu !== "") {
-        let limiteFonte = (fonte === "550w") ? 550 : (fonte === "850w" ? 850 : 0);
-        let consumoGpu = (gpu === "rtx5070ti") ? 300 : (gpu === "rx9070xt" ? 320 : 200);
-        if (fonte === "") errosDeMontagem.push("O sistema precisa de uma Fonte para ligar a GPU.");
-        else if (consumoGpu > 250 && limiteFonte < 600) errosDeMontagem.push(`A fonte (${limiteFonte}W) não suportará a carga da GPU.`);
+// =======================================================
+    // ⚡ CALCULADORA DE CONSUMO DE ENERGIA SIMPLIFICADA
+    // =======================================================
+    let consumoTotal = 0;
+    
+    if (placaMaeValue !== "") consumoTotal += 40; 
+    
+    if (processador === "am4") consumoTotal += 80; 
+    else if (processador === "am5") consumoTotal += 120; 
+    else if (processador === "lga1700") consumoTotal += 150; 
+
+    if (gpu === "rx9060xt") consumoTotal += 180;
+    else if (gpu === "rtx5070ti") consumoTotal += 285;
+    else if (gpu === "rx9070xt") consumoTotal += 320;
+
+    consumoTotal += (totalRamNum * 5); 
+    if (armazenamento !== "") consumoTotal += 5; 
+    consumoTotal += (totalFans * 3); 
+    
+    if (cooler === "aircooler") consumoTotal += 3;
+    else if (cooler === "wc240") consumoTotal += 15; 
+    else if (cooler === "wc360") consumoTotal += 20; 
+
+    let limiteFonte = 0;
+    if (fonte === "550w") limiteFonte = 550;
+    else if (fonte === "850w") limiteFonte = 850;
+
+    // Atualiza o texto simples no final do painel
+    let elConsumo = document.getElementById('consumo-watts');
+    if (elConsumo) {
+        if (consumoTotal > 0) {
+            elConsumo.innerText = `Consumo: ${consumoTotal} W`;
+            elConsumo.style.display = "block"; // Mostra o texto quando há consumo
+        } else {
+            elConsumo.style.display = "none"; // Esconde se o PC estiver vazio
+        }
+    }
+
+    // Regras de Segurança Invisíveis (Só apitam se der erro)
+    if (consumoTotal > 0) {
+        if (fonte === "") {
+            errosDeMontagem.push(`Falta Energia: O sistema consome cerca de ${consumoTotal}W, mas não há fonte instalada.`);
+        } else {
+            let margemSeguranca = consumoTotal * 1.20; 
+            if (limiteFonte < consumoTotal) {
+                errosDeMontagem.push(`Desarme Imediato: O PC consome até ~${consumoTotal}W sob carga, mas a fonte fornece apenas ${limiteFonte}W.`);
+            } else if (limiteFonte < margemSeguranca) {
+                alertasDeMontagem.push(`Aviso de Sobrecarga: O PC exige ~${consumoTotal}W e a fonte tem ${limiteFonte}W. Recomendamos um modelo mais forte.`);
+            }
+        }
     }
     if (processador !== "" && cooler === "") errosDeMontagem.push("Risco de Superaquecimento: Falta refrigeração no CPU.");
 
@@ -778,27 +868,51 @@ function verificarCompatibilidade() {
         alertasDeMontagem.push(`O PC não irá ligar. Faltam itens essenciais: ${listaFaltantes.join(", ")}.`);
     }
 
-    let conteudoLogs = document.getElementById('conteudo-logs');
+let conteudoLogs = document.getElementById('conteudo-logs');
     let btnPower = document.getElementById('btn-power');
 
     if (placaMaeValue !== "" || processador !== "" || totalRamNum > 0 || gpu !== "" || fonte !== "" || cooler !== "" || armazenamento !== "" || totalFans > 0) {
         let htmlFinal = "";
+        
+        // 1. BLOCO DE ERROS ❌
         if (errosDeMontagem.length > 0) {
             luzAlerta.intensity = 5; luzAlerta.color.setHex(0xc0392b); 
             errosDeMontagem.forEach(err => htmlFinal += `<div class="log-erro">❌ ${err}</div>`);
         }
+
+        // 2. BLOCO DE ALERTAS ⚠️
         if (alertasDeMontagem.length > 0) {
             if (errosDeMontagem.length === 0) { luzAlerta.intensity = 3; luzAlerta.color.setHex(0xf1c40f); }
             alertasDeMontagem.forEach(al => htmlFinal += `<div class="log-alerta">⚠️ ${al}</div>`);
         }
+        
+        // 3. SUCESSO E BOTÃO POWER ✅
         if (errosDeMontagem.length === 0 && !faltaHardwareEssencial) {
             luzAlerta.intensity = 5; luzAlerta.color.setHex(0x27ae60); 
-            htmlFinal = `<div class="log-sucesso">✅ SISTEMA PRONTO PARA DEPOIMENTO DE CARGA!</div>` + htmlFinal;
+            htmlFinal = `<div class="log-sucesso">✅ SISTEMA PRONTO PARA RECEBER CARGA!</div>` + htmlFinal;
             if (btnPower && !sistemaLigado) { btnPower.disabled = false; btnPower.className = "btn-pronto"; btnPower.innerText = "⚡ LIGAR PC"; }
         } else {
             if (btnPower && !sistemaLigado) { btnPower.disabled = true; btnPower.className = "btn-desligado"; btnPower.innerText = "🔌 LIGAR PC"; }
         }
+        
+        // 🌬️ 4. NOVO: DIAGNÓSTICO DE FLUXO DE AR
+        if (totalFans > 0) {
+            let infoFluxoAr = "";
+            if (fansIn > fansOut) {
+                // Pressão Positiva (Azul - Ideal)
+                infoFluxoAr = `<div style="color: #3498db; background: rgba(52, 152, 219, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #3498db; font-size: 0.95rem;">💨 <b>Pressão Positiva (${fansIn} In / ${fansOut} Out):</b> Excelente! Como entra mais ar do que sai, o PC vai expulsar o excesso pelas frestas, evitando a acumulação de poeira.</div>`;
+            } else if (fansOut > fansIn) {
+                // Pressão Negativa (Laranja - Alerta de Poeira)
+                infoFluxoAr = `<div style="color: #e67e22; background: rgba(230, 126, 34, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #e67e22; font-size: 0.95rem;">🌪️ <b>Pressão Negativa (${fansIn} In / ${fansOut} Out):</b> Atenção! Como sai mais ar do que entra, o gabinete atua como um "aspirador", puxando poeira por todas as frestas não filtradas.</div>`;
+            } else {
+                // Pressão Neutra (Verde)
+                infoFluxoAr = `<div style="color: #2ecc71; background: rgba(46, 204, 113, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #2ecc71; font-size: 0.95rem;">🌬️ <b>Pressão Neutra (${fansIn} In / ${fansOut} Out):</b> Fluxo de ar perfeitamente equilibrado. Garante boa refrigeração, mas exige limpeza regular dos filtros.</div>`;
+            }
+            htmlFinal += infoFluxoAr; // Cola o diagnóstico de ar no fundo dos logs
+        }
+
         conteudoLogs.innerHTML = htmlFinal;
+        
     } else {
         conteudoLogs.innerHTML = "Aguardando seleção de componentes...";
         luzAlerta.intensity = 0;
