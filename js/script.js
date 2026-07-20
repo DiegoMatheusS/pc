@@ -535,6 +535,7 @@ function verificarCompatibilidade() {
             
             cena.add(modeloPlacaReal); 
             slotPlacaMae.material.opacity = 0; 
+            slotPlacaMae.userData.opacidadeOriginal = 0; // 🎯 ADICIONE ESTA LINHA!
         });
     }
 
@@ -561,6 +562,7 @@ function verificarCompatibilidade() {
             
             cena.add(modeloProcessadorReal); 
             slotProcessador.material.opacity = 0; 
+            slotProcessador.userData.opacidadeOriginal = 0; // 🎯 ADICIONE ESTA LINHA!
         });
     }
 
@@ -587,6 +589,7 @@ function verificarCompatibilidade() {
             
             cena.add(modeloGpuReal); 
             slotGpu.material.opacity = 0; 
+            slotGpu.userData.opacidadeOriginal = 0; // 🎯 ADICIONE ESTA LINHA!
         });
     }
 
@@ -946,20 +949,22 @@ function alternarEnergia() {
         if(btnUI) { btnUI.className = "btn-ligado"; btnUI.innerText = "🔴 DESLIGAR PC"; }
         botaoPower3D.material.color.setHex(0x1abc9c); 
         
-        // 🎨 MUDE AQUI: Cinza um pouco mais claro (simulando a luz do PC a bater no fundo)
         cena.background = new THREE.Color(0x444444); 
         
         objetosInterativos.forEach(obj => {
             if (obj !== botaoPower3D) { 
                 obj.material.wireframe = false;
-                obj.material.opacity = 0.95;
+                
+                // 🎯 A MÁGICA AQUI: Só fica sólido se NÃO for um fantasma!
+                if (obj.userData.opacidadeOriginal !== 0) {
+                    obj.material.opacity = 0.95;
+                }
             }
         });
     } else {
         if(btnUI) { btnUI.className = "btn-pronto"; btnUI.innerText = "⚡ LIGAR PC"; }
         botaoPower3D.material.color.setHex(0xff0000); 
         
-        // 🎨 MUDE AQUI: Volta para o Cinza Escuro inicial quando desliga
         cena.background = new THREE.Color(0x333333); 
         
         objetosInterativos.forEach(obj => {
