@@ -610,11 +610,19 @@ function verificarCompatibilidade() {
                 modelosFansInstalados[chave] = null;
             }
 
-            if (valorMenu === "" || arame.visible === false) {
-                arame.material.opacity = 0.8;
-                arame.userData.opacidadeOriginal = 0.8;
-                arame.material.wireframe = true;
+            if (valorMenu === "") {
+                arame.visible = true; 
+                arame.material.wireframe = false; // Tira os riscos azuis
+                arame.material.opacity = 0;       // Fica 100% transparente (invisível)
+                arame.userData.opacidadeOriginal = 0;
                 return;
+            }
+			else {
+                arame.visible = true; 
+                arame.material.wireframe = false; // Sem riscos
+                arame.material.opacity = 0.9;     
+                arame.material.color.setHex(0x222222); // Cor cinza/preta simulando ventoinha genérica
+                modelosFansInstalados[chave] = arame;  
             }
 
             let novaFan = modeloFanBase.clone();
@@ -654,11 +662,11 @@ function verificarCompatibilidade() {
         aplicarFan('fanTeto3', fanTeto3, fTeto3, 'teto');
     }
 
-    // =======================================================
+   // =======================================================
     // 🛡️ CARREGAMENTO SEGURO DA FAN BASE
     // =======================================================
     if (precisaDeFan && modeloFanBase === null && !carregandoFan) {
-        carregandoFan = f; // 🔴 Fecha o semáforo
+        carregandoFan = true; // 🟢 CORRIGIDO: Agora é "true" em vez de "f"!
         telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
         
         carregador.load('modelos/fan.glb', function(gltf) {
@@ -674,7 +682,7 @@ function verificarCompatibilidade() {
             envelope.add(modeloOriginal);
             
             modeloFanBase = envelope; 
-            carregandoFan = false; // 🟢 Abre o semáforo
+            carregandoFan = false; // Abre o semáforo
             
             console.log("✅ Ventoinha 3D carregada com sucesso!");
             distribuirFans3D(); 

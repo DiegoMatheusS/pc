@@ -20,9 +20,10 @@
     </div>
     <div id="container-3d"></div>
 
-    <div id="menu-flutuante" style="display: none;">
+	<div id="menu-flutuante" style="display: none;">
         <h3 id="menu-titulo">Peça</h3>
-        <select id="select-flutuante"></select>
+        <!-- ADICIONADO onchange AQUI -->
+        <select id="select-flutuante" onchange="verificarCompatibilidade()"></select>
     </div>
     
     <button id="btn-toggle-menu">▼ Esconder Menu</button>
