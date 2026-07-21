@@ -61,7 +61,7 @@ html, body {
 .log-sucesso { color: #2ecc71; background: rgba(46, 204, 113, 0.1); padding: 10px; border-left: 4px solid #2ecc71; margin-bottom: 10px; font-size: 13px; border-radius: 4px; }
 
 /* ==========================================================================
-   4. MENU INFERIOR E BOTÃO POWER
+   4. MENU INFERIOR, BOTÃO POWER E PAINEL DE WATTS
    ========================================================================== */
 #menu-inferior {
     position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -85,51 +85,19 @@ html, body {
 .grupo-hardware label { display: block; font-size: 11px; color: #95a5a6; margin-bottom: 4px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .grupo-hardware select { width: 100%; background: #2c3e50; color: white; border: 1px solid #34495e; padding: 4px; border-radius: 4px; font-size: 11px; height: 26px; outline: none; cursor: pointer; }
 
+/* 🔴 CONFIGURAÇÃO BASE (COMPUTADOR) PARA O BOTÃO POWER */
 #btn-power {
-    position: absolute; bottom: 25vh; right: 30px; padding: 15px 30px;
+    position: fixed; bottom: 20px; right: 20px; padding: 15px 30px;
     font-size: 1.2rem; font-weight: bold; color: white; background-color: #222;
     border: 2px solid #555; border-radius: 8px; cursor: not-allowed; transition: all 0.3s ease; z-index: 1000;
 }
 #btn-power.btn-pronto { background-color: #1abc9c; border-color: #16a085; box-shadow: 0 0 20px #1abc9c; cursor: pointer; text-shadow: 0 0 5px white; }
 #btn-power.btn-ligado { background-color: #e74c3c; border-color: #c0392b; box-shadow: 0 0 30px #e74c3c; cursor: pointer; }
 
-/* ==========================================================================
-   5. BOTÃO MODO CINEMA (SETA)
-   ========================================================================== */
-#btn-toggle-menu {
-    position: fixed; bottom: 23vh; left: 50%; transform: translateX(-50%);
-    background: rgba(15, 17, 21, 0.9); color: #00ffff; border: 1px solid #444; border-bottom: none;
-    padding: 6px 20px; border-radius: 8px 8px 0 0; cursor: pointer; z-index: 3100; font-size: 12px; font-weight: bold; transition: all 0.5s ease; backdrop-filter: blur(5px);
-}
-.botao-descido { bottom: 0 !important; background: #00ffff !important; color: #000 !important; border-radius: 8px 8px 0 0 !important; }
-
-/* ==========================================================================
-   6. RESPONSIVIDADE (SMARTPHONE E TABLET)
-   ========================================================================== */
-@media (max-width: 768px) {
-    #menu-inferior {
-        display: grid !important; width: 95% !important; padding: 10px !important; bottom: 15px !important;
-        max-height: 20vh !important; grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important;
-        -webkit-overflow-scrolling: touch !important; z-index: 3000 !important;
-    }
-    #btn-power { bottom: auto !important; top: 15px !important; right: 15px !important; padding: 10px 15px !important; font-size: 14px !important; z-index: 2000 !important; }
-    
-    #painel-logs {
-        width: 45% !important; left: 10px !important; right: auto !important; top: 10px !important; transform: none !important;
-        max-height: 15vh !important; padding: 8px !important; background: rgba(10, 10, 10, 0.4) !important; border: 1px solid #333 !important;
-    }
-    #painel-logs h3 { font-size: 10px !important; margin-bottom: 4px !important; }
-    .log-erro, .log-alerta, .log-sucesso { font-size: 9px !important; padding: 4px !important; margin-bottom: 4px !important; line-height: 1.1 !important; }
-    #menu-flutuante { min-width: 180px !important; padding: 10px !important; }
-    #btn-toggle-menu { bottom: 23vh !important; }
-}
-
-
-/* --- PAINEL DE CONSUMO FLUTUANTE HUD --- */
+/* ⚡ CONFIGURAÇÃO BASE (COMPUTADOR) PARA OS WATTS */
 #consumo-watts {
     position: fixed;
-    /* 🚀 A MÁGICA AQUI: Aumentamos a distância do fundo para dar espaço ao botão! */
-    bottom: 90px; 
+    bottom: 90px; /* Fica acima do botão power no PC */
     right: 20px;  
     background-color: rgba(20, 20, 20, 0.9); 
     border-left: 4px solid #f1c40f; 
@@ -143,11 +111,57 @@ html, body {
     box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.6);
 }
 
-/* E garanta que o seu botão de Ligar PC está fixo na base */
-#btn-power {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 999;
-    /* ... mantenha as cores e tamanhos que você já configurou ... */
+/* ==========================================================================
+   5. BOTÃO MODO CINEMA (SETA)
+   ========================================================================== */
+#btn-toggle-menu {
+    position: fixed; bottom: 23vh; left: 50%; transform: translateX(-50%);
+    background: rgba(15, 17, 21, 0.9); color: #00ffff; border: 1px solid #444; border-bottom: none;
+    padding: 6px 20px; border-radius: 8px 8px 0 0; cursor: pointer; z-index: 3100; font-size: 12px; font-weight: bold; transition: all 0.5s ease; backdrop-filter: blur(5px);
+}
+.botao-descido { bottom: 0 !important; background: #00ffff !important; color: #000 !important; border-radius: 8px 8px 0 0 !important; }
+
+
+/* ==========================================================================
+   6. RESPONSIVIDADE (SMARTPHONE E TABLET)
+   ========================================================================== */
+@media (max-width: 768px) {
+    #menu-inferior {
+        display: grid !important; width: 95% !important; padding: 10px !important; bottom: 15px !important;
+        max-height: 20vh !important; grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important;
+        -webkit-overflow-scrolling: touch !important; z-index: 3000 !important;
+    }
+    
+    /* 🔴 NO CELULAR: O Botão de Energia vai para o TOPO-DIREITA */
+    #btn-power { 
+        bottom: auto !important; 
+        top: 15px !important; 
+        right: 15px !important; 
+        padding: 10px 15px !important; 
+        font-size: 14px !important; 
+        z-index: 2000 !important; 
+    }
+    
+    /* ⚡ NO CELULAR: O Painel de Consumo vai para logo abaixo do Botão de Energia */
+    #consumo-watts {
+        bottom: auto !important; 
+        top: 70px !important; /* Desce um pouco para não bater no botão */
+        right: 15px !important;
+        font-size: 1rem !important; 
+        padding: 8px 16px !important;
+        z-index: 2000 !important;
+    }
+    
+    #painel-logs {
+        width: 45% !important; left: 10px !important; right: auto !important; top: 10px !important; transform: none !important;
+        max-height: 15vh !important; padding: 8px !important; background: rgba(10, 10, 10, 0.4) !important; border: 1px solid #333 !important;
+    }
+    #painel-logs h3 { font-size: 10px !important; margin-bottom: 4px !important; }
+    .log-erro, .log-alerta, .log-sucesso { font-size: 9px !important; padding: 4px !important; margin-bottom: 4px !important; line-height: 1.1 !important; }
+    
+    #menu-flutuante { min-width: 180px !important; padding: 10px !important; }
+    
+    /* SETA DO MENU NO CELULAR */
+    #btn-toggle-menu { bottom: 23vh !important; }
+    #btn-toggle-menu.botao-descido { bottom: 20px !important; box-shadow: 0px 4px 15px rgba(0,0,0,0.8); }
 }
