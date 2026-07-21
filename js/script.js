@@ -2,6 +2,67 @@
 (function() {
     
 // ==========================================================================
+// 🧠 BANCO DE DADOS (JSON) - CARREGAMENTO DINÂMICO
+// ==========================================================================
+async function carregarBancoDeDados() {
+    try {
+        const resposta = await fetch('hardware.json');
+        const banco = await resposta.json();
+        
+        // Função para injetar as opções do JSON no HTML
+        function popularMenu(idMenu, itensJson) {
+            const select = document.getElementById(idMenu);
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">-- Vazio / Selecione --</option>';
+            
+            itensJson.forEach(item => {
+                let opcao = document.createElement('option');
+                opcao.value = item.id;
+                opcao.text = item.nome;
+                select.appendChild(opcao);
+            });
+        }
+
+        popularMenu('gabinete', banco.gabinete);
+        popularMenu('placa-mae', banco.placa_mae);
+        popularMenu('processador', banco.processador);
+        popularMenu('gpu', banco.gpu);
+        popularMenu('fonte', banco.fonte);
+        popularMenu('cooler', banco.cooler);
+        popularMenu('armazenamento', banco.armazenamento);
+        
+        // Povoa automaticamente os 4 slots de RAM
+        ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => popularMenu(id, banco.ram));
+        
+        // Povoa automaticamente todos os 7 slots de Ventoinhas
+        ['fan-tras', 'fan-frente1', 'fan-frente2', 'fan-frente3', 'fan-teto1', 'fan-teto2', 'fan-teto3']
+            .forEach(id => popularMenu(id, banco.ventoinhas));
+        
+        // Força o simulador a ler as peças recém-carregadas
+        verificarCompatibilidade();
+        
+    } catch (erro) {
+        console.error("Erro ao carregar hardware.json! Verifique se está usando Live Server.", erro);
+    }
+}
+// Dispara o carregamento assim que o site abre
+carregarBancoDeDados();
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+// ==========================================================================
 // 1. CONFIGURAÇÃO BÁSICA DO AMBIENTE
 // ==========================================================================
 const cena = new THREE.Scene();

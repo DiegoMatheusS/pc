@@ -1,0 +1,48 @@
+{
+  "gabinete": [
+    {"id": "mid-tower", "nome": "Mid-Tower (Padrão - Pichau HX710L mATX, Mini-ITX)"},
+    {"id": "compacto", "nome": "Compacto (Mini-ITX / mATX)"},
+    {"id": "full-tower", "nome": "Full-Tower (Gigante - Suporta E-ATX)"}
+  ],
+  "placa_mae": [
+    {"id": "am4-matx", "nome": "ASUS B550 (AM4 - Micro-ATX)"},
+    {"id": "am5-atx", "nome": "Gigabyte B650 (AM5 - ATX Padrão)"},
+    {"id": "lga1700-matx", "nome": "Asus Z790M (LGA1700 - Micro-ATX)"},
+    {"id": "am5-eatx", "nome": "ASRock X670E Taichi (AM5 - E-ATX)"}
+  ],
+  "processador": [
+    {"id": "am4", "nome": "AMD Ryzen 7 5700X"},
+    {"id": "am5", "nome": "AMD Ryzen 5 7600X"},
+    {"id": "lga1700", "nome": "Intel Core i5-13600K"}
+  ],
+  "ram": [
+    {"id": "ddr4-8gb-3200", "nome": "DDR4 8GB 3200MHz"},
+    {"id": "ddr4-16gb-3600", "nome": "DDR4 16GB 3600MHz"},
+    {"id": "ddr5-16gb-5200", "nome": "DDR5 16GB 5200MHz"},
+    {"id": "ddr5-32gb-6000", "nome": "DDR5 32GB 6000MHz (RGB)"}
+  ],
+  "gpu": [
+    {"id": "rx9060xt", "nome": "AMD Radeon RX 9060 XT (Compacta - 2 Fans)"},
+    {"id": "rtx5070ti", "nome": "NVIDIA GeForce RTX 5070 Ti (Grande - 3 Fans)"},
+    {"id": "rx9070xt", "nome": "AMD Radeon RX 9070 XT (Massiva - 3 Fans + Dissipador)"}
+  ],
+  "fonte": [
+    {"id": "550w", "nome": "Gigabyte P550b 550W"},
+    {"id": "850w", "nome": "Corsair RM850x 850W"}
+  ],
+  "cooler": [
+    {"id": "aircooler", "nome": "Air Cooler Torre"},
+    {"id": "wc240", "nome": "Water Cooler Sangue Frio 2 (240mm - 2 Fans)"},
+    {"id": "wc360", "nome": "Water Cooler Extremo (360mm - 3 Fans)"}
+  ],
+  "armazenamento": [
+    {"id": "ssd-sata", "nome": "SSD SATA 1TB (Gaveta Traseira)"},
+    {"id": "ssd-m2", "nome": "SSD NVMe M.2 1TB (Na Placa-Mãe)"}
+  ],
+  "ventoinhas": [
+    {"id": "risemode_out", "nome": "RiseMode 120mm (vento fora)"},
+    {"id": "risemode_in", "nome": "RiseMode 120mm (vento dentro)"},
+    {"id": "arctic_out", "nome": "Arctic P12 Pro 120mm (vento fora)"},
+    {"id": "arctic_in", "nome": "Arctic P12 Pro 120mm (vento dentro)"}
+  ]
+}

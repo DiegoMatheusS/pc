@@ -32,194 +32,66 @@
 	
 		<div id="grupo-gabinete" class="grupo-hardware">
             <label>Tamanho do Gabinete:</label>
-            <select id="gabinete" onchange="verificarCompatibilidade()">
-                <option value="mid-tower">Mid-Tower (Padrão - Pichau HX710L mATX, Mini-ITX)</option>
-                <option value="compacto">Compacto (Mini-ITX / mATX)</option>
-                <option value="full-tower">Full-Tower (Gigante - Suporta E-ATX)</option>
-            </select>
+            <select id="gabinete" onchange="verificarCompatibilidade()"></select>
         </div>
         
         <div id="grupo-placa-mae" class="grupo-hardware">
             <label>Placa-Mãe:</label>
-            <select id="placa-mae" onchange="verificarCompatibilidade()">
-                <option value="">-- Selecione --</option>
-                <option value="am4-matx">ASUS B550 (AM4 - Micro-ATX)</option>
-                <option value="am5-atx">Gigabyte B650 (AM5 - ATX Padrão)</option>
-                <option value="lga1700-matx">Asus Z790M (LGA1700 - Micro-ATX)</option>
-                <option value="am5-eatx">ASRock X670E Taichi (AM5 - E-ATX)</option>
-            </select>
+            <select id="placa-mae" onchange="verificarCompatibilidade()"></select>
         </div>
 
         <div id="grupo-processador" class="grupo-hardware">
             <label>Processador (CPU):</label>
-            <select id="processador" onchange="verificarCompatibilidade()">
-                <option value="">-- Selecione --</option>
-                <option value="am4">AMD Ryzen 7 5700X</option>
-                <option value="am5">AMD Ryzen 5 7600X</option>
-                <option value="lga1700">Intel Core i5-13600K</option>
-            </select>
+            <select id="processador" onchange="verificarCompatibilidade()"></select>
         </div>
         
         <div class="grupo-hardware" id="grupo-ram">
             <label>Memória RAM (Por Slot):</label>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px;">
-                <select id="ram1" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;">
-                    <option value="">Slot 1</option>
-                    <option value="ddr4-8gb-3200">DDR4 8GB 3200MHz</option>
-                    <option value="ddr4-16gb-3600">DDR4 16GB 3600MHz</option>
-                    <option value="ddr5-16gb-5200">DDR5 16GB 5200MHz</option>
-                    <option value="ddr5-32gb-6000">DDR5 32GB 6000MHz (RGB)</option>
-                </select>
-                <select id="ram2" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;">
-                    <option value="">Slot 2</option>
-                    <option value="ddr4-8gb-3200">DDR4 8GB 3200MHz</option>
-                    <option value="ddr4-16gb-3600">DDR4 16GB 3600MHz</option>
-                    <option value="ddr5-16gb-5200">DDR5 16GB 5200MHz</option>
-                    <option value="ddr5-32gb-6000">DDR5 32GB 6000MHz (RGB)</option>
-                </select>
-                <select id="ram3" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;">
-                    <option value="">Slot 3</option>
-                    <option value="ddr4-8gb-3200">DDR4 8GB 3200MHz</option>
-                    <option value="ddr4-16gb-3600">DDR4 16GB 3600MHz</option>
-                    <option value="ddr5-16gb-5200">DDR5 16GB 5200MHz</option>
-                    <option value="ddr5-32gb-6000">DDR5 32GB 6000MHz (RGB)</option>
-                </select>
-                <select id="ram4" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;">
-                    <option value="">Slot 4</option>
-                    <option value="ddr4-8gb-3200">DDR4 8GB 3200MHz</option>
-                    <option value="ddr4-16gb-3600">DDR4 16GB 3600MHz</option>
-                    <option value="ddr5-16gb-5200">DDR5 16GB 5200MHz</option>
-                    <option value="ddr5-32gb-6000">DDR5 32GB 6000MHz (RGB)</option>
-                </select>
+                <select id="ram1" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+                <select id="ram2" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+                <select id="ram3" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+                <select id="ram4" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
             </div>
         </div>
 
         <div class="grupo-hardware" id="grupo-gpu">
             <label>Placa de Vídeo (GPU):</label>
-            <select id="gpu" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="rx9060xt">AMD Radeon RX 9060 XT (Compacta - 2 Fans)</option>
-                <option value="rtx5070ti">NVIDIA GeForce RTX 5070 Ti (Grande - 3 Fans)</option>
-                <option value="rx9070xt">AMD Radeon RX 9070 XT (Massiva - 3 Fans + Dissipador Largo)</option>
-            </select>
+            <select id="gpu" onchange="verificarCompatibilidade()"></select>
         </div>
 
         <div class="grupo-hardware" id="grupo-fonte">
             <label>Fonte:</label>
-            <select id="fonte" onchange="verificarCompatibilidade()">
-                <option value="">-- Selecione --</option>
-                <option value="550w">Gigabyte P550b 550W</option>
-                <option value="850w">Corsair RM850x 850W</option>
-            </select>
+            <select id="fonte" onchange="verificarCompatibilidade()"></select>
         </div>
 
         <div class="grupo-hardware" id="grupo-cooler">
             <label>Refrigeração CPU:</label>
-            <select id="cooler" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="aircooler">Air Cooler Torre</option>
-                <option value="wc240">Water Cooler Sangue Frio 2 (240mm - 2 Fans)</option>
-                <option value="wc360">Water Cooler Extremo (360mm - 3 Fans)</option>
-            </select>
+            <select id="cooler" onchange="verificarCompatibilidade()"></select>
         </div>
             
         <div class="grupo-hardware" id="grupo-teto">
             <label>Painel Superior (Teto):</label>
             <select id="teto" onchange="verificarCompatibilidade()">
+                <!-- O teto mantém o HTML fixo porque ele ativa outras coisas especiais -->
                 <option value="">-- Vazio --</option>
                 <option value="2xfan">Instalar 2x Ventoinhas</option>
                 <option value="3xfan">Instalar 3x Ventoinhas</option>
             </select>
         </div>
 
-        <!-- ========================================== -->
-        <!-- SISTEMA DE REFRIGERAÇÃO DO CHASSI (FANS)   -->
-        <!-- ========================================== -->
-
-        <div class="grupo-hardware" id="grupo-fan-teto1">
-            <label>Teto (Frente):</label>
-            <select id="fan-teto1" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="risemode_out">RiseMode 120mm (vento fora &#8593;)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro &#8595;)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora &#8593;)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro &#8595;)</option>
-            </select>
-        </div>
-
-        <div class="grupo-hardware" id="grupo-fan-teto2">
-            <label>Teto (Meio):</label>
-            <select id="fan-teto2" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="risemode_out">RiseMode 120mm (vento fora &#8593;)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro &#8595;)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora &#8593;)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro &#8595;)</option>
-            </select>
-        </div>
-
-        <div class="grupo-hardware" id="grupo-fan-teto3">
-            <label>Teto (Traseira):</label>
-            <select id="fan-teto3" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="risemode_out">RiseMode 120mm (vento fora &#8593;)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro &#8595;)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora &#8593;)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro &#8595;)</option>
-            </select>
-        </div>
-
-        <div class="grupo-hardware" id="grupo-fan-tras">
-            <label>Ventoinha Traseira:</label>
-            <select id="fan-tras" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="risemode_out">RiseMode 120mm (vento fora <---)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro --->)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora <---)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro --->)</option>
-            </select>
-        </div>
-
-        <div class="grupo-hardware" id="grupo-fan-frente1">
-            <label>Frente (Topo):</label>
-            <select id="fan-frente1" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                 <option value="risemode_out">RiseMode 120mm (vento fora --->)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro <---)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora --->)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro <---)</option>
-            </select>
-        </div>
-
-        <div class="grupo-hardware" id="grupo-fan-frente2">
-            <label>Frente (Meio):</label>
-            <select id="fan-frente2" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="risemode_out">RiseMode 120mm (vento fora --->)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro <---)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora --->)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro <---)</option>
-            </select>
-        </div>
-
-        <div class="grupo-hardware" id="grupo-fan-frente3">
-            <label>Frente (Baixo):</label>
-            <select id="fan-frente3" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                 <option value="risemode_out">RiseMode 120mm (vento fora --->)</option>
-                <option value="risemode_in">RiseMode 120mm (vento dentro <---)</option>
-                <option value="arctic_out">Arctic P12 Pro 120mm (vento fora --->)</option>
-                <option value="arctic_in">Arctic P12 Pro 120mm (vento dentro <---)</option>
-            </select>
-        </div>
+        <!-- As FANS -->
+        <div class="grupo-hardware" id="grupo-fan-teto1"><label>Teto (Frente):</label><select id="fan-teto1" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-teto2"><label>Teto (Meio):</label><select id="fan-teto2" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-teto3"><label>Teto (Traseira):</label><select id="fan-teto3" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-tras"><label>Ventoinha Traseira:</label><select id="fan-tras" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-frente1"><label>Frente (Topo):</label><select id="fan-frente1" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-frente2"><label>Frente (Meio):</label><select id="fan-frente2" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-frente3"><label>Frente (Baixo):</label><select id="fan-frente3" onchange="verificarCompatibilidade()"></select></div>
         
         <div class="grupo-hardware" id="grupo-armazenamento">
             <label>Armazenamento:</label>
-            <select id="armazenamento" onchange="verificarCompatibilidade()">
-                <option value="">-- Vazio --</option>
-                <option value="ssd-sata">SSD SATA 1TB (Gaveta Traseira)</option>
-                <option value="ssd-m2">SSD NVMe M.2 1TB (Na Placa-Mãe)</option>
-            </select>
+            <select id="armazenamento" onchange="verificarCompatibilidade()"></select>
         </div>
     </div>
 	<div id="painel-logs">
