@@ -32,4 +32,4 @@ Como o projeto utiliza arquivos de modelos 3D (`.glb`) carregados externamente, 
 
 1. Clone o repositório:
    ```bash
-   git clone [https://github.com/SEU-USUARIO/pc-builder-3d.git](https://github.com/SEU-USUARIO/pc-builder-3d.git)
+   git clone [[https://github.com/DiegoMatheusS/pc.git](https://github.com/DiegoMatheusS/pc.git)]
