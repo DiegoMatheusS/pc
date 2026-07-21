@@ -708,20 +708,27 @@ function verificarCompatibilidade() {
         if (tamanhoPlaca === "matx") alertasDeMontagem.push("Estética: Placa-mãe Micro-ATX num gabinete Full-Tower deixará muito espaço vazio.");
     }
 
-    // --- REGRAS DE MEMÓRIA RAM ---
+  // --- REGRAS DE MEMÓRIA RAM ---
     let totalRamNum = ['ram1', 'ram2', 'ram3', 'ram4'].reduce((soma, id) => soma + (getVal(id) !== "" ? 1 : 0), 0);
     let ddrSuportadoPelaPlaca = (socketPlaca === "am4" || socketPlaca === "lga1200") ? "ddr4" : "ddr5";
     let mhzMaximoDaPlaca = (ddrSuportadoPelaPlaca === "ddr4") ? 3600 : 6400;
+    
     let ddrDetectado = "", mhzDetectado = 0, misturou = false, erroDdr = false, erroMhz = false;
 
     ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => {
         let valor = getVal(id);
         if (valor === "") return;
+        
+        // 🎯 Leitura blindada do ID (Ex: ddr4-8gb-3200 pega a geração e o final)
         let info = valor.split("-"); 
-        let geracao = info[0], mhz = parseInt(info[2]);
+        let geracao = info[0];
+        let mhz = parseInt(info[info.length - 1]) || 3200; // Pega o último bloco como MHz
 
-        if ((ddrDetectado !== "" && ddrDetectado !== geracao) || (mhzDetectado !== 0 && mhzDetectado !== mhz)) misturou = true;
-        ddrDetectado = geracao; mhzDetectado = mhz;
+        if (ddrDetectado !== "" && ddrDetectado !== geracao) misturou = true;
+        if (mhzDetectado !== 0 && mhzDetectado !== mhz) misturou = true;
+        
+        ddrDetectado = geracao; 
+        mhzDetectado = mhz;
         
         if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdr = true;
         if (placaMaeValue !== "" && mhz > mhzMaximoDaPlaca) erroMhz = true;

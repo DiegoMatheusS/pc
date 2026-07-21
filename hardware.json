@@ -1,48 +1,90 @@
 {
   "gabinete": [
-    {"id": "mid-tower", "nome": "Mid-Tower (Padrão - Pichau HX710L mATX, Mini-ITX)", "watts": 0},
-    {"id": "compacto", "nome": "Compacto (Mini-ITX / mATX)", "watts": 0},
-    {"id": "full-tower", "nome": "Full-Tower (Gigante - Suporta E-ATX)", "watts": 0}
+    {"id": "compacto", "nome": "Mini-ITX - Cooler Master NR200", "watts": 0},
+    {"id": "mid-tower", "nome": "Mid-Tower - Pichau HX710L (Aquário)", "watts": 0},
+    {"id": "mid-tower", "nome": "Mid-Tower - Corsair 4000D Airflow", "watts": 0},
+    {"id": "mid-tower", "nome": "Mid-Tower - NZXT H5 Flow", "watts": 0},
+    {"id": "full-tower", "nome": "Full-Tower - Lian Li O11 Dynamic EVO", "watts": 0},
+    {"id": "full-tower", "nome": "Full-Tower - Corsair 7000D Airflow", "watts": 0}
   ],
   "placa_mae": [
-    {"id": "am4-matx", "nome": "ASUS B550 (AM4 - Micro-ATX)", "watts": 40},
-    {"id": "am5-atx", "nome": "Gigabyte B650 (AM5 - ATX Padrão)", "watts": 40},
-    {"id": "lga1700-matx", "nome": "Asus Z790M (LGA1700 - Micro-ATX)", "watts": 40},
-    {"id": "am5-eatx", "nome": "ASRock X670E Taichi (AM5 - E-ATX)", "watts": 40}
+    {"id": "am4-matx", "nome": "AM4 - A320M Gigabyte (Micro-ATX)", "watts": 30},
+    {"id": "am4-matx", "nome": "AM4 - ASUS Prime B450M-Gaming (Micro-ATX)", "watts": 35},
+    {"id": "am4-matx", "nome": "AM4 - ASUS TUF Gaming B550M-Plus (Micro-ATX)", "watts": 40},
+    {"id": "am4-atx", "nome": "AM4 - MSI MAG X570 Tomahawk (ATX)", "watts": 50},
+    {"id": "am5-matx", "nome": "AM5 - ASRock A620M Pro RS (Micro-ATX)", "watts": 35},
+    {"id": "am5-atx", "nome": "AM5 - Gigabyte B650 AORUS Elite AX (ATX)", "watts": 45},
+    {"id": "am5-eatx", "nome": "AM5 - ASUS ROG Crosshair X670E Extreme (E-ATX)", "watts": 60},
+    {"id": "lga1700-matx", "nome": "LGA1700 - MSI PRO H610M-G (Micro-ATX)", "watts": 35},
+    {"id": "lga1700-atx", "nome": "LGA1700 - Gigabyte B760 Gaming X (ATX)", "watts": 45},
+    {"id": "lga1700-eatx", "nome": "LGA1700 - ASUS ROG Maximus Z790 Hero (E-ATX)", "watts": 60}
   ],
   "processador": [
-    {"id": "am4", "nome": "AMD Ryzen 7 5700X", "watts": 80},
-    {"id": "am5", "nome": "AMD Ryzen 5 7600X", "watts": 120},
-    {"id": "lga1700", "nome": "Intel Core i5-13600K", "watts": 150}
+    {"id": "am4", "nome": "AMD Ryzen 5 4600G (6 Núcleos / 12 Threads)", "watts": 65},
+    {"id": "am4", "nome": "AMD Ryzen 5 5600 (6 Núcleos / 12 Threads)", "watts": 65},
+    {"id": "am4", "nome": "AMD Ryzen 7 5700X (8 Núcleos / 16 Threads)", "watts": 65},
+    {"id": "am4", "nome": "AMD Ryzen 7 5800X3D (8 Núcleos / 16 Threads)", "watts": 105},
+    {"id": "am5", "nome": "AMD Ryzen 5 7600 (6 Núcleos / 12 Threads)", "watts": 65},
+    {"id": "am5", "nome": "AMD Ryzen 7 7800X3D (8 Núcleos / 16 Threads)", "watts": 120},
+    {"id": "am5", "nome": "AMD Ryzen 9 7950X (16 Núcleos / 32 Threads)", "watts": 170},
+    {"id": "lga1700", "nome": "Intel Core i3-12100F (4 Núcleos / 8 Threads)", "watts": 58},
+    {"id": "lga1700", "nome": "Intel Core i5-13400F (10 Núcleos / 16 Threads)", "watts": 65},
+    {"id": "lga1700", "nome": "Intel Core i5-13600K (14 Núcleos / 20 Threads)", "watts": 125},
+    {"id": "lga1700", "nome": "Intel Core i7-14700K (20 Núcleos / 28 Threads)", "watts": 253},
+    {"id": "lga1700", "nome": "Intel Core i9-14900K (24 Núcleos / 32 Threads)", "watts": 253}
   ],
   "ram": [
-    {"id": "ddr4-8gb-3200", "nome": "DDR4 8GB 3200MHz", "watts": 5},
-    {"id": "ddr4-16gb-3600", "nome": "DDR4 16GB 3600MHz", "watts": 5},
-    {"id": "ddr5-16gb-5200", "nome": "DDR5 16GB 5200MHz", "watts": 5},
-    {"id": "ddr5-32gb-6000", "nome": "DDR5 32GB 6000MHz (RGB)", "watts": 5}
+    {"id": "ddr4-2666", "nome": "Crucial Basics 8GB DDR4 2666MHz", "watts": 3},
+    {"id": "ddr4-3200", "nome": "Corsair Vengeance LED 8GB DDR4 3200MHz", "watts": 4},
+    {"id": "ddr4-3200", "nome": "Kingston Fury Beast 16GB DDR4 3200MHz", "watts": 4},
+    {"id": "ddr4-3600", "nome": "Asgard Valkyrie 16GB DDR4 3600MHz", "watts": 5},
+    {"id": "ddr5-4800", "nome": "Crucial 16GB DDR5 4800MHz", "watts": 4},
+    {"id": "ddr5-5200", "nome": "Corsair Vengeance 16GB DDR5 5200MHz", "watts": 5},
+    {"id": "ddr5-6000", "nome": "XPG Lancer 16GB DDR5 6000MHz (RGB)", "watts": 6},
+    {"id": "ddr5-6400", "nome": "G.Skill Trident Z5 32GB DDR5 6400MHz", "watts": 7}
   ],
   "gpu": [
-    {"id": "rx9060xt", "nome": "AMD Radeon RX 9060 XT (Compacta - 2 Fans)", "watts": 180},
-    {"id": "rtx5070ti", "nome": "NVIDIA GeForce RTX 5070 Ti (Grande - 3 Fans)", "watts": 285},
-    {"id": "rx9070xt", "nome": "AMD Radeon RX 9070 XT (Massiva - 3 Fans + Dissipador)", "watts": 320}
+    {"id": "rx9060xt", "nome": "AMD Radeon RX 6600 8GB (Compacta - 2 Fans)", "watts": 132},
+    {"id": "rx9060xt", "nome": "NVIDIA GeForce RTX 3060 12GB (Compacta - 2 Fans)", "watts": 170},
+    {"id": "rx9060xt", "nome": "NVIDIA GeForce RTX 4060 8GB (Compacta - 2 Fans)", "watts": 115},
+    {"id": "rtx5070ti", "nome": "AMD Radeon RX 7700 XT 12GB (Grande - 3 Fans)", "watts": 245},
+    {"id": "rtx5070ti", "nome": "NVIDIA GeForce RTX 4070 SUPER 12GB (Grande - 3 Fans)", "watts": 220},
+    {"id": "rtx5070ti", "nome": "NVIDIA GeForce RTX 4070 Ti 12GB (Grande - 3 Fans)", "watts": 285},
+    {"id": "rx9070xt", "nome": "AMD Radeon RX 7900 XTX 24GB (Massiva)", "watts": 355},
+    {"id": "rx9070xt", "nome": "NVIDIA GeForce RTX 4080 SUPER 16GB (Massiva)", "watts": 320},
+    {"id": "rx9070xt", "nome": "NVIDIA GeForce RTX 4090 24GB (Massiva)", "watts": 450}
   ],
   "fonte": [
-    {"id": "550w", "nome": "Gigabyte P550b 550W", "watts": 550},
-    {"id": "850w", "nome": "Corsair RM850x 850W", "watts": 850}
+    {"id": "450w", "nome": "Corsair CV450 450W (80 Plus Bronze)", "watts": 450},
+    {"id": "550w", "nome": "Gigabyte P550B 550W (80 Plus Bronze)", "watts": 550},
+    {"id": "650w", "nome": "MSI MAG A650BN 650W (80 Plus Bronze)", "watts": 650},
+    {"id": "750w", "nome": "XPG Core Reactor 750W (80 Plus Gold - Modular)", "watts": 750},
+    {"id": "850w", "nome": "Corsair RM850x 850W (80 Plus Gold - Modular)", "watts": 850},
+    {"id": "1000w", "nome": "Super Flower Leadex 1000W (80 Plus Platinum)", "watts": 1000},
+    {"id": "1200w", "nome": "ASUS ROG Thor 1200W (80 Plus Platinum)", "watts": 1200}
   ],
   "cooler": [
-    {"id": "aircooler", "nome": "Air Cooler Torre", "watts": 3},
-    {"id": "wc240", "nome": "Water Cooler Sangue Frio 2 (240mm - 2 Fans)", "watts": 15},
-    {"id": "wc360", "nome": "Water Cooler Extremo (360mm - 3 Fans)", "watts": 20}
+    {"id": "aircooler", "nome": "AMD Wraith Stealth (Cooler Box)", "watts": 2},
+    {"id": "aircooler", "nome": "DeepCool AK400 (Air Cooler Torre)", "watts": 3},
+    {"id": "wc240", "nome": "Water Cooler PCYES Sangue Frio 2 (240mm)", "watts": 15},
+    {"id": "wc240", "nome": "Water Cooler Corsair H100i (240mm)", "watts": 15},
+    {"id": "wc360", "nome": "Water Cooler NZXT Kraken Elite (360mm)", "watts": 20},
+    {"id": "wc360", "nome": "Water Cooler Lian Li Galahad II (360mm)", "watts": 20}
   ],
   "armazenamento": [
-    {"id": "ssd-sata", "nome": "SSD SATA 1TB (Gaveta Traseira)", "watts": 5},
-    {"id": "ssd-m2", "nome": "SSD NVMe M.2 1TB (Na Placa-Mãe)", "watts": 5}
+    {"id": "ssd-sata", "nome": "SSD SATA Kingston A400 480GB", "watts": 3},
+    {"id": "ssd-sata", "nome": "SSD SATA Crucial BX500 1TB", "watts": 4},
+    {"id": "ssd-m2", "nome": "SSD NVMe M.2 Kingston NV2 1TB (Gen4)", "watts": 5},
+    {"id": "ssd-m2", "nome": "SSD NVMe M.2 WD Black SN850X 2TB (Gen4)", "watts": 7}
   ],
   "ventoinhas": [
-    {"id": "risemode_out", "nome": "RiseMode 120mm (vento fora)", "watts": 3},
-    {"id": "risemode_in", "nome": "RiseMode 120mm (vento dentro)", "watts": 3},
-    {"id": "arctic_out", "nome": "Arctic P12 Pro 120mm (vento fora)", "watts": 3},
-    {"id": "arctic_in", "nome": "Arctic P12 Pro 120mm (vento dentro)", "watts": 3}
+    {"id": "arctic_in", "nome": "Arctic P12 Pro 120mm (Injeção / Ar para Dentro)", "watts": 3},
+    {"id": "arctic_out", "nome": "Arctic P12 Pro 120mm (Exaustão / Ar para Fora)", "watts": 3},
+    {"id": "risemode_in", "nome": "Rise Mode 120mm (Injeção / Ar para Dentro)", "watts": 3},
+    {"id": "risemode_out", "nome": "Rise Mode 120mm (Exaustão / Ar para Fora)", "watts": 3},
+    {"id": "corsair_in", "nome": "Corsair AF120 Elite (Injeção / Ar para Dentro)", "watts": 4},
+    {"id": "corsair_out", "nome": "Corsair AF120 Elite (Exaustão / Ar para Fora)", "watts": 4},
+    {"id": "lianli_in", "nome": "Lian Li UNI FAN SL120 (Injeção / Ar para Dentro)", "watts": 5},
+    {"id": "lianli_out", "nome": "Lian Li UNI FAN SL120 (Exaustão / Ar para Fora)", "watts": 5}
   ]
 }
