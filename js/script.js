@@ -9,7 +9,7 @@ async function carregarBancoDeDados() {
         const resposta = await fetch('hardware.json');
         const banco = await resposta.json();
         
-        // Função para injetar as opções do JSON no HTML
+       // Função para injetar as opções do JSON no HTML e blindar os eventos
         function popularMenu(idMenu, itensJson) {
             const select = document.getElementById(idMenu);
             if (!select) return;
@@ -20,6 +20,11 @@ async function carregarBancoDeDados() {
                 let opcao = document.createElement('option');
                 opcao.value = item.id;
                 opcao.text = item.nome;
+                
+                // 🚀 O TRUQUE DE MESTRE: Esconde os Watts na opção HTML!
+                // Se a peça não tiver watts no JSON, ele assume 0 por segurança.
+                opcao.setAttribute('data-watts', item.watts || 0); 
+                
                 select.appendChild(opcao);
             });
         }
@@ -450,221 +455,116 @@ window.addEventListener('mousemove', (evento) => {
 });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // ==========================================================================
 // 4. LÓGICA, COMPATIBILIDADE E SISTEMA DE VENTOINHAS (.GLB)
 // ==========================================================================
+
+// ⚡ Lê os Watts escondidos diretamente do botão que o utilizador escolheu
+function extrairWatts(idMenu) {
+    let el = document.getElementById(idMenu);
+    if (!el || el.value === "") return 0;
+    return parseInt(el.options[el.selectedIndex].getAttribute('data-watts')) || 0;
+}
+
+// 🛠️ Função Auxiliar para não repetir document.getElementById
+const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
+const getEl = (id) => document.getElementById(id);
+
+// 🎛️ Controlador Universal de Botões
+function atualizarBotao(id, ativo, classeAtiva, classeInativa, texto = null) {
+    let btn = getEl(id);
+    if (!btn) return;
+    btn.disabled = !ativo;
+    btn.className = ativo ? classeAtiva : classeInativa;
+    if (texto) btn.innerText = texto;
+}
+
 function verificarCompatibilidade() {
-	let gabineteValue = document.getElementById('gabinete') ? document.getElementById('gabinete').value : "mid-tower";
-    let placaMaeValue = document.getElementById('placa-mae') ? document.getElementById('placa-mae').value : "";
-    let processador = document.getElementById('processador') ? document.getElementById('processador').value : "";
-    let gpu = document.getElementById('gpu') ? document.getElementById('gpu').value : "";
-    let fonte = document.getElementById('fonte') ? document.getElementById('fonte').value : "";
-    let armazenamento = document.getElementById('armazenamento') ? document.getElementById('armazenamento').value : "";
+    let gabineteValue = getVal('gabinete') || "mid-tower";
+    let placaMaeValue = getVal('placa-mae');
+    let processador = getVal('processador');
+    let gpu = getVal('gpu');
+    let fonte = getVal('fonte');
+    let armazenamento = getVal('armazenamento');
+    let cooler = getVal('cooler');
 
-    
-    let vRam1 = document.getElementById('ram1') ? document.getElementById('ram1').value : "";
-    let vRam2 = document.getElementById('ram2') ? document.getElementById('ram2').value : "";
-    let vRam3 = document.getElementById('ram3') ? document.getElementById('ram3').value : "";
-    let vRam4 = document.getElementById('ram4') ? document.getElementById('ram4').value : "";
-    let totalRamNum = (vRam1 !== "" ? 1 : 0) + (vRam2 !== "" ? 1 : 0) + (vRam3 !== "" ? 1 : 0) + (vRam4 !== "" ? 1 : 0);
-
-    let selectCooler = document.getElementById('cooler');
-    let cooler = selectCooler ? selectCooler.value : "";
-    let selectTeto = document.getElementById('teto');
-    let selectTeto1 = document.getElementById('fan-teto1');
-    let selectTeto2 = document.getElementById('fan-teto2');
-    let selectTeto3 = document.getElementById('fan-teto3');
-
-    // --- CÉREBRO DOS RADIADORES E TETO ---
-    if (cooler === 'wc240') {
-        if (selectTeto) { selectTeto.innerHTML = '<option value="radiador">[ Ocupado pelo Radiador 240mm ]</option>'; selectTeto.disabled = true; }
-        if (selectTeto1) { selectTeto1.value = "risemode_out"; selectTeto1.disabled = true; selectTeto1.parentElement.style.display = 'block'; }
-        if (selectTeto2) { selectTeto2.value = "risemode_out"; selectTeto2.disabled = true; selectTeto2.parentElement.style.display = 'block'; }
-        if (selectTeto3) { selectTeto3.value = ""; selectTeto3.parentElement.style.display = 'none'; }
-        fanTeto1.visible = true; fanTeto2.visible = true; fanTeto3.visible = false;
-        radiador240.visible = true; radiador360.visible = false;
-    } else if (cooler === 'wc360') {
-        if (selectTeto) { selectTeto.innerHTML = '<option value="radiador">[ Ocupado pelo Radiador 360mm ]</option>'; selectTeto.disabled = true; }
-        if (selectTeto1) { selectTeto1.value = "risemode_out"; selectTeto1.disabled = true; selectTeto1.parentElement.style.display = 'block'; }
-        if (selectTeto2) { selectTeto2.value = "risemode_out"; selectTeto2.disabled = true; selectTeto2.parentElement.style.display = 'block'; }
-        if (selectTeto3) { selectTeto3.value = "risemode_out"; selectTeto3.disabled = true; selectTeto3.parentElement.style.display = 'block'; }
-        fanTeto1.visible = true; fanTeto2.visible = true; fanTeto3.visible = true;
-        radiador240.visible = false; radiador360.visible = true;
-    } else {
-        if (selectTeto && selectTeto.disabled) {
-            selectTeto.innerHTML = `<option value="">-- Vazio --</option><option value="2xfan">Instalar 2x Ventoinhas</option><option value="3xfan">Instalar 3x Ventoinhas</option>`;
-            selectTeto.disabled = false;
-        }
-        let valTeto = selectTeto ? selectTeto.value : "";
-        if (valTeto === '2xfan') {
-            if (selectTeto1) { selectTeto1.disabled = false; selectTeto1.parentElement.style.display = 'block'; }
-            if (selectTeto2) { selectTeto2.disabled = false; selectTeto2.parentElement.style.display = 'block'; }
-            if (selectTeto3) { selectTeto3.value = ""; selectTeto3.parentElement.style.display = 'none'; }
-            fanTeto1.visible = true; fanTeto2.visible = true; fanTeto3.visible = false;
-        } else if (valTeto === '3xfan') {
-            if (selectTeto1) { selectTeto1.disabled = false; selectTeto1.parentElement.style.display = 'block'; }
-            if (selectTeto2) { selectTeto2.disabled = false; selectTeto2.parentElement.style.display = 'block'; }
-            if (selectTeto3) { selectTeto3.disabled = false; selectTeto3.parentElement.style.display = 'block'; }
-            fanTeto1.visible = true; fanTeto2.visible = true; fanTeto3.visible = true;
-        } else {
-            if (selectTeto1) { selectTeto1.value = ""; selectTeto1.parentElement.style.display = 'none'; }
-            if (selectTeto2) { selectTeto2.value = ""; selectTeto2.parentElement.style.display = 'none'; }
-            if (selectTeto3) { selectTeto3.value = ""; selectTeto3.parentElement.style.display = 'none'; }
-            fanTeto1.visible = false; fanTeto2.visible = false; fanTeto3.visible = false;
-        }
-        radiador240.visible = false; radiador360.visible = false;
-    }
-
-    let fTeto1 = selectTeto1 ? selectTeto1.value : "";
-    let fTeto2 = selectTeto2 ? selectTeto2.value : "";
-    let fTeto3 = selectTeto3 ? selectTeto3.value : "";
-    let fTras = document.getElementById('fan-tras') ? document.getElementById('fan-tras').value : "";
-    let fFrente1 = document.getElementById('fan-frente1') ? document.getElementById('fan-frente1').value : "";
-    let fFrente2 = document.getElementById('fan-frente2') ? document.getElementById('fan-frente2').value : "";
-    let fFrente3 = document.getElementById('fan-frente3') ? document.getElementById('fan-frente3').value : "";
-
-    fanTras.visible = true; fanFrente1.visible = true; fanFrente2.visible = true; fanFrente3.visible = true;
-    fanTeto1.userData.ligada = (fTeto1 !== ""); fanTeto2.userData.ligada = (fTeto2 !== ""); fanTeto3.userData.ligada = (fTeto3 !== "");
-    fanTras.userData.ligada = (fTras !== ""); fanFrente1.userData.ligada = (fFrente1 !== ""); fanFrente2.userData.ligada = (fFrente2 !== ""); fanFrente3.userData.ligada = (fFrente3 !== "");
-
-    let errosDeMontagem = [];
-    let alertasDeMontagem = [];
-
-    // 1. PRIMEIRO: Descobrir qual é o tamanho da placa selecionada no menu!
-    let socketPlaca = "", tamanhoPlaca = "";
-    if (placaMaeValue !== "") {
-        let partes = placaMaeValue.split("-");
-        socketPlaca = partes[0]; 
-        tamanhoPlaca = partes[1]; // O sistema agora sabe se é atx, matx ou eatx
-    }
+    // 👻 CAÇA-FANTASMAS 3D: Esconde modelos se o utilizador selecionar "Vazio"
+    if (typeof modeloGpuReal !== 'undefined' && modeloGpuReal) modeloGpuReal.visible = (gpu !== "");
+    if (typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal) modeloPlacaReal.visible = (placaMaeValue !== "");
+    if (typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal) modeloProcessadorReal.visible = (processador !== "");
 
     // =======================================================
-    // 📏 MOTOR DE FÍSICA E DIMENSÕES (O GABINETE)
+    // 📦 CARREGAMENTO DOS MODELOS 3D (.GLB) PRINCIPAIS
     // =======================================================
-    
-    // O Processador, RAM e SSD entram sempre, pois são peças pequenas!
-    // Mas as peças grandes sofrem bloqueio dependendo do Gabinete:
-
-    if (gabineteValue === "compacto") {
-        // Gabinete Pequeno: Sofre muito com peças grandes
-        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") {
-            errosDeMontagem.push(`Erro de Chassi: Uma placa-mãe ${tamanhoPlaca.toUpperCase()} é muito alta e larga. Ela não entra num gabinete Compacto.`);
-        }
-        if (gpu === "rtx5070ti" || gpu === "rx9070xt") {
-            errosDeMontagem.push("Colisão Física: Esta Placa de Vídeo é massiva! Ela vai bater na fonte ou impedir a tampa de vidro de fechar num chassi Compacto.");
-        }
-        if (cooler === "wc360") {
-            errosDeMontagem.push("Erro de Teto: Um radiador de 360mm é comprido demais para o teto de um gabinete Compacto (limite máximo é 240mm).");
-        }
-        
-    } else if (gabineteValue === "mid-tower") {
-        // Gabinete Pichau HX710L (Limite: mATX / Mini-ITX)
-        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") {
-            errosDeMontagem.push("Falta de Espaço: O Pichau HX710L suporta no máximo placas Micro-ATX (mATX). Uma placa ATX ou E-ATX não vai caber neste aquário.");
-        }
-        if (gpu === "rx9070xt") {
-            errosDeMontagem.push("Erro de Comprimento: A RX 9070 XT colide fisicamente com as ventoinhas frontais neste chassi.");
-        }
-        
-    } else if (gabineteValue === "full-tower") {
-        // Gabinete Gigante: Cabe absolutamente tudo!
-        if (tamanhoPlaca === "matx") {
-            alertasDeMontagem.push("Estética: Você colocou uma placa-mãe minúscula (Micro-ATX) num gabinete gigante (Full-Tower). Vai sobrar muito espaço vazio, mas funciona perfeitamente.");
-        }
-    }
-
-   // --- CARREGAMENTOS 3D DOS SEUS ARQUIVOS (.GLB) ---
     
     // 1. A Placa-Mãe (placa.glb)
-    if (placaMaeValue !== "" && modeloPlacaReal === null) {
-        telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; 
+    if (placaMaeValue !== "" && typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal === null) {
+        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
         carregador.load('modelos/placa.glb', function(gltf) {
             modeloPlacaReal = gltf.scene; 
-            
-            // ESCALA DA PLACA-MÃE
-            let s = 0.8; 
-            modeloPlacaReal.scale.set(s, s, s);
-            
-            // ROTAÇÃO
+            modeloPlacaReal.scale.set(0.8, 0.8, 0.8);
             modeloPlacaReal.rotation.set(0, Math.PI / 2, 0); 
-            
-            // POSIÇÃO 
-            let placaX = -1.05; 
-            let placaY = 3.4;   
-            let placaZ = 0.5;   
-            modeloPlacaReal.position.set(placaX, placaY, placaZ); 
-            
+            modeloPlacaReal.position.set(-1.05, 3.4, 0.5); 
             cena.add(modeloPlacaReal); 
-            slotPlacaMae.material.opacity = 0; 
-            slotPlacaMae.userData.opacidadeOriginal = 0; // 🎯 ADICIONE ESTA LINHA!
+            if(slotPlacaMae) { slotPlacaMae.material.opacity = 0; slotPlacaMae.userData.opacidadeOriginal = 0; }
         });
     }
 
     // 2. O Processador (processador.glb)
-    if (processador !== "" && modeloProcessadorReal === null) {
-        telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
+    if (processador !== "" && typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal === null) {
+        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
         carregador.load('modelos/processador.glb', function(gltf) {
             modeloProcessadorReal = gltf.scene; 
-            
-            // ESCALA (Acabando com o "tapete")
-            let sProc = 0.80; 
-            modeloProcessadorReal.scale.set(sProc, sProc, sProc); 
-            
-            // ROTAÇÃO (O duplo giro que o deitou na posição certa)
+            modeloProcessadorReal.scale.set(0.80, 0.80, 0.80); 
             modeloProcessadorReal.rotation.set(1.55, 1.5, 0); 
             modeloProcessadorReal.rotateX(Math.PI / 2); 
             modeloProcessadorReal.rotateY(Math.PI / 2); 
-            
-            // POSIÇÃO 
-            let posX = -0.90; 
-            let posY = 3.5;   
-            let posZ = 1.0;   
-            modeloProcessadorReal.position.set(posX, posY, posZ); 
-            
+            modeloProcessadorReal.position.set(-0.90, 3.5, 1.0); 
             cena.add(modeloProcessadorReal); 
-            slotProcessador.material.opacity = 0; 
-            slotProcessador.userData.opacidadeOriginal = 0; // 🎯 ADICIONE ESTA LINHA!
+            if(slotProcessador) { slotProcessador.material.opacity = 0; slotProcessador.userData.opacidadeOriginal = 0; }
         });
     }
 
     // 3. A Placa de Vídeo (placavideo.glb)
-    if (gpu !== "" && modeloGpuReal === null) {
-        telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
+    if (gpu !== "" && typeof modeloGpuReal !== 'undefined' && modeloGpuReal === null) {
+        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
         carregador.load('modelos/placavideo.glb', function(gltf) {
             modeloGpuReal = gltf.scene; 
-            
-            // ESCALA (O raio encolhedor)
-            let sGpu = 0.30; 
-            modeloGpuReal.scale.set(sGpu, sGpu, sGpu);
-
-            // ROTAÇÃO (Barriga para baixo)
+            modeloGpuReal.scale.set(0.30, 0.30, 0.30);
             modeloGpuReal.rotation.set(0, 0, 0); 
             modeloGpuReal.rotateX(Math.PI / 2); 
             modeloGpuReal.rotateZ(Math.PI / 2);
-
-            // POSIÇÃO 
-            let gpuX = 0;  
-            let gpuY = 2.2;   
-            let gpuZ = 0.80;   
-            modeloGpuReal.position.set(gpuX, gpuY, gpuZ); 
-            
+            modeloGpuReal.position.set(0, 2.2, 0.80); 
             cena.add(modeloGpuReal); 
-            slotGpu.material.opacity = 0; 
-            slotGpu.userData.opacidadeOriginal = 0; // 🎯 ADICIONE ESTA LINHA!
+            if(slotGpu) { slotGpu.material.opacity = 0; slotGpu.userData.opacidadeOriginal = 0; }
         });
     }
 
-   // --- 🎯 O NOVO CÉREBRO DAS VENTOINHAS (.GLB) ---
-    let fansIn = 0, fansOut = 0, totalFans = 0;
-    [fTras, fFrente1, fFrente2, fFrente3, fTeto1, fTeto2, fTeto3].forEach(f => { 
-        if (f.includes('in')) fansIn++; 
-        if (f.includes('out')) fansOut++; 
-        if (f !== "") totalFans++; 
-    });
-
+    // =======================================================
+    // 🌬️ SISTEMA E DISTRIBUIÇÃO DAS VENTOINHAS 3D
+    // =======================================================
+    let arrayFans = [getVal('fan-tras'), getVal('fan-frente1'), getVal('fan-frente2'), getVal('fan-frente3'), getVal('fan-teto1'), getVal('fan-teto2'), getVal('fan-teto3')];
+    let fansIn = arrayFans.filter(f => f.includes('in')).length;
+    let fansOut = arrayFans.filter(f => f.includes('out')).length;
+    let totalFans = arrayFans.filter(f => f !== "").length;
     let precisaDeFan = totalFans > 0;
 
-    // A função mestre que clona a fan original e distribui pelos arames azuis
     function distribuirFans3D() {
         if (!modeloFanBase) return;
 
@@ -673,41 +573,32 @@ function verificarCompatibilidade() {
                 cena.remove(modelosFansInstalados[chave]);
                 modelosFansInstalados[chave] = null;
             }
+            if (!arame) return;
 
             if (valorMenu === "") {
                 arame.visible = true; 
-                arame.material.wireframe = false; // Tira os riscos azuis
-                arame.material.opacity = 0;       // Fica 100% transparente (invisível)
+                arame.material.wireframe = false;
+                arame.material.opacity = 0;       
                 arame.userData.opacidadeOriginal = 0;
                 return;
-            }
-			else {
+            } else {
                 arame.visible = true; 
-                arame.material.wireframe = false; // Sem riscos
+                arame.material.wireframe = false; 
                 arame.material.opacity = 0.9;     
-                arame.material.color.setHex(0x222222); // Cor cinza/preta simulando ventoinha genérica
+                arame.material.color.setHex(0x222222); 
                 modelosFansInstalados[chave] = arame;  
             }
 
             let novaFan = modeloFanBase.clone();
             novaFan.position.copy(arame.position);
             
-            // 🚀 O RAIO DE CRESCIMENTO (Com o centro já corrigido)
             let tamanhoFan = 4; 
             novaFan.scale.set(tamanhoFan, tamanhoFan, tamanhoFan); 
             novaFan.rotation.set(0, 0, 0); 
 
-            // Lógica de Rotação (Parede vs Teto)
-            if (localMontagem === 'teto') {
-                novaFan.rotateX(Math.PI / 2); 
-            }
-
-            // Lógica de Fluxo de Ar
-            if (valorMenu.includes("out")) {
-                novaFan.rotateY(Math.PI); 
-            } else if (valorMenu.includes("in")) {
-                novaFan.rotateY(0); 
-            }
+            if (localMontagem === 'teto') novaFan.rotateX(Math.PI / 2); 
+            if (valorMenu.includes("out")) novaFan.rotateY(Math.PI); 
+            else if (valorMenu.includes("in")) novaFan.rotateY(0); 
 
             cena.add(novaFan);
             modelosFansInstalados[chave] = novaFan;
@@ -717,26 +608,21 @@ function verificarCompatibilidade() {
             arame.material.wireframe = false;
         }
 
-        aplicarFan('fanTras', fanTras, fTras, 'parede');
-        aplicarFan('fanFrente1', fanFrente1, fFrente1, 'parede');
-        aplicarFan('fanFrente2', fanFrente2, fFrente2, 'parede');
-        aplicarFan('fanFrente3', fanFrente3, fFrente3, 'parede');
-        aplicarFan('fanTeto1', fanTeto1, fTeto1, 'teto');
-        aplicarFan('fanTeto2', fanTeto2, fTeto2, 'teto');
-        aplicarFan('fanTeto3', fanTeto3, fTeto3, 'teto');
+        aplicarFan('fanTras', typeof fanTras !== 'undefined' ? fanTras : null, getVal('fan-tras'), 'parede');
+        aplicarFan('fanFrente1', typeof fanFrente1 !== 'undefined' ? fanFrente1 : null, getVal('fan-frente1'), 'parede');
+        aplicarFan('fanFrente2', typeof fanFrente2 !== 'undefined' ? fanFrente2 : null, getVal('fan-frente2'), 'parede');
+        aplicarFan('fanFrente3', typeof fanFrente3 !== 'undefined' ? fanFrente3 : null, getVal('fan-frente3'), 'parede');
+        aplicarFan('fanTeto1', typeof fanTeto1 !== 'undefined' ? fanTeto1 : null, getVal('fan-teto1'), 'teto');
+        aplicarFan('fanTeto2', typeof fanTeto2 !== 'undefined' ? fanTeto2 : null, getVal('fan-teto2'), 'teto');
+        aplicarFan('fanTeto3', typeof fanTeto3 !== 'undefined' ? fanTeto3 : null, getVal('fan-teto3'), 'teto');
     }
 
-   // =======================================================
-    // 🛡️ CARREGAMENTO SEGURO DA FAN BASE
-    // =======================================================
-    if (precisaDeFan && modeloFanBase === null && !carregandoFan) {
-        carregandoFan = true; // 🟢 CORRIGIDO: Agora é "true" em vez de "f"!
-        telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1';
+    if (precisaDeFan && typeof modeloFanBase !== 'undefined' && modeloFanBase === null && !carregandoFan) {
+        carregandoFan = true;
+        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
         
         carregador.load('modelos/fan.glb', function(gltf) {
             let modeloOriginal = gltf.scene;
-            
-            // Centralização perfeita
             let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
             let centroReal = new THREE.Vector3();
             caixaContorno.getCenter(centroReal);
@@ -746,253 +632,205 @@ function verificarCompatibilidade() {
             envelope.add(modeloOriginal);
             
             modeloFanBase = envelope; 
-            carregandoFan = false; // Abre o semáforo
-            
-            console.log("✅ Ventoinha 3D carregada com sucesso!");
+            carregandoFan = false; 
             distribuirFans3D(); 
-            
         }, undefined, function(erro) {
             console.error("❌ ERRO: O ficheiro fan.glb não foi encontrado na pasta 'modelos/'", erro);
-            carregandoFan = false; // Abre o semáforo mesmo se der erro
+            carregandoFan = false; 
         });
-        
-    } else if (modeloFanBase !== null) {
+    } else if (typeof modeloFanBase !== 'undefined' && modeloFanBase !== null) {
         distribuirFans3D();
     }
-    // --------------------------------------------------
 
-    let ddrSuportadoPelaPlaca = "ddr5";
-    let mhzMaximoDaPlaca = 5600;
-    let mhzMaximoNativoDoCpu = 5200;
-
-    if (socketPlaca === "am4" || socketPlaca === "lga1200") {
-        ddrSuportadoPelaPlaca = "ddr4";
-        mhzMaximoDaPlaca = 3600;
-        mhzMaximoNativoDoCpu = 3200;
-    } else if (socketPlaca === "am5" || socketPlaca === "lga1700") {
-        ddrSuportadoPelaPlaca = "ddr5";
-        mhzMaximoDaPlaca = 6400;
-        mhzMaximoNativoDoCpu = 5200;
-    }
-
-    let ddrDetectado = "";
-    let mhzDetectado = 0;
-    let misturouGeracao = false;
-    let misturouFrequencia = false;
-    let erroDdrIncompativel = false;
-    let erroMhzExcedidoPlaca = false;
-    let alertaMhzOverclockCpu = false;
-
-    function processarSlotRam(pente, valor) {
-        if (valor === "") {
-            pente.material.wireframe = true; pente.material.color.setHex(0x9b59b6);
-            pente.userData.modelo = "";
-            return;
-        }
-        pente.material.wireframe = false;
-        
-        let info = valor.split("-"); 
-        let geracao = info[0];
-        let mhz = parseInt(info[2]);
-
-        if (ddrDetectado !== "" && ddrDetectado !== geracao) misturouGeracao = true;
-        if (mhzDetectado !== 0 && mhzDetectado !== mhz) misturouFrequencia = true;
-        ddrDetectado = geracao;
-        mhzDetectado = mhz;
-
-        if (geracao === "ddr4") {
-            pente.material.color.setHex(0x2c3e50); 
-            pente.userData.modelo = "ddr4";
-        } else {
-            if (mhz >= 6000) {
-                pente.material.color.setHex(0x9b59b6); 
-                pente.userData.modelo = "rgb";
-            } else {
-                pente.material.color.setHex(0xecf0f1); 
-                pente.userData.modelo = "ddr5";
-            }
-        }
-
-        if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdrIncompativel = true;
-        if (placaMaeValue !== "" && mhz > mhzMaximoDaPlaca) erroMhzExcedidoPlaca = true;
-        if (processador !== "" && mhz > mhzMaximoNativoDoCpu && mhz <= mhzMaximoDaPlaca) alertaMhzOverclockCpu = true;
-    }
-
-    processarSlotRam(ram1, vRam1); processarSlotRam(ram2, vRam2); processarSlotRam(ram3, vRam3); processarSlotRam(ram4, vRam4);
-
-    slotSsd.material.wireframe = (armazenamento !== "ssd-sata");
-    if(slotM2) slotM2.material.wireframe = (armazenamento !== "ssd-m2");
-    if (slotPlacaMae) slotPlacaMae.material.wireframe = (placaMaeValue === "");
-    if (slotProcessador) slotProcessador.material.wireframe = (processador === "");
-    if (slotGpu) slotGpu.material.wireframe = (gpu === "");
-    if (slotFonte) slotFonte.material.wireframe = (fonte === "");
-    if (slotCooler) slotCooler.material.wireframe = (cooler === "");
-    
-    let usaWC240 = (cooler === "wc240");
-    let usaWC360 = (cooler === "wc360");
-
-    if (radiador240) {
-        radiador240.material.wireframe = !usaWC240; 
-        if (usaWC240) radiador240.material.color.setHex(0xbdc3c7); 
-    }
-    
-    if (radiador360) {
-        radiador360.material.wireframe = !usaWC360;
-        if (usaWC360) radiador360.material.color.setHex(0xbdc3c7); 
-    }
-
-    if (misturouGeracao || misturouFrequencia) {
-        errosDeMontagem.push("Incompatibilidade Crítica de RAM: Não misture frequências (MHz) ou gerações (DDR4/DDR5) diferentes. Isso causa queima de circuitos ou instabilidade fatal.");
-    }
-    if (erroDdrIncompativel) {
-        errosDeMontagem.push(`Incompatibilidade de Encaixe: A placa-mãe atual exige memórias do tipo ${ddrSuportadoPelaPlaca.toUpperCase()}, mas você instalou pentes ${ddrDetectado.toUpperCase()}. O encaixe físico é impossível.`);
-    }
-    if (erroMhzExcedidoPlaca) {
-        errosDeMontagem.push(`Bloqueio de Barramento: A frequência de ${mhzDetectado}MHz excede o limite elétrico suportado pelas trilhas desta placa-mãe (Máx: ${mhzMaximoDaPlaca}MHz).`);
-    }
-    if (alertaMhzOverclockCpu) {
-        alertasDeMontagem.push(`Aviso de Overclock (XMP/EXPO): A velocidade de ${mhzDetectado}MHz está acima do suporte padrão do processador (${mhzMaximoDaPlaca === 3600 ? '3200MHz' : '5200MHz'}). O computador vai ligar, mas operará em overclock estável através do perfil XMP/EXPO na BIOS.`);
-    }
-
-    if (totalRamNum > 0 && !misturouGeracao && !misturouFrequencia) {
-        if (totalRamNum === 1) alertasDeMontagem.push("Gargalo de Banda: Apenas 1 canal ativo (Single Channel). Seu processador perderá até 30% de desempenho em jogos.");
-        if (totalRamNum === 2 && (vRam2 === "" || vRam4 === "")) alertasDeMontagem.push("Otimização Pendente: Para habilitar o Dual Channel verdadeiro com 2 pentes, mude-os para os slots alternados 2 e 4.");
-    }
-
-    if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. O CPU não encaixa.");
-    if (tamanhoPlaca === "eatx") errosDeMontagem.push("Falta de Espaço Crítica: Placas E-ATX não cabem fisicamente neste chassi.");
-    
-// =======================================================
-    // ⚡ CALCULADORA DE CONSUMO DE ENERGIA SIMPLIFICADA
     // =======================================================
-    let consumoTotal = 0;
-    
-    if (placaMaeValue !== "") consumoTotal += 40; 
-    
-    if (processador === "am4") consumoTotal += 80; 
-    else if (processador === "am5") consumoTotal += 120; 
-    else if (processador === "lga1700") consumoTotal += 150; 
+    // 🧠 CÉREBRO DOS RADIADORES E TETO
+    // =======================================================
+    let selectTeto = getEl('teto'), selectTeto1 = getEl('fan-teto1'), selectTeto2 = getEl('fan-teto2'), selectTeto3 = getEl('fan-teto3');
 
-    if (gpu === "rx9060xt") consumoTotal += 180;
-    else if (gpu === "rtx5070ti") consumoTotal += 285;
-    else if (gpu === "rx9070xt") consumoTotal += 320;
+    const configurarTeto = (t1, t2, t3) => {
+        if (selectTeto1) { selectTeto1.disabled = t1; if(selectTeto1.parentElement) selectTeto1.parentElement.style.display = t1 ? 'block' : (getVal('teto') !== "" ? 'block' : 'none'); }
+        if (selectTeto2) { selectTeto2.disabled = t2; if(selectTeto2.parentElement) selectTeto2.parentElement.style.display = t2 ? 'block' : (getVal('teto') !== "" ? 'block' : 'none'); }
+        if (selectTeto3) { selectTeto3.disabled = t3; if(selectTeto3.parentElement) selectTeto3.parentElement.style.display = t3 ? 'block' : (getVal('teto') === '3xfan' ? 'block' : 'none'); }
+        if (typeof fanTeto1 !== 'undefined') { fanTeto1.visible = t1 || getVal('teto') !== ""; fanTeto1.userData.ligada = (getVal('fan-teto1') !== ""); }
+        if (typeof fanTeto2 !== 'undefined') { fanTeto2.visible = t2 || getVal('teto') !== ""; fanTeto2.userData.ligada = (getVal('fan-teto2') !== ""); }
+        if (typeof fanTeto3 !== 'undefined') { fanTeto3.visible = t3 || getVal('teto') === '3xfan'; fanTeto3.userData.ligada = (getVal('fan-teto3') !== ""); }
+    };
 
-    consumoTotal += (totalRamNum * 5); 
-    if (armazenamento !== "") consumoTotal += 5; 
-    consumoTotal += (totalFans * 3); 
-    
-    if (cooler === "aircooler") consumoTotal += 3;
-    else if (cooler === "wc240") consumoTotal += 15; 
-    else if (cooler === "wc360") consumoTotal += 20; 
-
-    let limiteFonte = 0;
-    if (fonte === "550w") limiteFonte = 550;
-    else if (fonte === "850w") limiteFonte = 850;
-
-    // Atualiza o texto simples no final do painel
-    let elConsumo = document.getElementById('consumo-watts');
-    if (elConsumo) {
-        if (consumoTotal > 0) {
-            elConsumo.innerText = `Consumo: ${consumoTotal} W`;
-            elConsumo.style.display = "block"; // Mostra o texto quando há consumo
-        } else {
-            elConsumo.style.display = "none"; // Esconde se o PC estiver vazio
+    if (cooler === 'wc240' || cooler === 'wc360') {
+        let is360 = (cooler === 'wc360');
+        if (selectTeto) { selectTeto.innerHTML = `<option value="radiador">[ Ocupado pelo Radiador ${is360 ? '360' : '240'}mm ]</option>`; selectTeto.disabled = true; }
+        if (selectTeto1) selectTeto1.value = "risemode_out";
+        if (selectTeto2) selectTeto2.value = "risemode_out";
+        if (selectTeto3) selectTeto3.value = is360 ? "risemode_out" : "";
+        configurarTeto(true, true, is360);
+        if (typeof radiador240 !== 'undefined') { radiador240.visible = !is360; radiador240.material.wireframe = false; radiador240.material.color.setHex(0xbdc3c7); }
+        if (typeof radiador360 !== 'undefined') { radiador360.visible = is360; radiador360.material.wireframe = false; radiador360.material.color.setHex(0xbdc3c7); }
+    } else {
+        if (selectTeto && selectTeto.disabled) {
+            selectTeto.innerHTML = `<option value="">-- Vazio --</option><option value="2xfan">Instalar 2x Ventoinhas</option><option value="3xfan">Instalar 3x Ventoinhas</option>`;
+            selectTeto.disabled = false;
         }
+        let valTeto = selectTeto ? selectTeto.value : "";
+        if (valTeto === '2xfan') configurarTeto(false, false, true);
+        else if (valTeto === '3xfan') configurarTeto(false, false, false);
+        else {
+            if (selectTeto1) selectTeto1.value = ""; if (selectTeto2) selectTeto2.value = ""; if (selectTeto3) selectTeto3.value = "";
+            configurarTeto(true, true, true);
+        }
+        if (typeof radiador240 !== 'undefined') radiador240.visible = false;
+        if (typeof radiador360 !== 'undefined') radiador360.visible = false;
     }
 
-    // Regras de Segurança Invisíveis (Só apitam se der erro)
-    if (consumoTotal > 0) {
-        if (fonte === "") {
-            errosDeMontagem.push(`Falta Energia: O sistema consome cerca de ${consumoTotal}W, mas não há fonte instalada.`);
-        } else {
-            let margemSeguranca = consumoTotal * 1.20; 
-            if (limiteFonte < consumoTotal) {
-                errosDeMontagem.push(`Desarme Imediato: O PC consome até ~${consumoTotal}W sob carga, mas a fonte fornece apenas ${limiteFonte}W.`);
-            } else if (limiteFonte < margemSeguranca) {
-                alertasDeMontagem.push(`Aviso de Sobrecarga: O PC exige ~${consumoTotal}W e a fonte tem ${limiteFonte}W. Recomendamos um modelo mais forte.`);
-            }
-        }
+    if (typeof fanTras !== 'undefined') { fanTras.visible = true; fanTras.userData.ligada = (getVal('fan-tras') !== ""); }
+    if (typeof fanFrente1 !== 'undefined') { fanFrente1.visible = true; fanFrente1.userData.ligada = (getVal('fan-frente1') !== ""); }
+    if (typeof fanFrente2 !== 'undefined') { fanFrente2.visible = true; fanFrente2.userData.ligada = (getVal('fan-frente2') !== ""); }
+    if (typeof fanFrente3 !== 'undefined') { fanFrente3.visible = true; fanFrente3.userData.ligada = (getVal('fan-frente3') !== ""); }
+
+    // =======================================================
+    // 📏 FÍSICA E COMPATIBILIDADE
+    // =======================================================
+    let errosDeMontagem = [], alertasDeMontagem = [];
+    let socketPlaca = "", tamanhoPlaca = "";
+    if (placaMaeValue !== "") {
+        let partes = placaMaeValue.split("-");
+        socketPlaca = partes[0]; 
+        tamanhoPlaca = partes[1];
     }
-    if (processador !== "" && cooler === "") errosDeMontagem.push("Risco de Superaquecimento: Falta refrigeração no CPU.");
 
-    if (gpu === "rx9060xt") slotGpu.scale.set(1, 1, 1);
-    else if (gpu === "rtx5070ti") slotGpu.scale.set(1, 1, 1.35);
-    else if (gpu === "rx9070xt") slotGpu.scale.set(1, 1, 1.7);
-    else slotGpu.scale.set(1, 1, 1);
+    if (gabineteValue === "compacto") {
+        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") errosDeMontagem.push(`Erro de Chassi: Placa-mãe ${tamanhoPlaca.toUpperCase()} não entra num gabinete Compacto.`);
+        if (gpu === "rtx5070ti" || gpu === "rx9070xt") errosDeMontagem.push("Colisão Física: Placa de Vídeo massiva! Baterá na fonte em chassi Compacto.");
+        if (cooler === "wc360") errosDeMontagem.push("Erro de Teto: Radiador de 360mm não cabe num gabinete Compacto.");
+    } else if (gabineteValue === "mid-tower") {
+        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") errosDeMontagem.push("Falta de Espaço: Gabinete suporta no máximo Micro-ATX (mATX).");
+        if (gpu === "rx9070xt") errosDeMontagem.push("Erro de Comprimento: A RX 9070 XT colide com as ventoinhas frontais neste chassi.");
+    } else if (gabineteValue === "full-tower") {
+        if (tamanhoPlaca === "matx") alertasDeMontagem.push("Estética: Placa-mãe Micro-ATX num gabinete Full-Tower deixará muito espaço vazio.");
+    }
 
-    if (gpu === "rx9070xt") errosDeMontagem.push("Erro de Gabinete Pequeno: A RX 9070 XT colide fisicamente com a ventoinha frontal pré-instalada.");
-    else if (gpu === "rtx5070ti") alertasDeMontagem.push("Aviso de Espaço (Clearance): A RTX 5070 Ti ficará a poucos milímetros da ventoinha frontal.");
+    // --- REGRAS DE MEMÓRIA RAM ---
+    let totalRamNum = ['ram1', 'ram2', 'ram3', 'ram4'].reduce((soma, id) => soma + (getVal(id) !== "" ? 1 : 0), 0);
+    let ddrSuportadoPelaPlaca = (socketPlaca === "am4" || socketPlaca === "lga1200") ? "ddr4" : "ddr5";
+    let mhzMaximoDaPlaca = (ddrSuportadoPelaPlaca === "ddr4") ? 3600 : 6400;
+    let ddrDetectado = "", mhzDetectado = 0, misturou = false, erroDdr = false, erroMhz = false;
 
+    ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => {
+        let valor = getVal(id);
+        if (valor === "") return;
+        let info = valor.split("-"); 
+        let geracao = info[0], mhz = parseInt(info[2]);
+
+        if ((ddrDetectado !== "" && ddrDetectado !== geracao) || (mhzDetectado !== 0 && mhzDetectado !== mhz)) misturou = true;
+        ddrDetectado = geracao; mhzDetectado = mhz;
+        
+        if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdr = true;
+        if (placaMaeValue !== "" && mhz > mhzMaximoDaPlaca) erroMhz = true;
+    });
+
+    if (misturou) errosDeMontagem.push("Incompatibilidade de RAM: Não misture frequências (MHz) ou gerações diferentes.");
+    if (erroDdr) errosDeMontagem.push(`Incompatibilidade Física: Placa-mãe exige ${ddrSuportadoPelaPlaca.toUpperCase()}, mas instalou ${ddrDetectado.toUpperCase()}.`);
+    if (erroMhz) errosDeMontagem.push(`Bloqueio: Frequência de ${mhzDetectado}MHz excede o limite da placa-mãe (Máx: ${mhzMaximoDaPlaca}MHz).`);
+    
+    if (totalRamNum === 1) alertasDeMontagem.push("Gargalo de Banda: Single Channel ativo. Perca de desempenho em jogos.");
+    if (totalRamNum === 2 && (getVal('ram2') === "" || getVal('ram4') === "")) alertasDeMontagem.push("Otimização: Para Dual Channel, use os slots alternados 2 e 4.");
+
+    if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. CPU não encaixa na Placa-Mãe.");
+    
     if (totalFans > 0) {
-        // Agora as opções chamam-se risemode_in e risemode_out, então verificamos .includes()
-        if (fTras.includes('in')) errosDeMontagem.push("Erro: A ventoinha traseira deve ser Exaustor.");
-        if (fFrente1.includes('out') || fFrente2.includes('out') || fFrente3.includes('out')) errosDeMontagem.push("Erro: Ventoinhas frontais devem ser Injeção.");
+        if (getVal('fan-tras').includes('in')) errosDeMontagem.push("Erro: Ventoinha traseira deve ser Exaustor (Out).");
+        if (['fan-frente1', 'fan-frente2', 'fan-frente3'].some(id => getVal(id).includes('out'))) errosDeMontagem.push("Erro: Ventoinhas frontais devem ser Injeção (In).");
     }
+
+    // =======================================================
+    // ⚡ CALCULADORA DE CONSUMO AUTOMÁTICA (JSON)
+    // =======================================================
+    let consumoTotal = extrairWatts('placa-mae') + extrairWatts('processador') + extrairWatts('gpu') + extrairWatts('cooler') + extrairWatts('armazenamento') +
+        ['ram1', 'ram2', 'ram3', 'ram4', 'fan-tras', 'fan-frente1', 'fan-frente2', 'fan-frente3', 'fan-teto1', 'fan-teto2', 'fan-teto3'].reduce((s, id) => s + extrairWatts(id), 0);
+    
+    let limiteFonte = extrairWatts('fonte');
+
+    let elConsumo = getEl('consumo-watts');
+    if (elConsumo) {
+        elConsumo.innerText = `Consumo: ${consumoTotal} W`;
+        elConsumo.style.display = consumoTotal > 0 ? "block" : "none";
+    }
+
+    if (consumoTotal > 0) {
+        if (fonte === "") errosDeMontagem.push(`Falta Energia: Sistema consome ~${consumoTotal}W, instale uma fonte.`);
+        else if (limiteFonte < consumoTotal) errosDeMontagem.push(`Desarme: O PC exige ~${consumoTotal}W, mas a fonte fornece apenas ${limiteFonte}W.`);
+        else if (limiteFonte < (consumoTotal * 1.20)) alertasDeMontagem.push(`Aviso: O PC exige ~${consumoTotal}W. Fonte operando perto do limite, considere upgrade.`);
+    }
+
+    if (processador !== "" && cooler === "") errosDeMontagem.push("Risco: Falta refrigeração no CPU.");
 
     let faltaHardwareEssencial = (placaMaeValue === "" || processador === "" || totalRamNum === 0 || fonte === "" || armazenamento === "");
-    if (faltaHardwareEssencial && (placaMaeValue !== "" || processador !== "" || totalRamNum > 0 || gpu !== "" || fonte !== "" || cooler !== "" || armazenamento !== "" || totalFans > 0)) {
-        let listaFaltantes = [];
-        if (placaMaeValue === "") listaFaltantes.push("Placa-Mãe");
-        if (processador === "") listaFaltantes.push("Processador");
-        if (totalRamNum === 0) listaFaltantes.push("Memória RAM");
-        if (fonte === "") listaFaltantes.push("Fonte");
-        if (armazenamento === "") listaFaltantes.push("Armazenamento");
-        alertasDeMontagem.push(`O PC não irá ligar. Faltam itens essenciais: ${listaFaltantes.join(", ")}.`);
+    if (faltaHardwareEssencial && consumoTotal > 0) {
+        let lista = [];
+        if (placaMaeValue === "") lista.push("Placa-Mãe");
+        if (processador === "") lista.push("Processador");
+        if (totalRamNum === 0) lista.push("RAM");
+        if (fonte === "") lista.push("Fonte");
+        if (armazenamento === "") lista.push("Armazenamento");
+        alertasDeMontagem.push(`PC inoperante. Faltam: ${lista.join(", ")}.`);
     }
 
-let conteudoLogs = document.getElementById('conteudo-logs');
-    let btnPower = document.getElementById('btn-power');
+    // =======================================================
+    // 🖥️ ATUALIZAÇÃO DA INTERFACE E LOGS
+    // =======================================================
+    let conteudoLogs = getEl('conteudo-logs');
+    let isLigado = typeof sistemaLigado !== 'undefined' && sistemaLigado;
 
-    if (placaMaeValue !== "" || processador !== "" || totalRamNum > 0 || gpu !== "" || fonte !== "" || cooler !== "" || armazenamento !== "" || totalFans > 0) {
+    if (consumoTotal > 0 || totalFans > 0) {
         let htmlFinal = "";
         
-        // 1. BLOCO DE ERROS ❌
         if (errosDeMontagem.length > 0) {
-            luzAlerta.intensity = 5; luzAlerta.color.setHex(0xc0392b); 
+            if (typeof luzAlerta !== 'undefined') { luzAlerta.intensity = 5; luzAlerta.color.setHex(0xc0392b); }
             errosDeMontagem.forEach(err => htmlFinal += `<div class="log-erro">❌ ${err}</div>`);
         }
-
-        // 2. BLOCO DE ALERTAS ⚠️
+        
         if (alertasDeMontagem.length > 0) {
-            if (errosDeMontagem.length === 0) { luzAlerta.intensity = 3; luzAlerta.color.setHex(0xf1c40f); }
+            if (errosDeMontagem.length === 0 && typeof luzAlerta !== 'undefined') { luzAlerta.intensity = 3; luzAlerta.color.setHex(0xf1c40f); }
             alertasDeMontagem.forEach(al => htmlFinal += `<div class="log-alerta">⚠️ ${al}</div>`);
         }
         
-        // 3. SUCESSO E BOTÃO POWER ✅
-        if (errosDeMontagem.length === 0 && !faltaHardwareEssencial) {
-            luzAlerta.intensity = 5; luzAlerta.color.setHex(0x27ae60); 
+        let sistemaPronto = (errosDeMontagem.length === 0 && !faltaHardwareEssencial);
+        
+        if (sistemaPronto) {
+            if (typeof luzAlerta !== 'undefined') { luzAlerta.intensity = 5; luzAlerta.color.setHex(0x27ae60); }
             htmlFinal = `<div class="log-sucesso">✅ SISTEMA PRONTO PARA RECEBER CARGA!</div>` + htmlFinal;
-            if (btnPower && !sistemaLigado) { btnPower.disabled = false; btnPower.className = "btn-pronto"; btnPower.innerText = "⚡ LIGAR PC"; }
+            atualizarBotao('btn-power', !isLigado, "btn-pronto", "btn-desligado", "⚡ LIGAR PC");
+            atualizarBotao('btn-relatorio', true, "btn-pronto", "btn-desligado");
         } else {
-            if (btnPower && !sistemaLigado) { btnPower.disabled = true; btnPower.className = "btn-desligado"; btnPower.innerText = "🔌 LIGAR PC"; }
+            atualizarBotao('btn-power', false, "btn-desligado", "btn-desligado", "🔌 LIGAR PC");
+            atualizarBotao('btn-relatorio', false, "btn-desligado", "btn-desligado");
         }
         
-        // 🌬️ 4. NOVO: DIAGNÓSTICO DE FLUXO DE AR
         if (totalFans > 0) {
-            let infoFluxoAr = "";
-            if (fansIn > fansOut) {
-                // Pressão Positiva (Azul - Ideal)
-                infoFluxoAr = `<div style="color: #3498db; background: rgba(52, 152, 219, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #3498db; font-size: 0.95rem;">💨 <b>Pressão Positiva (${fansIn} In / ${fansOut} Out):</b> Excelente! Como entra mais ar do que sai, o PC vai expulsar o excesso pelas frestas, evitando a acumulação de poeira.</div>`;
-            } else if (fansOut > fansIn) {
-                // Pressão Negativa (Laranja - Alerta de Poeira)
-                infoFluxoAr = `<div style="color: #e67e22; background: rgba(230, 126, 34, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #e67e22; font-size: 0.95rem;">🌪️ <b>Pressão Negativa (${fansIn} In / ${fansOut} Out):</b> Atenção! Como sai mais ar do que entra, o gabinete atua como um "aspirador", puxando poeira por todas as frestas não filtradas.</div>`;
-            } else {
-                // Pressão Neutra (Verde)
-                infoFluxoAr = `<div style="color: #2ecc71; background: rgba(46, 204, 113, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #2ecc71; font-size: 0.95rem;">🌬️ <b>Pressão Neutra (${fansIn} In / ${fansOut} Out):</b> Fluxo de ar perfeitamente equilibrado. Garante boa refrigeração, mas exige limpeza regular dos filtros.</div>`;
-            }
-            htmlFinal += infoFluxoAr; // Cola o diagnóstico de ar no fundo dos logs
+            if (fansIn > fansOut) htmlFinal += `<div style="color: #3498db; background: rgba(52, 152, 219, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #3498db; font-size: 0.95rem;">💨 <b>Pressão Positiva (${fansIn} In / ${fansOut} Out):</b> Excelente! Expulsa poeira.</div>`;
+            else if (fansOut > fansIn) htmlFinal += `<div style="color: #e67e22; background: rgba(230, 126, 34, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #e67e22; font-size: 0.95rem;">🌪️ <b>Pressão Negativa (${fansIn} In / ${fansOut} Out):</b> Atenção! Gabinete atuando como aspirador de pó.</div>`;
+            else htmlFinal += `<div style="color: #2ecc71; background: rgba(46, 204, 113, 0.1); padding: 8px; margin-top: 10px; border-left: 4px solid #2ecc71; font-size: 0.95rem;">🌬️ <b>Pressão Neutra (${fansIn} In / ${fansOut} Out):</b> Fluxo equilibrado.</div>`;
         }
 
-        conteudoLogs.innerHTML = htmlFinal;
+        if (conteudoLogs) conteudoLogs.innerHTML = htmlFinal;
         
     } else {
-        conteudoLogs.innerHTML = "Aguardando seleção de componentes...";
-        luzAlerta.intensity = 0;
-        if (btnPower) { btnPower.disabled = true; btnPower.className = "btn-desligado"; }
+        if (conteudoLogs) conteudoLogs.innerHTML = "Aguardando seleção de componentes...";
+        if (typeof luzAlerta !== 'undefined') luzAlerta.intensity = 0;
+        atualizarBotao('btn-power', false, "btn-desligado", "btn-desligado", "🔌 LIGAR PC");
+        atualizarBotao('btn-relatorio', false, "btn-desligado", "btn-desligado");
     }
 }
-verificarCompatibilidade();
 window.verificarCompatibilidade = verificarCompatibilidade;
+
+
+
+
+
+
+
+
+
+
 
 // ==========================================================================
 // 5. MOTOR DE ANIMAÇÃO E SISTEMA DE ENERGIA UNIVERSAL
@@ -1101,3 +939,58 @@ if (btnToggle && menuPrincipalUI) {
 }
 animar();
 })();
+
+
+// ==========================================================================
+// 8. GERADOR DE RELATÓRIO E PDF
+// ==========================================================================
+
+// Função auxiliar para capturar o TEXTO visível do Menu, e não o "value" escondido
+function obterNomePeca(idElemento) {
+    let el = document.getElementById(idElemento);
+    if (!el || el.value === "") return "Não Instalado";
+    return el.options[el.selectedIndex].text;
+}
+
+function abrirRelatorio() {
+    let btnUI = document.getElementById('btn-relatorio');
+    if (btnUI && btnUI.disabled) return; // Só abre se o PC estiver pronto
+
+    let consumoAtual = document.getElementById('consumo-watts') ? document.getElementById('consumo-watts').innerText.replace('Consumo: ', '') : '0 W';
+
+    let html = `
+        <div class="relatorio-secao">
+            <h3>🖥️ Componentes Principais</h3>
+            <div class="relatorio-item"><strong>Gabinete:</strong> <span>${obterNomePeca('gabinete')}</span></div>
+            <div class="relatorio-item"><strong>Placa-Mãe:</strong> <span>${obterNomePeca('placa-mae')}</span></div>
+            <div class="relatorio-item"><strong>Processador:</strong> <span>${obterNomePeca('processador')}</span></div>
+            <div class="relatorio-item"><strong>Placa de Vídeo:</strong> <span>${obterNomePeca('gpu')}</span></div>
+        </div>
+
+        <div class="relatorio-secao">
+            <h3>⚡ Memória e Armazenamento</h3>
+            <div class="relatorio-item"><strong>Memória RAM:</strong> <span>
+                Slot 1: ${obterNomePeca('ram1')}<br>
+                Slot 2: ${obterNomePeca('ram2')}<br>
+                Slot 3: ${obterNomePeca('ram3')}<br>
+                Slot 4: ${obterNomePeca('ram4')}
+            </span></div>
+            <div class="relatorio-item"><strong>Armazenamento Principal:</strong> <span>${obterNomePeca('armazenamento')}</span></div>
+        </div>
+
+        <div class="relatorio-secao">
+            <h3>❄️ Energia e Refrigeração</h3>
+            <div class="relatorio-item"><strong>Fonte de Alimentação:</strong> <span>${obterNomePeca('fonte')}</span></div>
+            <div class="relatorio-item"><strong>Cooler do Processador:</strong> <span>${obterNomePeca('cooler')}</span></div>
+            <div class="relatorio-item"><strong>Consumo de Pico Estimado:</strong> <span style="color: #e74c3c; font-weight: bold;">${consumoAtual}</span></div>
+        </div>
+    `;
+    
+    document.getElementById('conteudo-relatorio').innerHTML = html;
+    document.getElementById('modal-relatorio').style.display = 'block';
+}
+
+// Controlos de fechar a janela
+document.getElementById('fechar-modal').onclick = () => document.getElementById('modal-relatorio').style.display = "none";
+window.onclick = (event) => { if (event.target == document.getElementById('modal-relatorio')) document.getElementById('modal-relatorio').style.display = "none"; }
+if(document.getElementById('btn-relatorio')) document.getElementById('btn-relatorio').addEventListener('click', abrirRelatorio);

@@ -103,6 +103,21 @@
     <div id="consumo-watts">Consumo: 0 W</div>
 
     <div id="tooltip-3d"></div>
+
+    <!-- Botão Gerar Relatório -->
+    <button id="btn-relatorio" class="btn-desligado" disabled>📋 RELATÓRIO</button>
+
+    <!-- Janela Modal Oculta do Relatório -->
+    <div id="modal-relatorio">
+        <div class="modal-conteudo">
+            <span id="fechar-modal">&times;</span>
+            <h2>📋 Laudo Técnico da Montagem</h2>
+            <div id="conteudo-relatorio">
+                <!-- O JavaScript vai injetar as peças aqui dentro -->
+            </div>
+            <button id="btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+        </div>
+    </div>
     <button id="btn-power" class="btn-desligado" disabled>🔌 LIGAR PC</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
