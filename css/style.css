@@ -216,7 +216,8 @@ html, body {
    📋 JANELA DO RELATÓRIO (ESTILO PREMIUM)
    ========================================= */
 #modal-relatorio {
-    position: fixed; z-index: 3000;
+    position: fixed; 
+    z-index: 9999; /* 🚀 TRUQUE: O valor máximo garante que esconde o botão "Esconder Menu" */
     left: 0; top: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px);
     display: none; align-items: center; justify-content: center;
