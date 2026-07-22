@@ -510,54 +510,52 @@ function verificarCompatibilidade() {
     if (typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal) modeloProcessadorReal.visible = (processador !== "");
 
     // =======================================================
-    // 📦 CARREGAMENTO DOS MODELOS 3D (.GLB) PRINCIPAIS
+    // 🧠 1. CÉREBRO DOS RADIADORES E TETO
     // =======================================================
-    
-    // 1. A Placa-Mãe (placa.glb)
-    if (placaMaeValue !== "" && typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal === null) {
-        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
-        carregador.load('modelos/placa.glb', function(gltf) {
-            modeloPlacaReal = gltf.scene; 
-            modeloPlacaReal.scale.set(0.8, 0.8, 0.8);
-            modeloPlacaReal.rotation.set(0, Math.PI / 2, 0); 
-            modeloPlacaReal.position.set(-1.05, 3.4, 0.5); 
-            cena.add(modeloPlacaReal); 
-            if(slotPlacaMae) { slotPlacaMae.material.opacity = 0; slotPlacaMae.userData.opacidadeOriginal = 0; }
-        });
-    }
+    let selectTeto = getEl('teto'), selectTeto1 = getEl('fan-teto1'), selectTeto2 = getEl('fan-teto2'), selectTeto3 = getEl('fan-teto3');
 
-    // 2. O Processador (processador.glb)
-    if (processador !== "" && typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal === null) {
-        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
-        carregador.load('modelos/processador.glb', function(gltf) {
-            modeloProcessadorReal = gltf.scene; 
-            modeloProcessadorReal.scale.set(0.80, 0.80, 0.80); 
-            modeloProcessadorReal.rotation.set(1.55, 1.5, 0); 
-            modeloProcessadorReal.rotateX(Math.PI / 2); 
-            modeloProcessadorReal.rotateY(Math.PI / 2); 
-            modeloProcessadorReal.position.set(-0.90, 3.5, 1.0); 
-            cena.add(modeloProcessadorReal); 
-            if(slotProcessador) { slotProcessador.material.opacity = 0; slotProcessador.userData.opacidadeOriginal = 0; }
-        });
-    }
+    if (cooler === 'wc240' || cooler === 'wc360') {
+        let is360 = (cooler === 'wc360');
+        if (selectTeto) { 
+            selectTeto.innerHTML = `<option value="radiador">[ Ocupado pelo Radiador ${is360 ? '360' : '240'}mm ]</option>`; 
+            selectTeto.disabled = true; 
+        }
+        if (selectTeto1) { selectTeto1.disabled = false; if(selectTeto1.parentElement) selectTeto1.parentElement.style.display = 'block'; }
+        if (selectTeto2) { selectTeto2.disabled = false; if(selectTeto2.parentElement) selectTeto2.parentElement.style.display = 'block'; }
+        if (selectTeto3) { 
+            selectTeto3.disabled = false; 
+            if(selectTeto3.parentElement) selectTeto3.parentElement.style.display = is360 ? 'block' : 'none'; 
+            if (!is360) selectTeto3.value = ""; 
+        }
 
-    // 3. A Placa de Vídeo (placavideo.glb)
-    if (gpu !== "" && typeof modeloGpuReal !== 'undefined' && modeloGpuReal === null) {
-        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
-        carregador.load('modelos/placavideo.glb', function(gltf) {
-            modeloGpuReal = gltf.scene; 
-            modeloGpuReal.scale.set(0.30, 0.30, 0.30);
-            modeloGpuReal.rotation.set(0, 0, 0); 
-            modeloGpuReal.rotateX(Math.PI / 2); 
-            modeloGpuReal.rotateZ(Math.PI / 2);
-            modeloGpuReal.position.set(0, 2.2, 0.80); 
-            cena.add(modeloGpuReal); 
-            if(slotGpu) { slotGpu.material.opacity = 0; slotGpu.userData.opacidadeOriginal = 0; }
-        });
+        if (typeof fanTeto1 !== 'undefined') fanTeto1.visible = true;
+        if (typeof fanTeto2 !== 'undefined') fanTeto2.visible = true;
+        if (typeof fanTeto3 !== 'undefined') fanTeto3.visible = is360;
+        
+        if (typeof radiador240 !== 'undefined') { radiador240.visible = !is360; radiador240.material.wireframe = false; radiador240.material.color.setHex(0xbdc3c7); }
+        if (typeof radiador360 !== 'undefined') { radiador360.visible = is360; radiador360.material.wireframe = false; radiador360.material.color.setHex(0xbdc3c7); }
+    } else {
+        if (selectTeto && selectTeto.disabled) {
+            selectTeto.innerHTML = `<option value="">-- Vazio --</option><option value="2xfan">Instalar 2x Ventoinhas</option><option value="3xfan">Instalar 3x Ventoinhas</option>`;
+            selectTeto.disabled = false;
+        }
+        let valTeto = selectTeto ? selectTeto.value : "";
+        let usa2Fans = (valTeto === '2xfan');
+        let usa3Fans = (valTeto === '3xfan');
+
+        if (selectTeto1) { selectTeto1.disabled = false; if(selectTeto1.parentElement) selectTeto1.parentElement.style.display = (usa2Fans || usa3Fans) ? 'block' : 'none'; if (!usa2Fans && !usa3Fans) selectTeto1.value = ""; }
+        if (selectTeto2) { selectTeto2.disabled = false; if(selectTeto2.parentElement) selectTeto2.parentElement.style.display = (usa2Fans || usa3Fans) ? 'block' : 'none'; if (!usa2Fans && !usa3Fans) selectTeto2.value = ""; }
+        if (selectTeto3) { selectTeto3.disabled = false; if(selectTeto3.parentElement) selectTeto3.parentElement.style.display = usa3Fans ? 'block' : 'none'; if (!usa3Fans) selectTeto3.value = ""; }
+
+        if (typeof fanTeto1 !== 'undefined') fanTeto1.visible = (usa2Fans || usa3Fans);
+        if (typeof fanTeto2 !== 'undefined') fanTeto2.visible = (usa2Fans || usa3Fans);
+        if (typeof fanTeto3 !== 'undefined') fanTeto3.visible = usa3Fans;
+        if (typeof radiador240 !== 'undefined') radiador240.visible = false;
+        if (typeof radiador360 !== 'undefined') radiador360.visible = false;
     }
 
     // =======================================================
-    // 🌬️ SISTEMA E DISTRIBUIÇÃO DAS VENTOINHAS 3D
+    // 🌬️ 2. SISTEMA E DISTRIBUIÇÃO DAS VENTOINHAS 3D
     // =======================================================
     let arrayFans = [getVal('fan-tras'), getVal('fan-frente1'), getVal('fan-frente2'), getVal('fan-frente3'), getVal('fan-teto1'), getVal('fan-teto2'), getVal('fan-teto3')];
     let fansIn = arrayFans.filter(f => f.includes('in')).length;
@@ -568,58 +566,55 @@ function verificarCompatibilidade() {
     function distribuirFans3D() {
         if (!modeloFanBase) return;
 
-        function aplicarFan(chave, arame, valorMenu, localMontagem) {
-            if (modelosFansInstalados[chave]) {
-                cena.remove(modelosFansInstalados[chave]);
-                modelosFansInstalados[chave] = null;
+        let tetoAberto = (getVal('teto') === '2xfan' || getVal('teto') === '3xfan' || getVal('cooler') === 'wc240' || getVal('cooler') === 'wc360');
+        let teto3Aberto = (getVal('teto') === '3xfan' || getVal('cooler') === 'wc360');
+
+        function aplicarFan(chave, arame, valorMenu, localMontagem, slotDisponivel = true) {
+            // Proteção extra para garantir que os modelos fantasma existem
+            if (typeof modelosFansInstalados === 'undefined') window.modelosFansInstalados = {};
+
+            if (modelosFansInstalados[chave]) { 
+                cena.remove(modelosFansInstalados[chave]); 
+                modelosFansInstalados[chave] = null; 
             }
             if (!arame) return;
 
             if (valorMenu === "") {
-                arame.visible = true; 
-                arame.material.wireframe = false;
-                arame.material.opacity = 0;       
-                arame.userData.opacidadeOriginal = 0;
+                arame.visible = slotDisponivel; 
+                arame.material.wireframe = true; 
+                arame.material.opacity = 0.3; 
+                arame.material.color.setHex(0x00ffff); 
+                arame.userData.opacidadeOriginal = 0.3;
                 return;
             } else {
-                arame.visible = true; 
-                arame.material.wireframe = false; 
-                arame.material.opacity = 0.9;     
-                arame.material.color.setHex(0x222222); 
-                modelosFansInstalados[chave] = arame;  
+                arame.visible = false; 
             }
 
             let novaFan = modeloFanBase.clone();
             novaFan.position.copy(arame.position);
-            
-            let tamanhoFan = 4; 
-            novaFan.scale.set(tamanhoFan, tamanhoFan, tamanhoFan); 
+            novaFan.scale.set(4, 4, 4); 
             novaFan.rotation.set(0, 0, 0); 
-
+            
             if (localMontagem === 'teto') novaFan.rotateX(Math.PI / 2); 
             if (valorMenu.includes("out")) novaFan.rotateY(Math.PI); 
             else if (valorMenu.includes("in")) novaFan.rotateY(0); 
 
             cena.add(novaFan);
             modelosFansInstalados[chave] = novaFan;
-
-            arame.material.opacity = 0;
-            arame.userData.opacidadeOriginal = 0; 
-            arame.material.wireframe = false;
         }
 
-        aplicarFan('fanTras', typeof fanTras !== 'undefined' ? fanTras : null, getVal('fan-tras'), 'parede');
-        aplicarFan('fanFrente1', typeof fanFrente1 !== 'undefined' ? fanFrente1 : null, getVal('fan-frente1'), 'parede');
-        aplicarFan('fanFrente2', typeof fanFrente2 !== 'undefined' ? fanFrente2 : null, getVal('fan-frente2'), 'parede');
-        aplicarFan('fanFrente3', typeof fanFrente3 !== 'undefined' ? fanFrente3 : null, getVal('fan-frente3'), 'parede');
-        aplicarFan('fanTeto1', typeof fanTeto1 !== 'undefined' ? fanTeto1 : null, getVal('fan-teto1'), 'teto');
-        aplicarFan('fanTeto2', typeof fanTeto2 !== 'undefined' ? fanTeto2 : null, getVal('fan-teto2'), 'teto');
-        aplicarFan('fanTeto3', typeof fanTeto3 !== 'undefined' ? fanTeto3 : null, getVal('fan-teto3'), 'teto');
+        aplicarFan('fanTras', typeof fanTras !== 'undefined' ? fanTras : null, getVal('fan-tras'), 'parede', true);
+        aplicarFan('fanFrente1', typeof fanFrente1 !== 'undefined' ? fanFrente1 : null, getVal('fan-frente1'), 'parede', true);
+        aplicarFan('fanFrente2', typeof fanFrente2 !== 'undefined' ? fanFrente2 : null, getVal('fan-frente2'), 'parede', true);
+        aplicarFan('fanFrente3', typeof fanFrente3 !== 'undefined' ? fanFrente3 : null, getVal('fan-frente3'), 'parede', true);
+        aplicarFan('fanTeto1', typeof fanTeto1 !== 'undefined' ? fanTeto1 : null, getVal('fan-teto1'), 'teto', tetoAberto);
+        aplicarFan('fanTeto2', typeof fanTeto2 !== 'undefined' ? fanTeto2 : null, getVal('fan-teto2'), 'teto', tetoAberto);
+        aplicarFan('fanTeto3', typeof fanTeto3 !== 'undefined' ? fanTeto3 : null, getVal('fan-teto3'), 'teto', teto3Aberto);
     }
 
-    if (precisaDeFan && typeof modeloFanBase !== 'undefined' && modeloFanBase === null && !carregandoFan) {
+    if (precisaDeFan && typeof modeloFanBase !== 'undefined' && modeloFanBase === null && typeof carregandoFan !== 'undefined' && !carregandoFan) {
         carregandoFan = true;
-        if(typeof telaCarregamento !== 'undefined') { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
         
         carregador.load('modelos/fan.glb', function(gltf) {
             let modeloOriginal = gltf.scene;
@@ -634,67 +629,51 @@ function verificarCompatibilidade() {
             modeloFanBase = envelope; 
             carregandoFan = false; 
             distribuirFans3D(); 
-        }, undefined, function(erro) {
-            console.error("❌ ERRO: O ficheiro fan.glb não foi encontrado na pasta 'modelos/'", erro);
-            carregandoFan = false; 
-        });
+        }, undefined, function(erro) { console.error("❌ ERRO:", erro); carregandoFan = false; });
     } else if (typeof modeloFanBase !== 'undefined' && modeloFanBase !== null) {
         distribuirFans3D();
     }
 
     // =======================================================
-    // 🧠 CÉREBRO DOS RADIADORES E TETO
+    // 📦 3. CARREGAMENTO DOS MODELOS 3D (.GLB) PRINCIPAIS
     // =======================================================
-    let selectTeto = getEl('teto'), selectTeto1 = getEl('fan-teto1'), selectTeto2 = getEl('fan-teto2'), selectTeto3 = getEl('fan-teto3');
-
-    const configurarTeto = (t1, t2, t3) => {
-        if (selectTeto1) { selectTeto1.disabled = t1; if(selectTeto1.parentElement) selectTeto1.parentElement.style.display = t1 ? 'block' : (getVal('teto') !== "" ? 'block' : 'none'); }
-        if (selectTeto2) { selectTeto2.disabled = t2; if(selectTeto2.parentElement) selectTeto2.parentElement.style.display = t2 ? 'block' : (getVal('teto') !== "" ? 'block' : 'none'); }
-        if (selectTeto3) { selectTeto3.disabled = t3; if(selectTeto3.parentElement) selectTeto3.parentElement.style.display = t3 ? 'block' : (getVal('teto') === '3xfan' ? 'block' : 'none'); }
-        if (typeof fanTeto1 !== 'undefined') { fanTeto1.visible = t1 || getVal('teto') !== ""; fanTeto1.userData.ligada = (getVal('fan-teto1') !== ""); }
-        if (typeof fanTeto2 !== 'undefined') { fanTeto2.visible = t2 || getVal('teto') !== ""; fanTeto2.userData.ligada = (getVal('fan-teto2') !== ""); }
-        if (typeof fanTeto3 !== 'undefined') { fanTeto3.visible = t3 || getVal('teto') === '3xfan'; fanTeto3.userData.ligada = (getVal('fan-teto3') !== ""); }
-    };
-
-    if (cooler === 'wc240' || cooler === 'wc360') {
-        let is360 = (cooler === 'wc360');
-        if (selectTeto) { selectTeto.innerHTML = `<option value="radiador">[ Ocupado pelo Radiador ${is360 ? '360' : '240'}mm ]</option>`; selectTeto.disabled = true; }
-        if (selectTeto1) selectTeto1.value = "risemode_out";
-        if (selectTeto2) selectTeto2.value = "risemode_out";
-        if (selectTeto3) selectTeto3.value = is360 ? "risemode_out" : "";
-        configurarTeto(true, true, is360);
-        if (typeof radiador240 !== 'undefined') { radiador240.visible = !is360; radiador240.material.wireframe = false; radiador240.material.color.setHex(0xbdc3c7); }
-        if (typeof radiador360 !== 'undefined') { radiador360.visible = is360; radiador360.material.wireframe = false; radiador360.material.color.setHex(0xbdc3c7); }
-    } else {
-        if (selectTeto && selectTeto.disabled) {
-            selectTeto.innerHTML = `<option value="">-- Vazio --</option><option value="2xfan">Instalar 2x Ventoinhas</option><option value="3xfan">Instalar 3x Ventoinhas</option>`;
-            selectTeto.disabled = false;
-        }
-        let valTeto = selectTeto ? selectTeto.value : "";
-        if (valTeto === '2xfan') configurarTeto(false, false, true);
-        else if (valTeto === '3xfan') configurarTeto(false, false, false);
-        else {
-            if (selectTeto1) selectTeto1.value = ""; if (selectTeto2) selectTeto2.value = ""; if (selectTeto3) selectTeto3.value = "";
-            configurarTeto(true, true, true);
-        }
-        if (typeof radiador240 !== 'undefined') radiador240.visible = false;
-        if (typeof radiador360 !== 'undefined') radiador360.visible = false;
+    if (placaMaeValue !== "" && typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal === null) {
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        carregador.load('modelos/placa.glb', function(gltf) {
+            modeloPlacaReal = gltf.scene; modeloPlacaReal.scale.set(0.8, 0.8, 0.8);
+            modeloPlacaReal.rotation.set(0, Math.PI / 2, 0); modeloPlacaReal.position.set(-1.05, 3.4, 0.5); 
+            cena.add(modeloPlacaReal); if(typeof slotPlacaMae !== 'undefined' && slotPlacaMae) { slotPlacaMae.material.opacity = 0; slotPlacaMae.userData.opacidadeOriginal = 0; }
+        });
     }
 
-    if (typeof fanTras !== 'undefined') { fanTras.visible = true; fanTras.userData.ligada = (getVal('fan-tras') !== ""); }
-    if (typeof fanFrente1 !== 'undefined') { fanFrente1.visible = true; fanFrente1.userData.ligada = (getVal('fan-frente1') !== ""); }
-    if (typeof fanFrente2 !== 'undefined') { fanFrente2.visible = true; fanFrente2.userData.ligada = (getVal('fan-frente2') !== ""); }
-    if (typeof fanFrente3 !== 'undefined') { fanFrente3.visible = true; fanFrente3.userData.ligada = (getVal('fan-frente3') !== ""); }
+    if (processador !== "" && typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal === null) {
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        carregador.load('modelos/processador.glb', function(gltf) {
+            modeloProcessadorReal = gltf.scene; modeloProcessadorReal.scale.set(0.80, 0.80, 0.80); 
+            modeloProcessadorReal.rotation.set(1.55, 1.5, 0); modeloProcessadorReal.rotateX(Math.PI / 2); modeloProcessadorReal.rotateY(Math.PI / 2); 
+            modeloProcessadorReal.position.set(-0.90, 3.5, 1.0); cena.add(modeloProcessadorReal); 
+            if(typeof slotProcessador !== 'undefined' && slotProcessador) { slotProcessador.material.opacity = 0; slotProcessador.userData.opacidadeOriginal = 0; }
+        });
+    }
+
+    if (gpu !== "" && typeof modeloGpuReal !== 'undefined' && modeloGpuReal === null) {
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        carregador.load('modelos/placavideo.glb', function(gltf) {
+            modeloGpuReal = gltf.scene; modeloGpuReal.scale.set(0.30, 0.30, 0.30);
+            modeloGpuReal.rotation.set(0, 0, 0); modeloGpuReal.rotateX(Math.PI / 2); modeloGpuReal.rotateZ(Math.PI / 2);
+            modeloGpuReal.position.set(0, 2.2, 0.80); cena.add(modeloGpuReal); 
+            if(typeof slotGpu !== 'undefined' && slotGpu) { slotGpu.material.opacity = 0; slotGpu.userData.opacidadeOriginal = 0; }
+        });
+    }
 
     // =======================================================
-    // 📏 FÍSICA E COMPATIBILIDADE
+    // 📏 4. FÍSICA E COMPATIBILIDADE (RAM, GPU e GABINETE)
     // =======================================================
     let errosDeMontagem = [], alertasDeMontagem = [];
     let socketPlaca = "", tamanhoPlaca = "";
     if (placaMaeValue !== "") {
         let partes = placaMaeValue.split("-");
-        socketPlaca = partes[0]; 
-        tamanhoPlaca = partes[1];
+        socketPlaca = partes[0]; tamanhoPlaca = partes[1] || "atx";
     }
 
     if (gabineteValue === "compacto") {
@@ -702,34 +681,33 @@ function verificarCompatibilidade() {
         if (gpu === "rtx5070ti" || gpu === "rx9070xt") errosDeMontagem.push("Colisão Física: Placa de Vídeo massiva! Baterá na fonte em chassi Compacto.");
         if (cooler === "wc360") errosDeMontagem.push("Erro de Teto: Radiador de 360mm não cabe num gabinete Compacto.");
     } else if (gabineteValue === "mid-tower") {
-        if (tamanhoPlaca === "atx" || tamanhoPlaca === "eatx") errosDeMontagem.push("Falta de Espaço: Gabinete suporta no máximo Micro-ATX (mATX).");
-        if (gpu === "rx9070xt") errosDeMontagem.push("Erro de Comprimento: A RX 9070 XT colide com as ventoinhas frontais neste chassi.");
+        if (tamanhoPlaca === "eatx") errosDeMontagem.push("Falta de Espaço: Gabinete suporta no máximo ATX.");
+        if (gpu === "rx9070xt") errosDeMontagem.push("Erro de Comprimento: A GPU colide com as ventoinhas frontais neste chassi.");
     } else if (gabineteValue === "full-tower") {
         if (tamanhoPlaca === "matx") alertasDeMontagem.push("Estética: Placa-mãe Micro-ATX num gabinete Full-Tower deixará muito espaço vazio.");
     }
 
-  // --- REGRAS DE MEMÓRIA RAM ---
+    if (typeof slotGpu !== 'undefined' && slotGpu) {
+        if (gpu === "rx9060xt") slotGpu.scale.set(1, 1, 1);
+        else if (gpu === "rtx5070ti") slotGpu.scale.set(1, 1, 1.35);
+        else if (gpu === "rx9070xt") slotGpu.scale.set(1, 1, 1.7);
+        else slotGpu.scale.set(1, 1, 1);
+    }
+
     let totalRamNum = ['ram1', 'ram2', 'ram3', 'ram4'].reduce((soma, id) => soma + (getVal(id) !== "" ? 1 : 0), 0);
     let ddrSuportadoPelaPlaca = (socketPlaca === "am4" || socketPlaca === "lga1200") ? "ddr4" : "ddr5";
     let mhzMaximoDaPlaca = (ddrSuportadoPelaPlaca === "ddr4") ? 3600 : 6400;
-    
     let ddrDetectado = "", mhzDetectado = 0, misturou = false, erroDdr = false, erroMhz = false;
 
     ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => {
         let valor = getVal(id);
         if (valor === "") return;
-        
-        // 🎯 Leitura blindada do ID (Ex: ddr4-8gb-3200 pega a geração e o final)
         let info = valor.split("-"); 
         let geracao = info[0];
-        let mhz = parseInt(info[info.length - 1]) || 3200; // Pega o último bloco como MHz
+        let mhz = parseInt(info[info.length - 1]) || 3200;
 
-        if (ddrDetectado !== "" && ddrDetectado !== geracao) misturou = true;
-        if (mhzDetectado !== 0 && mhzDetectado !== mhz) misturou = true;
-        
-        ddrDetectado = geracao; 
-        mhzDetectado = mhz;
-        
+        if ((ddrDetectado !== "" && ddrDetectado !== geracao) || (mhzDetectado !== 0 && mhzDetectado !== mhz)) misturou = true;
+        ddrDetectado = geracao; mhzDetectado = mhz;
         if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdr = true;
         if (placaMaeValue !== "" && mhz > mhzMaximoDaPlaca) erroMhz = true;
     });
@@ -737,30 +715,24 @@ function verificarCompatibilidade() {
     if (misturou) errosDeMontagem.push("Incompatibilidade de RAM: Não misture frequências (MHz) ou gerações diferentes.");
     if (erroDdr) errosDeMontagem.push(`Incompatibilidade Física: Placa-mãe exige ${ddrSuportadoPelaPlaca.toUpperCase()}, mas instalou ${ddrDetectado.toUpperCase()}.`);
     if (erroMhz) errosDeMontagem.push(`Bloqueio: Frequência de ${mhzDetectado}MHz excede o limite da placa-mãe (Máx: ${mhzMaximoDaPlaca}MHz).`);
-    
     if (totalRamNum === 1) alertasDeMontagem.push("Gargalo de Banda: Single Channel ativo. Perca de desempenho em jogos.");
     if (totalRamNum === 2 && (getVal('ram2') === "" || getVal('ram4') === "")) alertasDeMontagem.push("Otimização: Para Dual Channel, use os slots alternados 2 e 4.");
-
     if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. CPU não encaixa na Placa-Mãe.");
     
     if (totalFans > 0) {
-        if (getVal('fan-tras').includes('in')) errosDeMontagem.push("Erro: Ventoinha traseira deve ser Exaustor (Out).");
+        if (getVal('fan-tras').includes('in')) errosDeMontagem.push("Erro: Ventoinha traseira deve ser Exaustão (Out).");
         if (['fan-frente1', 'fan-frente2', 'fan-frente3'].some(id => getVal(id).includes('out'))) errosDeMontagem.push("Erro: Ventoinhas frontais devem ser Injeção (In).");
     }
 
     // =======================================================
-    // ⚡ CALCULADORA DE CONSUMO AUTOMÁTICA (JSON)
+    // ⚡ 5. CALCULADORA DE CONSUMO AUTOMÁTICA (JSON)
     // =======================================================
     let consumoTotal = extrairWatts('placa-mae') + extrairWatts('processador') + extrairWatts('gpu') + extrairWatts('cooler') + extrairWatts('armazenamento') +
         ['ram1', 'ram2', 'ram3', 'ram4', 'fan-tras', 'fan-frente1', 'fan-frente2', 'fan-frente3', 'fan-teto1', 'fan-teto2', 'fan-teto3'].reduce((s, id) => s + extrairWatts(id), 0);
     
     let limiteFonte = extrairWatts('fonte');
-
     let elConsumo = getEl('consumo-watts');
-    if (elConsumo) {
-        elConsumo.innerText = `Consumo: ${consumoTotal} W`;
-        elConsumo.style.display = consumoTotal > 0 ? "block" : "none";
-    }
+    if (elConsumo) { elConsumo.innerText = `Consumo: ${consumoTotal} W`; elConsumo.style.display = consumoTotal > 0 ? "block" : "none"; }
 
     if (consumoTotal > 0) {
         if (fonte === "") errosDeMontagem.push(`Falta Energia: Sistema consome ~${consumoTotal}W, instale uma fonte.`);
@@ -782,7 +754,7 @@ function verificarCompatibilidade() {
     }
 
     // =======================================================
-    // 🖥️ ATUALIZAÇÃO DA INTERFACE E LOGS
+    // 🖥️ 6. ATUALIZAÇÃO DA INTERFACE E LOGS
     // =======================================================
     let conteudoLogs = getEl('conteudo-logs');
     let isLigado = typeof sistemaLigado !== 'undefined' && sistemaLigado;
