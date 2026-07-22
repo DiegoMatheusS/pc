@@ -992,41 +992,60 @@ if(document.getElementById('btn-relatorio')) document.getElementById('btn-relato
 
 
 // ==========================================================================
-// 🔍 SISTEMA DE PESQUISA INTELIGENTE (BARRA DE BUSCA)
+// 🔍 SISTEMA DE PESQUISA INTELIGENTE (COM KITS VIRTUAIS)
 // ==========================================================================
 const inputPesquisa = document.getElementById('input-pesquisa');
 const listaResultados = document.getElementById('lista-resultados');
 
+function removerAcentos(texto) {
+    return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
 if (inputPesquisa && listaResultados) {
     inputPesquisa.addEventListener('input', function() {
-        let termo = this.value.toLowerCase().trim();
+        let termoOriginal = this.value.trim();
+        let termoPesquisa = removerAcentos(termoOriginal);
         listaResultados.innerHTML = "";
         
-        if (termo.length < 2) {
+        if (termoPesquisa.length < 2) {
             listaResultados.style.display = "none";
             return;
         }
 
-        // Vai ler automaticamente todas as opções carregadas nos selects
         let todasAsOpcoes = [];
-        // Lemos apenas os slots primários para não duplicar RAMs e Fans nos resultados
+        // Lemos o ram1 como base para descobrir as memórias disponíveis
         let menusParaLer = ['gabinete', 'placa-mae', 'processador', 'gpu', 'fonte', 'cooler', 'armazenamento', 'ram1', 'fan-tras']; 
         
         menusParaLer.forEach(idMenu => {
             let select = document.getElementById(idMenu);
             if (select) {
                 Array.from(select.options).forEach(opt => {
-                    // Ignora as opções de "Vazio", "Radiador" e "Instalar Fans"
                     if (opt.value !== "" && opt.value !== "radiador" && !opt.value.includes("xfan")) {
-                        if (opt.text.toLowerCase().includes(termo)) {
-                            todasAsOpcoes.push({ texto: opt.text, valor: opt.value, menuBase: idMenu });
+                        
+                        let textoNormal = opt.text;
+                        let textoLimpo = removerAcentos(textoNormal);
+                        
+                        // 1. Pesquisa a peça normal
+                        if (textoLimpo.includes(termoPesquisa)) {
+                            todasAsOpcoes.push({ texto: textoNormal, valor: opt.value, menuBase: idMenu, isKit: false });
+                        }
+
+                        // 2. MAGIA: Cria um "Kit 2x" virtual se for uma memória RAM
+                        if (idMenu === 'ram1') {
+                            let textoKit = "📦 Kit 2x: " + textoNormal;
+                            let textoKitLimpo = removerAcentos(textoKit);
+                            
+                            // Se a pessoa pesquisar por "kit" ou pelo nome da ram, o kit aparece!
+                            if (textoKitLimpo.includes(termoPesquisa)) {
+                                todasAsOpcoes.push({ texto: textoKit, valor: opt.value, menuBase: idMenu, isKit: true });
+                            }
                         }
                     }
                 });
             }
         });
 
-        // Remove resultados duplicados (caso a mesma peça apareça mais que uma vez)
+        // Remove duplicados
         let unicas = Array.from(new Set(todasAsOpcoes.map(a => a.texto)))
             .map(texto => todasAsOpcoes.find(a => a.texto === texto));
 
@@ -1034,12 +1053,13 @@ if (inputPesquisa && listaResultados) {
             listaResultados.style.display = "block";
             unicas.forEach(item => {
                 let li = document.createElement('li');
-                li.innerHTML = item.texto.replace(new RegExp(termo, "gi"), match => `<b style="color:#00ffff">${match}</b>`); // Destaca o texto pesquisado
+                li.innerHTML = item.texto; 
                 
                 li.onclick = function() {
-                    aplicarPecaPesquisada(item.valor, item.menuBase);
-                    inputPesquisa.value = ""; // Limpa a barra
-                    listaResultados.style.display = "none"; // Esconde a lista
+                    // Agora passamos o isKit para a função!
+                    aplicarPecaPesquisada(item.valor, item.menuBase, item.isKit);
+                    inputPesquisa.value = ""; 
+                    listaResultados.style.display = "none"; 
                 };
                 listaResultados.appendChild(li);
             });
@@ -1049,41 +1069,60 @@ if (inputPesquisa && listaResultados) {
         }
     });
 
-    // Esconde a lista de resultados se o utilizador clicar fora dela
     document.addEventListener('click', function(e) {
         if (e.target !== inputPesquisa) listaResultados.style.display = "none";
     });
 }
 
-// 🧠 A Inteligência que coloca a peça no lugar certo
-function aplicarPecaPesquisada(valorDaPeca, menuDeOrigem) {
-    let selectAlvo = document.getElementById(menuDeOrigem);
-
-    // Regra Inteligente para RAM: Procura o primeiro slot vazio para não apagar a RAM que já lá está
-    if (menuDeOrigem.startsWith('ram')) {
-        let slotVazio = ['ram1', 'ram2', 'ram3', 'ram4'].find(id => {
+// 🧠 A Inteligência que coloca a(s) peça(s) no lugar certo
+function aplicarPecaPesquisada(valorDaPeca, menuDeOrigem, isKit) {
+    
+    // ==========================================
+    // SE FOR UM KIT 2X (Ocupa 2 Slots de RAM)
+    // ==========================================
+    if (isKit) {
+        // Encontra todos os slots de RAM que estão vazios
+        let slotsVazios = ['ram1', 'ram2', 'ram3', 'ram4'].filter(id => {
             let el = document.getElementById(id);
             return el && el.value === "";
         });
-        if (slotVazio) selectAlvo = document.getElementById(slotVazio);
-        else selectAlvo = document.getElementById('ram1'); // Se estiver tudo cheio, substitui o slot 1
+
+        if (slotsVazios.length >= 2) {
+            // Se tem pelo menos 2 slots livres, instala nos dois primeiros que encontrar
+            document.getElementById(slotsVazios[0]).value = valorDaPeca;
+            document.getElementById(slotsVazios[1]).value = valorDaPeca;
+        } else {
+            // Se não tem espaço livre, força a substituição nos slots recomendados (2 e 4 para Dual Channel)
+            document.getElementById('ram2').value = valorDaPeca;
+            document.getElementById('ram4').value = valorDaPeca;
+        }
     } 
-    // Regra Inteligente para VENTOINHAS: Procura um espaço de parede vazio
-    else if (menuDeOrigem.startsWith('fan-')) {
-        let slotFanVazio = ['fan-tras', 'fan-frente1', 'fan-frente2', 'fan-frente3'].find(id => {
-            let el = document.getElementById(id);
-            // Verifica se o slot está vazio e se não está escondido
-            return el && el.value === "" && el.parentElement.style.display !== 'none';
-        });
-        if (slotFanVazio) selectAlvo = document.getElementById(slotFanVazio);
+    // ==========================================
+    // SE FOR UMA PEÇA NORMAL (1 Slot)
+    // ==========================================
+    else {
+        let selectAlvo = document.getElementById(menuDeOrigem);
+
+        if (menuDeOrigem.startsWith('ram')) {
+            let slotVazio = ['ram1', 'ram2', 'ram3', 'ram4'].find(id => {
+                let el = document.getElementById(id);
+                return el && el.value === "";
+            });
+            if (slotVazio) selectAlvo = document.getElementById(slotVazio);
+            else selectAlvo = document.getElementById('ram1'); 
+        } 
+        else if (menuDeOrigem.startsWith('fan-')) {
+            let slotFanVazio = ['fan-tras', 'fan-frente1', 'fan-frente2', 'fan-frente3'].find(id => {
+                let el = document.getElementById(id);
+                return el && el.value === "" && el.parentElement.style.display !== 'none';
+            });
+            if (slotFanVazio) selectAlvo = document.getElementById(slotFanVazio);
+        }
+
+        if (selectAlvo) selectAlvo.value = valorDaPeca;
     }
 
-    // Altera o valor visual no menu e dispara a verificação 3D
-    if (selectAlvo) {
-        selectAlvo.value = valorDaPeca;
-        verificarCompatibilidade(); // 🚀 Chama o motor 3D e de matemática
-    }
+    // 🚀 Chama o motor 3D e de matemática para atualizar o visual e os Watts
+    verificarCompatibilidade(); 
 }
-
-
 

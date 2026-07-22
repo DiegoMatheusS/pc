@@ -18,6 +18,24 @@
             </div>
         </div>
     </div>
+
+    <!-- 🌟 NOVO CABEÇALHO FIXO -->
+    <header id="cabecalho-principal">
+        <!-- Logo na Esquerda -->
+        <div class="logo-container">
+            <span class="icone-logo">
+            <h1>PC Builder 3D</h1>
+        </div>
+        
+        <!-- Barra de Pesquisa no Meio -->
+        <div id="barra-pesquisa-container">
+            <input type="text" id="input-pesquisa" placeholder="🔍 Pesquisar peça (ex: RTX 4070, Kit)..." autocomplete="off">
+            <ul id="lista-resultados" style="display: none;"></ul>
+        </div>
+
+        <!-- Espaçador invisível na Direita (Mantém a barra perfeitamente centralizada) -->
+        <div class="espacador-cabecalho"></div>
+    </header>
     <div id="container-3d"></div>
 
 	<div id="menu-flutuante" style="display: none;">
@@ -28,13 +46,10 @@
     
     <button id="btn-toggle-menu">▼ Esconder Menu</button>
 
-    <!-- NOVA BARRA DE PESQUISA -->
-    <div id="barra-pesquisa-container">
-        <input type="text" id="input-pesquisa" placeholder="Pesquisar peça (ex: Ryzen 7, RTX 4070)..." autocomplete="off">
-        <ul id="lista-resultados" style="display: none;"></ul>
-    </div>
+    
 
     <div id="menu-inferior">
+       
 	
 		<div id="grupo-gabinete" class="grupo-hardware">
             <label>Tamanho do Gabinete:</label>
