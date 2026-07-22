@@ -234,3 +234,67 @@ html, body {
     .relatorio-secao { background: none; border: 1px solid #ccc; break-inside: avoid; }
     #btn-imprimir, #fechar-modal { display: none; }
 }
+
+/* =========================================
+    BARRA DE PESQUISA INTELIGENTE
+   ========================================= */
+#barra-pesquisa-container {
+    position: relative;
+    width: calc(30% - 40px);
+    margin: -55px auto;
+    z-index: 1000;
+}
+
+#input-pesquisa {
+    width: 100%;
+    padding: 12px 15px;
+    background: #1a1a1a;
+    border: 1px solid #34495e;
+    color: #ecf0f1;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#input-pesquisa:focus {
+    border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+#lista-resultados {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #222;
+    border: 1px solid #34495e;
+    border-top: none;
+    max-height: 250px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+#lista-resultados li {
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #333;
+    color: #bdc3c7;
+    font-size: 0.9rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+#lista-resultados li:last-child {
+    border-bottom: none;
+}
+
+#lista-resultados li:hover {
+    background: #00ffff;
+    color: #000;
+    font-weight: bold;
+}
