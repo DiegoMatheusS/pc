@@ -694,35 +694,68 @@ function verificarCompatibilidade() {
         else slotGpu.scale.set(1, 1, 1);
     }
 
+    // =======================================================
+    // 📏 REGRAS DE MEMÓRIA RAM (GERAÇÃO, FREQUÊNCIA E CPU)
+    // =======================================================
     let totalRamNum = ['ram1', 'ram2', 'ram3', 'ram4'].reduce((soma, id) => soma + (getVal(id) !== "" ? 1 : 0), 0);
     let ddrSuportadoPelaPlaca = (socketPlaca === "am4" || socketPlaca === "lga1200") ? "ddr4" : "ddr5";
     let mhzMaximoDaPlaca = (ddrSuportadoPelaPlaca === "ddr4") ? 3600 : 6400;
-    let ddrDetectado = "", mhzDetectado = 0, misturou = false, erroDdr = false, erroMhz = false;
+    
+    let ddrDetectado = "";
+    let erroDdr = false;
+    let erroMisturaGeracao = false;
+    let frequenciasRAM = [];
 
+    // Vasculha todos os slots de RAM
     ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => {
         let valor = getVal(id);
         if (valor === "") return;
+        
         let info = valor.split("-"); 
         let geracao = info[0];
         let mhz = parseInt(info[info.length - 1]) || 3200;
 
-        if ((ddrDetectado !== "" && ddrDetectado !== geracao) || (mhzDetectado !== 0 && mhzDetectado !== mhz)) misturou = true;
-        ddrDetectado = geracao; mhzDetectado = mhz;
+        // Erro Crítico: Misturar DDR4 com DDR5
+        if (ddrDetectado !== "" && ddrDetectado !== geracao) erroMisturaGeracao = true;
+        
+        ddrDetectado = geracao; 
+        frequenciasRAM.push(mhz); // Guarda as velocidades para comparar depois
+
         if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdr = true;
-        if (placaMaeValue !== "" && mhz > mhzMaximoDaPlaca) erroMhz = true;
     });
 
-    if (misturou) errosDeMontagem.push("Incompatibilidade de RAM: Não misture frequências (MHz) ou gerações diferentes.");
+    if (erroMisturaGeracao) errosDeMontagem.push("Incompatibilidade Crítica: Não pode misturar gerações diferentes (DDR4 com DDR5).");
     if (erroDdr) errosDeMontagem.push(`Incompatibilidade Física: Placa-mãe exige ${ddrSuportadoPelaPlaca.toUpperCase()}, mas instalou ${ddrDetectado.toUpperCase()}.`);
-    if (erroMhz) errosDeMontagem.push(`Bloqueio: Frequência de ${mhzDetectado}MHz excede o limite da placa-mãe (Máx: ${mhzMaximoDaPlaca}MHz).`);
+
+    // 🧠 Lógica Avançada de Frequências
+    if (frequenciasRAM.length > 0) {
+        let menorFrequencia = Math.min(...frequenciasRAM);
+        let maiorFrequencia = Math.max(...frequenciasRAM);
+
+        // ⚠️ ALERTA: Nivelamento de Velocidade (Permite ligar)
+        if (menorFrequencia !== maiorFrequencia) {
+            alertasDeMontagem.push(`Aviso de RAM: Frequências diferentes detectadas. O sistema limitará todas a ${menorFrequencia}MHz.`);
+        }
+
+        // ❌ ERRO: Limite da Placa-Mãe
+        if (placaMaeValue !== "" && maiorFrequencia > mhzMaximoDaPlaca) {
+            errosDeMontagem.push(`Bloqueio: Frequência da RAM (${maiorFrequencia}MHz) excede o limite da placa-mãe (Máx: ${mhzMaximoDaPlaca}MHz).`);
+        }
+
+        // ❌ ERRO: Limite do Processador
+        if (processador !== "") {
+            let cpuSocket = processador.split("-")[0];
+            let mhzMaximoCpu = (cpuSocket === "am4") ? 3600 : 6400; 
+            
+            if (maiorFrequencia > mhzMaximoCpu) {
+                errosDeMontagem.push(`Incompatibilidade de CPU: O controlador de memória não suporta ${maiorFrequencia}MHz (Máx: ${mhzMaximoCpu}MHz).`);
+            }
+        }
+    }
+
     if (totalRamNum === 1) alertasDeMontagem.push("Gargalo de Banda: Single Channel ativo. Perca de desempenho em jogos.");
     if (totalRamNum === 2 && (getVal('ram2') === "" || getVal('ram4') === "")) alertasDeMontagem.push("Otimização: Para Dual Channel, use os slots alternados 2 e 4.");
     if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. CPU não encaixa na Placa-Mãe.");
-    
-    if (totalFans > 0) {
-        if (getVal('fan-tras').includes('in')) errosDeMontagem.push("Erro: Ventoinha traseira deve ser Exaustão (Out).");
-        if (['fan-frente1', 'fan-frente2', 'fan-frente3'].some(id => getVal(id).includes('out'))) errosDeMontagem.push("Erro: Ventoinhas frontais devem ser Injeção (In).");
-    }
 
     // =======================================================
     // ⚡ 5. CALCULADORA DE CONSUMO AUTOMÁTICA (JSON)
