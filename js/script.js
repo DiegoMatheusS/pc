@@ -60,7 +60,7 @@ carregarBancoDeDados();
 const cena = new THREE.Scene();
 
 // 🎨 NOVO: Define o fundo inicial como Cinza Escuro
-cena.background = new THREE.Color(0x333333); 
+cena.background = new THREE.Color(0x444444); 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(5, 2.3, 0); 
 
@@ -128,7 +128,7 @@ let modelosRamInstalados = {
 // ==========================================================================
 
 const geoGabinete = new THREE.BoxGeometry(2.4, 4.6, 4.5);
-const matGabinete = new THREE.MeshBasicMaterial({ color: 0x333333, transparent: true, opacity: 0.1, wireframe: true });
+const matGabinete = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.1, wireframe: true });
 const slotGabinete = new THREE.Mesh(geoGabinete, matGabinete);
 slotGabinete.position.set(0, 2.3, 0); 
 cena.add(slotGabinete);
@@ -207,7 +207,7 @@ cena.add(slotCooler);
 const geoFonte = new THREE.BoxGeometry(1.6, 1.1, 1.6);
 const matFonte = new THREE.MeshBasicMaterial({ color: 0xf1c40f, transparent: true, opacity: 0.3, wireframe: true });
 const slotFonte = new THREE.Mesh(geoFonte, matFonte);
-slotFonte.position.set(-2.0, 0.6, 1.0); 
+slotFonte.position.set(-0.4, 0.6, 1.42); 
 slotFonte.userData = { tipo: 'fonte', nome: 'Espaço da Fonte' };
 cena.add(slotFonte);
 
