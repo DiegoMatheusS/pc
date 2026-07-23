@@ -153,28 +153,33 @@ slotProcessador.userData = { tipo: 'processador', nome: 'Slot do Processador' };
 cena.add(slotProcessador);
 
 // --- MEMÓRIA RAM (4 SLOTS INDIVIDUAIS PERSONALIZÁVEIS) ---
-const geoRam = new THREE.BoxGeometry(0.15, 0.8, 0.05); 
-const matRamPadrão = new THREE.MeshBasicMaterial({ color: 0x9b59b6, wireframe: true });
+    const geoRam = new THREE.BoxGeometry(0.15, 1, 0.05); 
+    const matRamPadrão = new THREE.MeshBasicMaterial({ color: 0x9b59b6, wireframe: true });
 
-const ram1 = new THREE.Mesh(geoRam, matRamPadrão.clone());
-ram1.position.set(-1.05, 3.4, 0.50);
-ram1.userData = { tipo: 'ram', idHtml: 'ram1', nome: 'Slot RAM 1 (Canal A1)' };
-cena.add(ram1);
+    // 🎯 O CONTROLO MESTRE DOS ARAMES:
+    // Estava em -1.05. Mudei para -0.90 para puxar os arames roxos para a frente.
+    // Vá testando valores como -0.85, -0.80 ou -0.95 até ficarem no sítio perfeito!
+    const posXRam = -0.90; 
 
-const ram2 = new THREE.Mesh(geoRam, matRamPadrão.clone());
-ram2.position.set(-1.05, 3.4, 0.40);
-ram2.userData = { tipo: 'ram', idHtml: 'ram2', nome: 'Slot RAM 2 (A2 - Dual Channel)' };
-cena.add(ram2);
+    const ram1 = new THREE.Mesh(geoRam, matRamPadrão.clone());
+    ram1.position.set(posXRam, 3.55, 0.60);
+    ram1.userData = { tipo: 'ram', idHtml: 'ram1', nome: 'Slot RAM 1 (Canal A1)' };
+    cena.add(ram1);
 
-const ram3 = new THREE.Mesh(geoRam, matRamPadrão.clone());
-ram3.position.set(-1.05, 3.4, 0.30);
-ram3.userData = { tipo: 'ram', idHtml: 'ram3', nome: 'Slot RAM 3 (Canal B1)' };
-cena.add(ram3);
+    const ram2 = new THREE.Mesh(geoRam, matRamPadrão.clone());
+    ram2.position.set(posXRam, 3.55, 0.50);
+    ram2.userData = { tipo: 'ram', idHtml: 'ram2', nome: 'Slot RAM 2 (A2 - Dual Channel)' };
+    cena.add(ram2);
 
-const ram4 = new THREE.Mesh(geoRam, matRamPadrão.clone());
-ram4.position.set(-1.05, 3.4, 0.20);
-ram4.userData = { tipo: 'ram', idHtml: 'ram4', nome: 'Slot RAM 4 (B2 - Dual Channel)' };
-cena.add(ram4);
+    const ram3 = new THREE.Mesh(geoRam, matRamPadrão.clone());
+    ram3.position.set(posXRam, 3.55, 0.40);
+    ram3.userData = { tipo: 'ram', idHtml: 'ram3', nome: 'Slot RAM 3 (Canal B1)' };
+    cena.add(ram3);
+
+    const ram4 = new THREE.Mesh(geoRam, matRamPadrão.clone());
+    ram4.position.set(posXRam, 3.55, 0.30);
+    ram4.userData = { tipo: 'ram', idHtml: 'ram4', nome: 'Slot RAM 4 (B2 - Dual Channel)' };
+    cena.add(ram4);
 
 // --- ARMAZENAMENTO M.2 NVMe (Na Placa-Mãe) ---
 const geoM2 = new THREE.BoxGeometry(0.05, 0.15, 0.6); 
@@ -479,9 +484,42 @@ function verificarCompatibilidade() {
     let armazenamento = getVal('armazenamento');
     let cooler = getVal('cooler');
 
+
+
+
+   // =======================================================
+    // 👻 CAÇA-FANTASMAS 3D: Controlo de Modelos e Arames
+    // =======================================================
     if (typeof modeloGpuReal !== 'undefined' && modeloGpuReal) modeloGpuReal.visible = (gpu !== "");
     if (typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal) modeloPlacaReal.visible = (placaMaeValue !== "");
     if (typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal) modeloProcessadorReal.visible = (processador !== "");
+
+    // 🛡️ FUNÇÃO BLINDADA: Força o arame a sumir, mas mantém a peça clicável!
+    function alternarArame(slot, estaOcupado) {
+        if (!slot) return;
+        slot.material.transparent = true; // Obriga o 3D a aceitar a invisibilidade
+        
+        if (estaOcupado) {
+            slot.material.opacity = 0;
+            slot.material.wireframe = false; // Desliga os riscos à força!
+            slot.userData.opacidadeOriginal = 0;
+        } else {
+            slot.material.opacity = 0.3;
+            slot.material.wireframe = true; // Volta a ligar os riscos
+            slot.userData.opacidadeOriginal = 0.3;
+        }
+        slot.material.needsUpdate = true; // Atualiza os gráficos na hora
+    }
+
+    // Variáveis para saber que tipo de SSD temos
+    let isM2 = armazenamento.includes("m2") || armazenamento.includes("nvme");
+    let isSata = armazenamento.includes("sata");
+
+    // Aplica a magia aos 3 slots rebeldes
+    alternarArame(typeof slotCooler !== 'undefined' ? slotCooler : null, cooler !== "");
+    alternarArame(typeof slotM2 !== 'undefined' ? slotM2 : null, isM2);
+    alternarArame(typeof slotSsd !== 'undefined' ? slotSsd : null, isSata);
+
 
     // =======================================================
     // 🧠 1. CÉREBRO DOS RADIADORES E TETO
@@ -631,7 +669,7 @@ function verificarCompatibilidade() {
                 // 🔎 ESCALA DA RAM
                 // A peça estava gigante. Reduzi para 0.15, ajuste se ficar muito pequena/grande
                 // ==========================================
-                novaRam.scale.set(0.15, 0.15, 0.15); 
+                novaRam.scale.set(0.20, 0.20, 0.20); 
                 
                 // ==========================================
                 // 🔄 ROTAÇÃO DA RAM
@@ -824,6 +862,7 @@ function verificarCompatibilidade() {
                 
                 // 🔄 2. ROTAÇÃO
                 modeloNvmeReal.rotation.set(0, 0, 0);
+                
                 
                 // 1. Mantém o que funcionou para o levantar (exemplo com Z)
                 modeloNvmeReal.rotation.z = Math.PI / 2; 
