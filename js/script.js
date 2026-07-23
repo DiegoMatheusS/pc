@@ -816,51 +816,97 @@ function verificarCompatibilidade() {
         if (isM2 && typeof modeloNvmeReal !== 'undefined' && modeloNvmeReal === null) {
             carregador.load('modelos/nvme.glb', function(gltf) {
                 modeloNvmeReal = gltf.scene; 
-                modeloNvmeReal.scale.set(1.0, 1.0, 1.0);
                 
+                // 🔎 1. ESCALA (Tamanho)
+                // Reduzi para 0.10 para tirar aquele aspecto de "prancha de surf". 
+                // Se ainda ficar grande, mude para 0.05. Se sumir, suba para 0.20.
+                modeloNvmeReal.scale.set(0.15, 0.15, 0.15);
+                
+                // 🔄 2. ROTAÇÃO
                 modeloNvmeReal.rotation.set(0, 0, 0);
-                modeloNvmeReal.rotation.x = 0; 
-                modeloNvmeReal.rotation.y = 0; 
-                modeloNvmeReal.rotation.z = 0; 
                 
+                // 1. Mantém o que funcionou para o levantar (exemplo com Z)
+                modeloNvmeReal.rotation.z = Math.PI / 2; 
+                
+                // 🪄 O TOQUE MÁGICO FINAL: Dá uma meia-volta (180º) para a frente aparecer!
+                modeloNvmeReal.rotation.y = Math.PI; 
+                
+                modeloNvmeReal.rotation.x = 0;
+                
+                // ↕️↔️ 3. POSIÇÃO FINO
                 if(typeof slotM2 !== 'undefined' && slotM2) {
                     modeloNvmeReal.position.copy(slotM2.position); 
-                    modeloNvmeReal.position.x += 0;
-                    modeloNvmeReal.position.y += 0;
-                    modeloNvmeReal.position.z += 0;
+                    
+                    // Ajustes de empurrão (em relação ao slot da placa-mãe):
+                    modeloNvmeReal.position.x += 0.2; // Esquerda (-) / Direita (+)
+                    modeloNvmeReal.position.y += 0.33; // Baixo (-) / Cima (+)
+                    modeloNvmeReal.position.z += 0.1; // Trás (-) / Frente (+)
                 }
                 
                 cena.add(modeloNvmeReal);
-                if(typeof slotM2 !== 'undefined' && slotM2) { slotM2.material.opacity = 0; slotM2.userData.opacidadeOriginal = 0; }
+                if(typeof slotM2 !== 'undefined' && slotM2) { 
+                    slotM2.material.opacity = 0; 
+                    slotM2.userData.opacidadeOriginal = 0; 
+                }
             });
         }
         
         // --- SSD SATA (2.5") ---
         if (isSata && typeof modeloSsdReal !== 'undefined' && modeloSsdReal === null) {
             carregador.load('modelos/ssd.glb', function(gltf) {
-                modeloSsdReal = gltf.scene; 
-                modeloSsdReal.scale.set(1.0, 1.0, 1.0);
+                let modeloOriginal = gltf.scene;
                 
+                let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
+                let centroReal = new THREE.Vector3();
+                caixaContorno.getCenter(centroReal);
+                modeloOriginal.position.set(-centroReal.x, -centroReal.y, -centroReal.z); 
+                
+                let envelope = new THREE.Group();
+                envelope.add(modeloOriginal);
+                modeloSsdReal = envelope;
+                
+                // 🔎 1. ESCALA 
+                // Se ele parecer muito pequeno na caixa amarela, aumente para 0.30 ou 0.40
+                modeloSsdReal.scale.set(1, 1, 1);
+                
+                // ==========================================
+                // 🔄 2. ROTAÇÃO (Colocar de pé)
+                // ==========================================
                 modeloSsdReal.rotation.set(0, 0, 0);
-                modeloSsdReal.rotation.x = 0;
-                modeloSsdReal.rotation.y = 0;
-                modeloSsdReal.rotation.z = 0;
                 
+                // Math.PI / 2 levanta a peça 90 graus. 
+                modeloSsdReal.rotation.x = Math.PI / 2; 
+                
+                modeloSsdReal.rotation.y = 0;
+                
+                // (Se ele ficar em pé mas de lado/atravessado, tire o Math.PI / 2 do 'x' e coloque aqui no 'z')
+                modeloSsdReal.rotation.z = 1.55; 
+                
+                // ==========================================
+                // ↕️↔️ 3. POSIÇÃO FINO (Empurrar para a caixa)
+                // ==========================================
                 if(typeof slotSsd !== 'undefined' && slotSsd) {
                     modeloSsdReal.position.copy(slotSsd.position);
-                    modeloSsdReal.position.x += 0;
-                    modeloSsdReal.position.y += 0;
+                    
+                    // Pela sua imagem, ele precisa de ir para a ESQUERDA e um pouco para CIMA
+                    modeloSsdReal.position.x -= -0.0; // Valor negativo empurra para a Esquerda
+                    modeloSsdReal.position.y += 0; // Valor positivo sobe a peça
                     modeloSsdReal.position.z += 0;
                 }
                 
                 cena.add(modeloSsdReal);
-                if(typeof slotSsd !== 'undefined' && slotSsd) { slotSsd.material.opacity = 0; slotSsd.userData.opacidadeOriginal = 0; }
+                if(typeof slotSsd !== 'undefined' && slotSsd) { 
+                    slotSsd.material.opacity = 0; 
+                    slotSsd.userData.opacidadeOriginal = 0; 
+                }
             });
         }
 
         if (typeof modeloNvmeReal !== 'undefined' && modeloNvmeReal) modeloNvmeReal.visible = isM2;
         if (typeof modeloSsdReal !== 'undefined' && modeloSsdReal) modeloSsdReal.visible = isSata;
     }
+
+    
 
     // =======================================================
     // 📏 5. FÍSICA E COMPATIBILIDADE (RAM, GPU e GABINETE)
