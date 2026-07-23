@@ -104,6 +104,7 @@ let modeloGpuReal = null;
 let modeloFonteReal = null; 
 let modeloNvmeReal = null; 
 let modeloSsdReal = null;
+let modeloAirCoolerReal = null;
 
 // O modelo base da fan vai servir para clonarmos para todos os slots
 let modeloFanBase = null;
@@ -943,6 +944,67 @@ function verificarCompatibilidade() {
 
         if (typeof modeloNvmeReal !== 'undefined' && modeloNvmeReal) modeloNvmeReal.visible = isM2;
         if (typeof modeloSsdReal !== 'undefined' && modeloSsdReal) modeloSsdReal.visible = isSata;
+    }
+
+    // ==========================================
+    // ❄️ CARREGAMENTO DO AIR COOLER
+    // ==========================================
+    let isAirCooler = (cooler !== "" && cooler !== "wc240" && cooler !== "wc360");
+
+    if (isAirCooler && typeof modeloAirCoolerReal !== 'undefined' && modeloAirCoolerReal === null) {
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        
+        carregador.load('modelos/aircooler.glb', function(gltf) {
+            let modeloOriginal = gltf.scene; 
+            
+            // 🎯 A MÁGICA: CENTRALIZADOR AUTOMÁTICO DE PIVÔ
+            let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
+            let centroReal = new THREE.Vector3();
+            caixaContorno.getCenter(centroReal);
+            modeloOriginal.position.set(-centroReal.x, -centroReal.y, -centroReal.z); 
+            
+            let envelope = new THREE.Group();
+            envelope.add(modeloOriginal);
+            modeloAirCoolerReal = envelope; 
+            
+            // 🔎 1. ESCALA (Tamanho)
+            // Se parecer um bloco gigante de metal, reduza para 0.05 ou 0.10
+            modeloAirCoolerReal.scale.set(0.30, 0.30, 0.30); 
+
+
+          // 🔄 2. ROTAÇÃO (AGORA EM GRAUS NORMAIS)
+            modeloAirCoolerReal.rotation.set(0, 0, 0);
+            
+            // Basta trocar o número dentro dos parênteses! (Tente 90, -90, 180, 270 ou 0)
+            
+            // Eixo X (Geralmente é o que deita ou levanta a peça)
+            modeloAirCoolerReal.rotation.x = THREE.MathUtils.degToRad(0); 
+            
+            // Gira de lado
+            modeloAirCoolerReal.rotation.y = THREE.MathUtils.degToRad(0); 
+            
+            // Gira pra cima
+            modeloAirCoolerReal.rotation.z = THREE.MathUtils.degToRad(-100);
+
+
+            
+            // ↕️↔️ 3. POSIÇÃO FINO
+            if(typeof slotCooler !== 'undefined' && slotCooler) {
+                modeloAirCoolerReal.position.copy(slotCooler.position); 
+                
+                // ⬆️ Se ele ficou enterrado na placa-mãe depois de levantar, suba-o aqui:
+                modeloAirCoolerReal.position.y += 1.5; // (Vá testando 0.5, 1.0, 1.5...)
+                
+                modeloAirCoolerReal.position.x += 0;
+                modeloAirCoolerReal.position.z += 0;
+            }
+            
+            cena.add(modeloAirCoolerReal);
+        });
+    }
+
+    if (typeof modeloAirCoolerReal !== 'undefined' && modeloAirCoolerReal) {
+        modeloAirCoolerReal.visible = isAirCooler;
     }
 
     
