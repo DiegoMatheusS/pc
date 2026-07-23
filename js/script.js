@@ -54,19 +54,6 @@ async function carregarBancoDeDados() {
 // Dispara o carregamento assim que o site abre
 carregarBancoDeDados();
 
-
-    
-
-
-
-
-
-
-
-
-
-
-
 // ==========================================================================
 // 1. CONFIGURAÇÃO BÁSICA DO AMBIENTE
 // ==========================================================================
@@ -109,17 +96,31 @@ gerenciador.onLoad = function () {
 };
 
 const carregador = new THREE.GLTFLoader(gerenciador);
-let modeloPlacaReal = null; let modeloProcessadorReal = null; let modeloGpuReal = null; 
+
+// 📦 Variáveis Globais dos Modelos 3D
+let modeloPlacaReal = null; 
+let modeloProcessadorReal = null; 
+let modeloGpuReal = null; 
+let modeloFonteReal = null; 
+let modeloNvmeReal = null; 
+let modeloSsdReal = null;
+
 // O modelo base da fan vai servir para clonarmos para todos os slots
 let modeloFanBase = null;
-let carregandoFan = false; // 🚦 NOVO: Semáforo para não deixar o sistema engasgar
+let carregandoFan = false; 
 
-// 🧠 O NOVO HUB DE VENTOINHAS (Para controlar os clones .glb sem poluir a cena)
+// 🧠 O NOVO HUB DE VENTOINHAS 
 let modelosFansInstalados = {
     'fanTras': null, 'fanFrente1': null, 'fanFrente2': null, 'fanFrente3': null,
     'fanTeto1': null, 'fanTeto2': null, 'fanTeto3': null
 };
 
+// 🧠 SISTEMA DE CLONES (MEMÓRIA RAM)
+let modeloRamBase = null;
+let carregandoRam = false;
+let modelosRamInstalados = {
+    'ram1': null, 'ram2': null, 'ram3': null, 'ram4': null
+};
 
 // ==========================================================================
 // 2. MAQUETE FÍSICA: GABINETE SUPERFRAME DRAKOR
@@ -179,7 +180,6 @@ cena.add(ram4);
 const geoM2 = new THREE.BoxGeometry(0.05, 0.15, 0.6); 
 const matM2 = new THREE.MeshBasicMaterial({ color: 0x00ffff, wireframe: true }); 
 const slotM2 = new THREE.Mesh(geoM2, matM2);
-
 slotM2.position.set(-1.05, 2.6, 1.0); 
 slotM2.userData = { tipo: 'armazenamento', idHtml: 'armazenamento', nome: 'Slot M.2 NVMe' };
 cena.add(slotM2);
@@ -213,15 +213,12 @@ slotSsd.position.set(-1.35, 2.5, 1.0);
 slotSsd.userData = { tipo: 'armazenamento', nome: 'Compartimento Traseiro SSD SATA' };
 cena.add(slotSsd);
 
-// --- ____________________ ---
-
 const geoTeto = new THREE.BoxGeometry(2.4, 0.1, 4.5);
 const matTeto = new THREE.MeshBasicMaterial({ color: 0x9b59b6, transparent: true, opacity: 0.3, wireframe: true });
 const slotTeto = new THREE.Mesh(geoTeto, matTeto);
 slotTeto.position.set(0, 4.55, 0); 
 slotTeto.userData = { tipo: 'teto', nome: 'Painel Superior (Teto)' };
 cena.add(slotTeto);
-
 
 // --- VENTOINHAS INDIVIDUAIS (ARAMES RESERVAS) ---
 const geoFan = new THREE.CylinderGeometry(0.5, 0.5, 0.15, 16);
@@ -231,8 +228,6 @@ const listaFans = [];
 // 1. Fan Traseiro
 const fanTras = new THREE.Mesh(geoFan, criarMatFan());
 fanTras.rotation.x = Math.PI / 2;
-// 🎯 CORREÇÃO DE POSIÇÃO: 
-// X = -1.15 (Encosta na lateral esquerda) | Y = 3.5 (Altura do CPU) | Z = 0.4 (Empurra para a grelha do fundo)
 fanTras.position.set(0.10, 3.5, 2); 
 fanTras.userData = { tipo: 'fan-tras', nome: 'Ventoinha Traseira' };
 cena.add(fanTras);
@@ -454,39 +449,19 @@ window.addEventListener('mousemove', (evento) => {
     }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ==========================================================================
 // 4. LÓGICA, COMPATIBILIDADE E SISTEMA DE VENTOINHAS (.GLB)
 // ==========================================================================
 
-// ⚡ Lê os Watts escondidos diretamente do botão que o utilizador escolheu
 function extrairWatts(idMenu) {
     let el = document.getElementById(idMenu);
     if (!el || el.value === "") return 0;
     return parseInt(el.options[el.selectedIndex].getAttribute('data-watts')) || 0;
 }
 
-// 🛠️ Função Auxiliar para não repetir document.getElementById
 const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
 const getEl = (id) => document.getElementById(id);
 
-// 🎛️ Controlador Universal de Botões
 function atualizarBotao(id, ativo, classeAtiva, classeInativa, texto = null) {
     let btn = getEl(id);
     if (!btn) return;
@@ -504,7 +479,6 @@ function verificarCompatibilidade() {
     let armazenamento = getVal('armazenamento');
     let cooler = getVal('cooler');
 
-    // 👻 CAÇA-FANTASMAS 3D: Esconde modelos se o utilizador selecionar "Vazio"
     if (typeof modeloGpuReal !== 'undefined' && modeloGpuReal) modeloGpuReal.visible = (gpu !== "");
     if (typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal) modeloPlacaReal.visible = (placaMaeValue !== "");
     if (typeof modeloProcessadorReal !== 'undefined' && modeloProcessadorReal) modeloProcessadorReal.visible = (processador !== "");
@@ -570,7 +544,6 @@ function verificarCompatibilidade() {
         let teto3Aberto = (getVal('teto') === '3xfan' || getVal('cooler') === 'wc360');
 
         function aplicarFan(chave, arame, valorMenu, localMontagem, slotDisponivel = true) {
-            // Proteção extra para garantir que os modelos fantasma existem
             if (typeof modelosFansInstalados === 'undefined') window.modelosFansInstalados = {};
 
             if (modelosFansInstalados[chave]) { 
@@ -635,7 +608,99 @@ function verificarCompatibilidade() {
     }
 
     // =======================================================
-    // 📦 3. CARREGAMENTO DOS MODELOS 3D (.GLB) PRINCIPAIS
+    // 🧠 3. SISTEMA DE CLONES DA MEMÓRIA RAM (.GLB)
+    // =======================================================
+    function distribuirRam3D() {
+        if (typeof modeloRamBase === 'undefined' || !modeloRamBase) return;
+        
+        ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => {
+            let valorMenu = getVal(id);
+            let arame = getEl(id) ? (id === 'ram1' ? ram1 : id === 'ram2' ? ram2 : id === 'ram3' ? ram3 : ram4) : null;
+            
+            if (modelosRamInstalados[id]) { cena.remove(modelosRamInstalados[id]); modelosRamInstalados[id] = null; }
+            if (!arame) return;
+
+            if (valorMenu === "") {
+                arame.visible = true; arame.material.wireframe = true; arame.material.opacity = 0.3;
+                arame.material.color.setHex(0x9b59b6); arame.userData.opacidadeOriginal = 0.3;
+            } else {
+                arame.visible = false;
+                let novaRam = modeloRamBase.clone();
+                
+                // ==========================================
+                // 🔎 ESCALA DA RAM
+                // A peça estava gigante. Reduzi para 0.15, ajuste se ficar muito pequena/grande
+                // ==========================================
+                novaRam.scale.set(0.15, 0.15, 0.15); 
+                
+                // ==========================================
+                // 🔄 ROTAÇÃO DA RAM
+                // ==========================================
+                novaRam.rotation.set(0, 0, 0);
+                
+                // O Math.PI / 2 (90 graus) vai forçar a RAM a ficar em pé. 
+                // Se ela ficar atravessada nos slots, mude o Math.PI/2 para o eixo Y ou Z
+                novaRam.rotation.x = Math.PI / 2; 
+                novaRam.rotation.y = 0; 
+                novaRam.rotation.z = 0; 
+                
+                // ==========================================
+                // ↕️↔️ POSIÇÃO DA RAM
+                // Como agora o centro é automático, ela vai colar exatamento no arame roxo!
+                // ==========================================
+                novaRam.position.copy(arame.position);
+                novaRam.position.x += 0;
+                novaRam.position.y += 0; // Se precisar afundar mais no slot, use -0.1, etc.
+                novaRam.position.z += 0;
+                
+                cena.add(novaRam);
+                modelosRamInstalados[id] = novaRam;
+            }
+        });
+    }
+
+    let precisaDeRam = getVal('ram1') !== "" || getVal('ram2') !== "" || getVal('ram3') !== "" || getVal('ram4') !== "";
+
+    if (precisaDeRam && (typeof modeloRamBase === 'undefined' || modeloRamBase === null) && !carregandoRam) {
+        carregandoRam = true;
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        
+        carregador.load('modelos/ram.glb', function(gltf) {
+            let modeloOriginal = gltf.scene;
+            
+            // 🎯 A MÁGICA: CENTRALIZADOR AUTOMÁTICO DE PIVÔ (Resolve a peça a flutuar)
+            let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
+            let centroReal = new THREE.Vector3();
+            caixaContorno.getCenter(centroReal);
+            modeloOriginal.position.set(-centroReal.x, -centroReal.y, -centroReal.z); 
+            
+            let envelope = new THREE.Group();
+            envelope.add(modeloOriginal);
+            
+            modeloRamBase = envelope;
+            carregandoRam = false;
+            distribuirRam3D();
+        });
+    } else if (typeof modeloRamBase !== 'undefined' && modeloRamBase !== null) {
+        distribuirRam3D();
+    }
+
+    
+    if (precisaDeRam && (typeof modeloRamBase === 'undefined' || modeloRamBase === null) && !carregandoRam) {
+        carregandoRam = true;
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        
+        carregador.load('modelos/ram.glb', function(gltf) {
+            modeloRamBase = gltf.scene;
+            carregandoRam = false;
+            distribuirRam3D();
+        });
+    } else if (typeof modeloRamBase !== 'undefined' && modeloRamBase !== null) {
+        distribuirRam3D();
+    }
+
+    // =======================================================
+    // 📦 4. CARREGAMENTO DOS MODELOS 3D (.GLB) PRINCIPAIS
     // =======================================================
     if (placaMaeValue !== "" && typeof modeloPlacaReal !== 'undefined' && modeloPlacaReal === null) {
         if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
@@ -661,35 +726,18 @@ function verificarCompatibilidade() {
         
         carregador.load('modelos/placavideo.glb', function(gltf) {
             modeloGpuReal = gltf.scene; 
-            
-            // ==========================================
-            // 🔎 1. ESCALA (Tamanho)
-            // Aumentei de 0.30 para 1.0. Se continuar pequena, mude para 1.5, 2.0, etc.
-            // ==========================================
             modeloGpuReal.scale.set(0.40, 0.40, 0.40);
             
-            // ==========================================
-            // 🔄 2. ROTAÇÃO
-            // ==========================================
             modeloGpuReal.rotation.set(0, 0, 0); 
-    
-            modeloGpuReal.rotation.x = Math.PI; // Manteve a placa de barriga para baixo (Certo!)
-    
-            // 🪄 A MÁGICA: Inverter o sinal faz a placa dar uma meia-volta perfeita
+            modeloGpuReal.rotation.x = Math.PI; 
             modeloGpuReal.rotation.y = -Math.PI / 2; 
-    
             modeloGpuReal.rotation.z = 0;  
             
-            // ==========================================
-            // ↕️↔️ 3. POSIÇÃO
-            // ==========================================
             if(typeof slotGpu !== 'undefined' && slotGpu) {
                 modeloGpuReal.position.copy(slotGpu.position); 
-                
-                // Mude aqui se ela precisar de ir um pouco para o lado, para cima ou para trás
-                modeloGpuReal.position.x += 0.1; //se afasta
-                modeloGpuReal.position.y += 0.5; // faz subir
-                modeloGpuReal.position.z += 0.3; //lados
+                modeloGpuReal.position.x += 0.1;
+                modeloGpuReal.position.y += 0.5; 
+                modeloGpuReal.position.z += 0.3; 
             }
 
             cena.add(modeloGpuReal); 
@@ -701,8 +749,121 @@ function verificarCompatibilidade() {
         });
     }
 
+    // ==========================================
+    // 🔌 CARREGAMENTO DA FONTE (PSU)
+    // ==========================================
+    if (fonte !== "" && typeof modeloFonteReal !== 'undefined' && modeloFonteReal === null) {
+        if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        
+        carregador.load('modelos/fonte.glb', function(gltf) {
+            let modeloOriginal = gltf.scene; 
+            
+            // 🎯 A MÁGICA: CENTRALIZADOR AUTOMÁTICO DE PIVÔ
+            let caixaContorno = new THREE.Box3().setFromObject(modeloOriginal);
+            let centroReal = new THREE.Vector3();
+            caixaContorno.getCenter(centroReal);
+            modeloOriginal.position.set(-centroReal.x, -centroReal.y, -centroReal.z); 
+            
+            let envelope = new THREE.Group();
+            envelope.add(modeloOriginal);
+            
+            modeloFonteReal = envelope; // Agora o modeloReal é o nosso envelope perfeitamente centrado!
+            
+            // ==========================================
+            // 🔎 ESCALA
+            // A peça devia estar gigante. Começamos com 0.10. 
+            // Se ficar minúscula, suba para 0.3, 0.5, etc.
+            // ==========================================
+            modeloFonteReal.scale.set(0.10, 0.10, 0.10); 
+            
+            // ==========================================
+            // 🔄 ROTAÇÃO
+            // ==========================================
+            modeloFonteReal.rotation.set(0, 0, 0);
+            
+            modeloFonteReal.rotation.x = 0; 
+            
+            // Se a ventoinha da fonte não estiver a apontar para baixo (ou para cima), 
+            // ou se os cabos estiverem virados para fora, experimente Math.PI / 2 ou Math.PI aqui
+            modeloFonteReal.rotation.y = 0; 
+            
+            modeloFonteReal.rotation.z = 0; 
+            
+            // ==========================================
+            // ↕️↔️ POSIÇÃO
+            // ==========================================
+            if(typeof slotFonte !== 'undefined' && slotFonte) {
+                modeloFonteReal.position.copy(slotFonte.position); 
+                
+                modeloFonteReal.position.x += 0;
+                modeloFonteReal.position.y += 0;
+                modeloFonteReal.position.z += 0;
+            }
+            
+            cena.add(modeloFonteReal); 
+            if(typeof slotFonte !== 'undefined' && slotFonte) { slotFonte.material.opacity = 0; slotFonte.userData.opacidadeOriginal = 0; }
+        });
+    }
+
+    // ==========================================
+    // 💾 CARREGAMENTO DO ARMAZENAMENTO (M.2 e SATA)
+    // ==========================================
+    if (armazenamento !== "") {
+        let isM2 = armazenamento.includes("m2") || armazenamento.includes("nvme");
+        let isSata = armazenamento.includes("sata");
+
+        // --- NVMe (M.2) ---
+        if (isM2 && typeof modeloNvmeReal !== 'undefined' && modeloNvmeReal === null) {
+            carregador.load('modelos/nvme.glb', function(gltf) {
+                modeloNvmeReal = gltf.scene; 
+                modeloNvmeReal.scale.set(1.0, 1.0, 1.0);
+                
+                modeloNvmeReal.rotation.set(0, 0, 0);
+                modeloNvmeReal.rotation.x = 0; 
+                modeloNvmeReal.rotation.y = 0; 
+                modeloNvmeReal.rotation.z = 0; 
+                
+                if(typeof slotM2 !== 'undefined' && slotM2) {
+                    modeloNvmeReal.position.copy(slotM2.position); 
+                    modeloNvmeReal.position.x += 0;
+                    modeloNvmeReal.position.y += 0;
+                    modeloNvmeReal.position.z += 0;
+                }
+                
+                cena.add(modeloNvmeReal);
+                if(typeof slotM2 !== 'undefined' && slotM2) { slotM2.material.opacity = 0; slotM2.userData.opacidadeOriginal = 0; }
+            });
+        }
+        
+        // --- SSD SATA (2.5") ---
+        if (isSata && typeof modeloSsdReal !== 'undefined' && modeloSsdReal === null) {
+            carregador.load('modelos/ssd.glb', function(gltf) {
+                modeloSsdReal = gltf.scene; 
+                modeloSsdReal.scale.set(1.0, 1.0, 1.0);
+                
+                modeloSsdReal.rotation.set(0, 0, 0);
+                modeloSsdReal.rotation.x = 0;
+                modeloSsdReal.rotation.y = 0;
+                modeloSsdReal.rotation.z = 0;
+                
+                if(typeof slotSsd !== 'undefined' && slotSsd) {
+                    modeloSsdReal.position.copy(slotSsd.position);
+                    modeloSsdReal.position.x += 0;
+                    modeloSsdReal.position.y += 0;
+                    modeloSsdReal.position.z += 0;
+                }
+                
+                cena.add(modeloSsdReal);
+                if(typeof slotSsd !== 'undefined' && slotSsd) { slotSsd.material.opacity = 0; slotSsd.userData.opacidadeOriginal = 0; }
+            });
+        }
+
+        if (typeof modeloNvmeReal !== 'undefined' && modeloNvmeReal) modeloNvmeReal.visible = isM2;
+        if (typeof modeloSsdReal !== 'undefined' && modeloSsdReal) modeloSsdReal.visible = isSata;
+    }
+
     // =======================================================
-    // 📏 4. FÍSICA E COMPATIBILIDADE (RAM, GPU e GABINETE)
+    // 📏 5. FÍSICA E COMPATIBILIDADE (RAM, GPU e GABINETE)
     // =======================================================
     let errosDeMontagem = [], alertasDeMontagem = [];
     let socketPlaca = "", tamanhoPlaca = "";
@@ -730,7 +891,7 @@ function verificarCompatibilidade() {
     }
 
     // =======================================================
-    // 📏 REGRAS DE MEMÓRIA RAM (GERAÇÃO, FREQUÊNCIA E CPU)
+    // 📏 REGRAS DE MEMÓRIA RAM
     // =======================================================
     let totalRamNum = ['ram1', 'ram2', 'ram3', 'ram4'].reduce((soma, id) => soma + (getVal(id) !== "" ? 1 : 0), 0);
     let ddrSuportadoPelaPlaca = (socketPlaca === "am4" || socketPlaca === "lga1200") ? "ddr4" : "ddr5";
@@ -741,7 +902,6 @@ function verificarCompatibilidade() {
     let erroMisturaGeracao = false;
     let frequenciasRAM = [];
 
-    // Vasculha todos os slots de RAM
     ['ram1', 'ram2', 'ram3', 'ram4'].forEach(id => {
         let valor = getVal(id);
         if (valor === "") return;
@@ -750,11 +910,10 @@ function verificarCompatibilidade() {
         let geracao = info[0];
         let mhz = parseInt(info[info.length - 1]) || 3200;
 
-        // Erro Crítico: Misturar DDR4 com DDR5
         if (ddrDetectado !== "" && ddrDetectado !== geracao) erroMisturaGeracao = true;
         
         ddrDetectado = geracao; 
-        frequenciasRAM.push(mhz); // Guarda as velocidades para comparar depois
+        frequenciasRAM.push(mhz); 
 
         if (placaMaeValue !== "" && geracao !== ddrSuportadoPelaPlaca) erroDdr = true;
     });
@@ -762,22 +921,18 @@ function verificarCompatibilidade() {
     if (erroMisturaGeracao) errosDeMontagem.push("Incompatibilidade Crítica: Não pode misturar gerações diferentes (DDR4 com DDR5).");
     if (erroDdr) errosDeMontagem.push(`Incompatibilidade Física: Placa-mãe exige ${ddrSuportadoPelaPlaca.toUpperCase()}, mas instalou ${ddrDetectado.toUpperCase()}.`);
 
-    // 🧠 Lógica Avançada de Frequências
     if (frequenciasRAM.length > 0) {
         let menorFrequencia = Math.min(...frequenciasRAM);
         let maiorFrequencia = Math.max(...frequenciasRAM);
 
-        // ⚠️ ALERTA: Nivelamento de Velocidade (Permite ligar)
         if (menorFrequencia !== maiorFrequencia) {
             alertasDeMontagem.push(`Aviso de RAM: Frequências diferentes detectadas. O sistema limitará todas a ${menorFrequencia}MHz.`);
         }
 
-        // ❌ ERRO: Limite da Placa-Mãe
         if (placaMaeValue !== "" && maiorFrequencia > mhzMaximoDaPlaca) {
             errosDeMontagem.push(`Bloqueio: Frequência da RAM (${maiorFrequencia}MHz) excede o limite da placa-mãe (Máx: ${mhzMaximoDaPlaca}MHz).`);
         }
 
-        // ❌ ERRO: Limite do Processador
         if (processador !== "") {
             let cpuSocket = processador.split("-")[0];
             let mhzMaximoCpu = (cpuSocket === "am4") ? 3600 : 6400; 
@@ -793,7 +948,7 @@ function verificarCompatibilidade() {
     if (socketPlaca !== "" && processador !== "" && socketPlaca !== processador) errosDeMontagem.push("Soquetes incompatíveis. CPU não encaixa na Placa-Mãe.");
 
     // =======================================================
-    // ⚡ 5. CALCULADORA DE CONSUMO AUTOMÁTICA (JSON)
+    // ⚡ 6. CALCULADORA DE CONSUMO AUTOMÁTICA
     // =======================================================
     let consumoTotal = extrairWatts('placa-mae') + extrairWatts('processador') + extrairWatts('gpu') + extrairWatts('cooler') + extrairWatts('armazenamento') +
         ['ram1', 'ram2', 'ram3', 'ram4', 'fan-tras', 'fan-frente1', 'fan-frente2', 'fan-frente3', 'fan-teto1', 'fan-teto2', 'fan-teto3'].reduce((s, id) => s + extrairWatts(id), 0);
@@ -822,7 +977,7 @@ function verificarCompatibilidade() {
     }
 
     // =======================================================
-    // 🖥️ 6. ATUALIZAÇÃO DA INTERFACE E LOGS
+    // 🖥️ 7. ATUALIZAÇÃO DA INTERFACE E LOGS
     // =======================================================
     let conteudoLogs = getEl('conteudo-logs');
     let isLigado = typeof sistemaLigado !== 'undefined' && sistemaLigado;
@@ -868,16 +1023,6 @@ function verificarCompatibilidade() {
     }
 }
 window.verificarCompatibilidade = verificarCompatibilidade;
-
-
-
-
-
-
-
-
-
-
 
 // ==========================================================================
 // 5. MOTOR DE ANIMAÇÃO E SISTEMA DE ENERGIA UNIVERSAL
@@ -987,12 +1132,10 @@ if (btnToggle && menuPrincipalUI) {
 animar();
 })();
 
-
 // ==========================================================================
 // 8. GERADOR DE RELATÓRIO E PDF
 // ==========================================================================
 
-// Função auxiliar para capturar o TEXTO visível do Menu, e não o "value" escondido
 function obterNomePeca(idElemento) {
     let el = document.getElementById(idElemento);
     if (!el || el.value === "") return "Não Instalado";
@@ -1001,7 +1144,7 @@ function obterNomePeca(idElemento) {
 
 function abrirRelatorio() {
     let btnUI = document.getElementById('btn-relatorio');
-    if (btnUI && btnUI.disabled) return; // Só abre se o PC estiver pronto
+    if (btnUI && btnUI.disabled) return; 
 
     let consumoAtual = document.getElementById('consumo-watts') ? document.getElementById('consumo-watts').innerText.replace('Consumo: ', '') : '0 W';
 
@@ -1037,27 +1180,9 @@ function abrirRelatorio() {
     document.getElementById('modal-relatorio').style.display = 'block';
 }
 
-// Controlos de fechar a janela
 document.getElementById('fechar-modal').onclick = () => document.getElementById('modal-relatorio').style.display = "none";
 window.onclick = (event) => { if (event.target == document.getElementById('modal-relatorio')) document.getElementById('modal-relatorio').style.display = "none"; }
 if(document.getElementById('btn-relatorio')) document.getElementById('btn-relatorio').addEventListener('click', abrirRelatorio);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ==========================================================================
 // 🔍 SISTEMA DE PESQUISA INTELIGENTE (COM KITS VIRTUAIS)
@@ -1081,7 +1206,6 @@ if (inputPesquisa && listaResultados) {
         }
 
         let todasAsOpcoes = [];
-        // Lemos o ram1 como base para descobrir as memórias disponíveis
         let menusParaLer = ['gabinete', 'placa-mae', 'processador', 'gpu', 'fonte', 'cooler', 'armazenamento', 'ram1', 'fan-tras']; 
         
         menusParaLer.forEach(idMenu => {
@@ -1093,17 +1217,14 @@ if (inputPesquisa && listaResultados) {
                         let textoNormal = opt.text;
                         let textoLimpo = removerAcentos(textoNormal);
                         
-                        // 1. Pesquisa a peça normal
                         if (textoLimpo.includes(termoPesquisa)) {
                             todasAsOpcoes.push({ texto: textoNormal, valor: opt.value, menuBase: idMenu, isKit: false });
                         }
 
-                        // 2. MAGIA: Cria um "Kit 2x" virtual se for uma memória RAM
                         if (idMenu === 'ram1') {
                             let textoKit = "📦 Kit 2x: " + textoNormal;
                             let textoKitLimpo = removerAcentos(textoKit);
                             
-                            // Se a pessoa pesquisar por "kit" ou pelo nome da ram, o kit aparece!
                             if (textoKitLimpo.includes(termoPesquisa)) {
                                 todasAsOpcoes.push({ texto: textoKit, valor: opt.value, menuBase: idMenu, isKit: true });
                             }
@@ -1113,7 +1234,6 @@ if (inputPesquisa && listaResultados) {
             }
         });
 
-        // Remove duplicados
         let unicas = Array.from(new Set(todasAsOpcoes.map(a => a.texto)))
             .map(texto => todasAsOpcoes.find(a => a.texto === texto));
 
@@ -1124,7 +1244,6 @@ if (inputPesquisa && listaResultados) {
                 li.innerHTML = item.texto; 
                 
                 li.onclick = function() {
-                    // Agora passamos o isKit para a função!
                     aplicarPecaPesquisada(item.valor, item.menuBase, item.isKit);
                     inputPesquisa.value = ""; 
                     listaResultados.style.display = "none"; 
@@ -1142,32 +1261,21 @@ if (inputPesquisa && listaResultados) {
     });
 }
 
-// 🧠 A Inteligência que coloca a(s) peça(s) no lugar certo
 function aplicarPecaPesquisada(valorDaPeca, menuDeOrigem, isKit) {
-    
-    // ==========================================
-    // SE FOR UM KIT 2X (Ocupa 2 Slots de RAM)
-    // ==========================================
     if (isKit) {
-        // Encontra todos os slots de RAM que estão vazios
         let slotsVazios = ['ram1', 'ram2', 'ram3', 'ram4'].filter(id => {
             let el = document.getElementById(id);
             return el && el.value === "";
         });
 
         if (slotsVazios.length >= 2) {
-            // Se tem pelo menos 2 slots livres, instala nos dois primeiros que encontrar
             document.getElementById(slotsVazios[0]).value = valorDaPeca;
             document.getElementById(slotsVazios[1]).value = valorDaPeca;
         } else {
-            // Se não tem espaço livre, força a substituição nos slots recomendados (2 e 4 para Dual Channel)
             document.getElementById('ram2').value = valorDaPeca;
             document.getElementById('ram4').value = valorDaPeca;
         }
     } 
-    // ==========================================
-    // SE FOR UMA PEÇA NORMAL (1 Slot)
-    // ==========================================
     else {
         let selectAlvo = document.getElementById(menuDeOrigem);
 
@@ -1190,7 +1298,5 @@ function aplicarPecaPesquisada(valorDaPeca, menuDeOrigem, isKit) {
         if (selectAlvo) selectAlvo.value = valorDaPeca;
     }
 
-    // 🚀 Chama o motor 3D e de matemática para atualizar o visual e os Watts
     verificarCompatibilidade(); 
 }
-
