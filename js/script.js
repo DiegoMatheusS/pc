@@ -658,11 +658,44 @@ function verificarCompatibilidade() {
 
     if (gpu !== "" && typeof modeloGpuReal !== 'undefined' && modeloGpuReal === null) {
         if(typeof telaCarregamento !== 'undefined' && telaCarregamento) { telaCarregamento.style.display = 'flex'; telaCarregamento.style.opacity = '1'; }
+        
         carregador.load('modelos/placavideo.glb', function(gltf) {
-            modeloGpuReal = gltf.scene; modeloGpuReal.scale.set(0.30, 0.30, 0.30);
-            modeloGpuReal.rotation.set(0, 0, 0); modeloGpuReal.rotateX(Math.PI / 2); modeloGpuReal.rotateZ(Math.PI / 2);
-            modeloGpuReal.position.set(0, 2.2, 0.80); cena.add(modeloGpuReal); 
-            if(typeof slotGpu !== 'undefined' && slotGpu) { slotGpu.material.opacity = 0; slotGpu.userData.opacidadeOriginal = 0; }
+            modeloGpuReal = gltf.scene; 
+            
+            // ==========================================
+            // 🔎 1. ESCALA (Tamanho)
+            // Aumentei de 0.30 para 1.0. Se continuar pequena, mude para 1.5, 2.0, etc.
+            // ==========================================
+            modeloGpuReal.scale.set(0.35, 0.35, 0.35);
+            
+            // ==========================================
+            // 🔄 2. ROTAÇÃO
+            // ==========================================
+            modeloGpuReal.rotation.set(1, 1, 1); // Limpa rotações antigas
+            
+            modeloGpuReal.rotation.x = 0;  
+            // Gira 90 graus para alinhar com o fundo do PC
+            modeloGpuReal.rotation.y = Math.PI / 2; // (Tente -Math.PI / 2 se ficar virada para a frente)
+            modeloGpuReal.rotation.z = 0;       
+            
+            // ==========================================
+            // ↕️↔️ 3. POSIÇÃO
+            // ==========================================
+            if(typeof slotGpu !== 'undefined' && slotGpu) {
+                modeloGpuReal.position.copy(slotGpu.position); 
+                
+                // Mude aqui se ela precisar de ir um pouco para o lado, para cima ou para trás
+                modeloGpuReal.position.x += 0; 
+                modeloGpuReal.position.y += 0; 
+                modeloGpuReal.position.z += 0; 
+            }
+
+            cena.add(modeloGpuReal); 
+            
+            if(typeof slotGpu !== 'undefined' && slotGpu) { 
+                slotGpu.material.opacity = 0; 
+                slotGpu.userData.opacidadeOriginal = 0; 
+            }
         });
     }
 
