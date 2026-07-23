@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montando Pc</title>
+    <link rel="stylesheet" href="css/pcbuildstyle.css">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' data: blob:;">
+</head>
+<body>
+    <!-- TELA DE CARREGAMENTO -->
+    <div id="tela-carregamento">
+        <div class="loader-conteudo">
+            <div class="spinner"></div>
+            <h2 id="texto-loading">A carregar Laboratório 3D...</h2>
+            <div class="barra-fundo">
+                <div id="barra-progresso"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 NOVO CABEÇALHO FIXO -->
+    <header id="cabecalho-principal">
+        <!-- Logo na Esquerda -->
+        <div class="logo-container">
+            <h1>PC Builder 3D</h1>
+        </div>
+        
+        <!-- Barra de Pesquisa no Meio -->
+        <div id="barra-pesquisa-container">
+            <input type="text" id="input-pesquisa" placeholder="Pesquisar peça (ex: RTX 4070, Kit)..." autocomplete="off">
+            <ul id="lista-resultados" style="display: none;"></ul>
+        </div>
+
+        <!-- Espaçador invisível na Direita (Mantém a barra perfeitamente centralizada) -->
+        <div class="espacador-cabecalho"></div>
+    </header>
+    <div id="container-3d"></div>
+
+	<div id="menu-flutuante" style="display: none;">
+        <h3 id="menu-titulo">Peça</h3>
+        <!-- ADICIONADO onchange AQUI -->
+        <select id="select-flutuante" onchange="verificarCompatibilidade()"></select>
+    </div>
+    
+    <button id="btn-toggle-menu">▼ Esconder Menu</button>
+
+    
+
+    <div id="menu-inferior">
+       
+	
+		<div id="grupo-gabinete" class="grupo-hardware">
+            <label>Tamanho do Gabinete:</label>
+            <select id="gabinete" onchange="verificarCompatibilidade()"></select>
+        </div>
+        
+        <div id="grupo-placa-mae" class="grupo-hardware">
+            <label>Placa-Mãe:</label>
+            <select id="placa-mae" onchange="verificarCompatibilidade()"></select>
+        </div>
+
+        <div id="grupo-processador" class="grupo-hardware">
+            <label>Processador (CPU):</label>
+            <select id="processador" onchange="verificarCompatibilidade()"></select>
+        </div>
+        
+        <div class="grupo-hardware" id="grupo-ram">
+            <label>Memória RAM (Por Slot):</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px;">
+                <select id="ram1" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+                <select id="ram2" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+                <select id="ram3" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+                <select id="ram4" onchange="verificarCompatibilidade()" style="font-size: 0.8rem; padding: 3px;"></select>
+            </div>
+        </div>
+
+        <div class="grupo-hardware" id="grupo-gpu">
+            <label>Placa de Vídeo (GPU):</label>
+            <select id="gpu" onchange="verificarCompatibilidade()"></select>
+        </div>
+
+        <div class="grupo-hardware" id="grupo-fonte">
+            <label>Fonte:</label>
+            <select id="fonte" onchange="verificarCompatibilidade()"></select>
+        </div>
+
+        <div class="grupo-hardware" id="grupo-cooler">
+            <label>Refrigeração CPU:</label>
+            <select id="cooler" onchange="verificarCompatibilidade()"></select>
+        </div>
+            
+        <div class="grupo-hardware" id="grupo-teto">
+            <label>Painel Superior (Teto):</label>
+            <select id="teto" onchange="verificarCompatibilidade()">
+                <!-- O teto mantém o HTML fixo porque ele ativa outras coisas especiais -->
+                <option value="">-- Vazio --</option>
+                <option value="2xfan">Instalar 2x Ventoinhas</option>
+                <option value="3xfan">Instalar 3x Ventoinhas</option>
+            </select>
+        </div>
+
+        <!-- As FANS -->
+        <div class="grupo-hardware" id="grupo-fan-teto1"><label>Teto (Frente):</label><select id="fan-teto1" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-teto2"><label>Teto (Meio):</label><select id="fan-teto2" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-teto3"><label>Teto (Traseira):</label><select id="fan-teto3" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-tras"><label>Ventoinha Traseira:</label><select id="fan-tras" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-frente1"><label>Frente (Topo):</label><select id="fan-frente1" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-frente2"><label>Frente (Meio):</label><select id="fan-frente2" onchange="verificarCompatibilidade()"></select></div>
+        <div class="grupo-hardware" id="grupo-fan-frente3"><label>Frente (Baixo):</label><select id="fan-frente3" onchange="verificarCompatibilidade()"></select></div>
+        
+        <div class="grupo-hardware" id="grupo-armazenamento">
+            <label>Armazenamento:</label>
+            <select id="armazenamento" onchange="verificarCompatibilidade()"></select>
+        </div>
+    </div>
+	<div id="painel-logs">
+        <h3>Logs do Sistema</h3>
+        <div id="conteudo-logs">Aguardando seleção de componentes...</div>
+    </div>
+    
+    <!-- 🎯 NOVO: Painel de Consumo movido para fora dos logs -->
+    <div id="consumo-watts">Consumo: 0 W</div>
+
+    <div id="tooltip-3d"></div>
+
+    <!-- Botão Gerar Relatório -->
+    <button id="btn-relatorio" class="btn-desligado" disabled>📋 RELATÓRIO</button>
+
+    <!-- Janela Modal Oculta do Relatório -->
+    <div id="modal-relatorio">
+        <div class="modal-conteudo">
+            <span id="fechar-modal">&times;</span>
+            <h2>Laudo Técnico da Montagem</h2>
+            <div id="conteudo-relatorio">
+                <!-- O JavaScript vai injetar as peças aqui dentro -->
+            </div>
+            <button id="btn-imprimir" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+        </div>
+    </div>
+    <button id="btn-power" class="btn-desligado" disabled>🔌 LIGAR PC</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha384-CI3ELBVUz9XQO+97x6nwMDPosPR5XvsxW2ua7N1Xeygeh1IxtgqtCkGfQY9WWdHu" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" integrity="sha384-fljlqkjWlmSFjkESkQvm77heIZpoWmXEOzlCA7kOpGUH+95Zk0yGfQieWM2q136E" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js" integrity="sha384-wagZhIFgY4hD+7awjQjR4e2E294y6J2HSnd8eTNc15ZubTeQeVRZwhQJ+W6hnBsf" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js" integrity="sha384-bXBR7wGBv71dkw7jwxbXO7wf4BrHzvRw0k9Mjn2jiYDYAhha8LYez1xkYTtHeLc4" crossorigin="anonymous"></script>
+    
+    <!-- Link para o nosso super ficheiro de lógica! -->
+    <script src="js/pcbuilderscript.js"></script>
+</body>
+</html>
