@@ -993,9 +993,9 @@ function verificarCompatibilidade() {
                 modeloAirCoolerReal.position.copy(slotCooler.position); 
                 
                 // ⬆️ Se ele ficou enterrado na placa-mãe depois de levantar, suba-o aqui:
-                modeloAirCoolerReal.position.y += 1.5; // (Vá testando 0.5, 1.0, 1.5...)
+                modeloAirCoolerReal.position.y += 0; // (Vá testando 0.5, 1.0, 1.5...)
                 
-                modeloAirCoolerReal.position.x += 0;
+                modeloAirCoolerReal.position.x += 0.5;
                 modeloAirCoolerReal.position.z += 0;
             }
             
