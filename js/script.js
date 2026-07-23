@@ -666,17 +666,19 @@ function verificarCompatibilidade() {
             // 🔎 1. ESCALA (Tamanho)
             // Aumentei de 0.30 para 1.0. Se continuar pequena, mude para 1.5, 2.0, etc.
             // ==========================================
-            modeloGpuReal.scale.set(0.35, 0.35, 0.35);
+            modeloGpuReal.scale.set(0.40, 0.40, 0.40);
             
             // ==========================================
             // 🔄 2. ROTAÇÃO
             // ==========================================
-            modeloGpuReal.rotation.set(1, 1, 1); // Limpa rotações antigas
-            
-            modeloGpuReal.rotation.x = 0;  
-            // Gira 90 graus para alinhar com o fundo do PC
-            modeloGpuReal.rotation.y = Math.PI / 2; // (Tente -Math.PI / 2 se ficar virada para a frente)
-            modeloGpuReal.rotation.z = 0;       
+            modeloGpuReal.rotation.set(0, 0, 0); 
+    
+            modeloGpuReal.rotation.x = Math.PI; // Manteve a placa de barriga para baixo (Certo!)
+    
+            // 🪄 A MÁGICA: Inverter o sinal faz a placa dar uma meia-volta perfeita
+            modeloGpuReal.rotation.y = -Math.PI / 2; 
+    
+            modeloGpuReal.rotation.z = 0;  
             
             // ==========================================
             // ↕️↔️ 3. POSIÇÃO
@@ -685,9 +687,9 @@ function verificarCompatibilidade() {
                 modeloGpuReal.position.copy(slotGpu.position); 
                 
                 // Mude aqui se ela precisar de ir um pouco para o lado, para cima ou para trás
-                modeloGpuReal.position.x += 0; 
-                modeloGpuReal.position.y += 0; 
-                modeloGpuReal.position.z += 0; 
+                modeloGpuReal.position.x += 0.1; //se afasta
+                modeloGpuReal.position.y += 0.5; // faz subir
+                modeloGpuReal.position.z += 0.3; //lados
             }
 
             cena.add(modeloGpuReal); 
