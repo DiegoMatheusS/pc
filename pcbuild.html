@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Montando Pc</title>
+    <link rel="stylesheet" href="css/cabecalho.css">
     <link rel="stylesheet" href="css/pcbuildstyle.css">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' data: blob:;">
 </head>
@@ -19,22 +20,17 @@
         </div>
     </div>
 
-    <!-- 🌟 NOVO CABEÇALHO FIXO -->
-    <header id="cabecalho-principal">
-        <!-- Logo na Esquerda -->
-        <div class="logo-container">
-            <h1>PC Builder 3D</h1>
-        </div>
-        
-        <!-- Barra de Pesquisa no Meio -->
+    <div id="ui-topo">
+        <header class="cabecalho" id="cabecalho-container"></header>
+
+        <!-- Barra de pesquisa exclusiva do PC Build -->
         <div id="barra-pesquisa-container">
             <input type="text" id="input-pesquisa" placeholder="Pesquisar peça (ex: RTX 4070, Kit)..." autocomplete="off">
             <ul id="lista-resultados" style="display: none;"></ul>
         </div>
-
-        <!-- Espaçador invisível na Direita (Mantém a barra perfeitamente centralizada) -->
-        <div class="espacador-cabecalho"></div>
-    </header>
+    </div>
+    <script src="js/cabecalho.js"></script>
+    
     <div id="container-3d"></div>
 
 	<div id="menu-flutuante" style="display: none;">
@@ -147,5 +143,6 @@
     
     <!-- Link para o nosso super ficheiro de lógica! -->
     <script src="js/pcbuildscript.js"></script>
+    
 </body>
 </html>

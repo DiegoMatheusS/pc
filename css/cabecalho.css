@@ -1,0 +1,47 @@
+/* --- CABEÇALHO GLOBAL --- */
+.cabecalho {
+    background-color: #ffffff;
+    color: #333333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 50px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 10;
+    
+    /* 🌟 A SOLUÇÃO AQUI */
+    box-sizing: border-box; 
+    width: 100%; 
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1e90ff;
+}
+
+.menu ul {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+.menu a {
+    color: #333333;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.menu a:hover {
+    color: #1e90ff;
+}
+
+.menu a.destaque {
+    color: #1e90ff;
+    font-weight: bold;
+}
