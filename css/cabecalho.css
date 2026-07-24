@@ -48,3 +48,34 @@
     color: #1e90ff;
     font-weight: bold;
 }
+
+/* ==========================================================================
+   RESPONSIVIDADE DO CABEÇALHO (SMARTPHONES E TABLETS)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .cabecalho {
+        flex-direction: column; /* Coloca a logo em cima e o menu embaixo */
+        gap: 15px; /* Reduz o espaço entre a logo e os botões */
+        padding: 15px 20px; /* Reduz o padding lateral para ganhar ecrã */
+        justify-content: center;
+    }
+
+    /* Transformamos o menu numa área deslizável (arrastar com o dedo) */
+    .menu {
+        width: 100%;
+        overflow-x: auto; /* Permite a rolagem horizontal */
+        -webkit-overflow-scrolling: touch; /* Deslize suave nos ecrãs táteis */
+    }
+
+    .menu ul {
+        justify-content: flex-start;
+        gap: 20px;
+        width: max-content; /* Força os itens a não se esmagarem para caber na tela */
+        padding: 5px 10px 10px 10px; /* Dá espaço para o toque do dedo */
+    }
+
+    /* Esconde a barra de rolagem cinzenta inestética, mantendo a função de rolar */
+    .menu::-webkit-scrollbar {
+        display: none;
+    }
+}

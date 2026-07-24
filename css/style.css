@@ -234,3 +234,38 @@ body {
     color: #00b85c; /* Fica verde (ou azul) ao passar o mouse */
     transform: scale(1.1); /* Dá uma leve crescidinha */
 }
+
+/* ==========================================================================
+   RESPONSIVIDADE DO BANNER (TABLETS E CELULARES)
+   ========================================================================== */
+@media (max-width: 992px) {
+    .banner {
+        padding: 120px 20px 40px 20px; 
+        min-height: auto; /* Remove a altura fixa para abraçar o conteúdo */
+    }
+
+    .banner-limite {
+        flex-direction: column; /* Quebra o layout: Texto em cima, 3D embaixo */
+        text-align: center;
+        gap: 0px; /* Reduz o espaço para não ficar muito longo */
+    }
+
+    .banner-conteudo {
+        text-align: center; /* Centraliza os textos no celular */
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .banner-conteudo h1 {
+        font-size: 38px; /* Diminui um pouco o título para caber na tela */
+    }
+
+    /* 🌟 DOMANDO A PLACA GIGANTE NO CELULAR */
+    .banner-3d {
+        position: relative; /* Tira do modo absoluto e coloca de volta na fila */
+        width: 100%; /* Ocupa a largura da tela do celular */
+        height: 350px; /* Dá uma altura segura para a pessoa ver a placa */
+        top: 0;
+        z-index: 10;
+    }
+}
