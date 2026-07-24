@@ -9,26 +9,22 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' data: blob:;">
 </head>
 <body>
-    <!-- TELA DE CARREGAMENTO -->
+   <!-- TELA DE CARREGAMENTO -->
     <div id="tela-carregamento">
-        <div class="loader-conteudo">
-            <div class="spinner"></div>
-            <h2 id="texto-loading">A carregar Laboratório 3D...</h2>
-            <div class="barra-fundo">
-                <div id="barra-progresso"></div>
-            </div>
-        </div>
+       <!-- ... código do loader ... -->
     </div>
 
+    <!-- 🌟 O PACOTE QUE FALTAVA (UI-TOPO) -->
     <div id="ui-topo">
         <header class="cabecalho" id="cabecalho-container"></header>
-
-        <!-- Barra de pesquisa exclusiva do PC Build -->
+        
+        <!-- 2. Barra de pesquisa exclusiva do PC Build -->
         <div id="barra-pesquisa-container">
             <input type="text" id="input-pesquisa" placeholder="Pesquisar peça (ex: RTX 4070, Kit)..." autocomplete="off">
             <ul id="lista-resultados" style="display: none;"></ul>
         </div>
     </div>
+    <!-- O script do cabeçalho pode ficar aqui fora ou dentro, sem problema -->
     <script src="js/cabecalho.js"></script>
     
     <div id="container-3d"></div>

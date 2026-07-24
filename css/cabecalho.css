@@ -3,14 +3,17 @@
     background-color: #ffffff;
     color: #333333;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 60px;
     align-items: center;
-    padding: 15px 50px;
+    
+    /* 🌟 A MÁGICA DO ESPAÇAMENTO AQUI */
+    /* Empurra a logo para a frente e cria o espaço atrás alinhando com um limite de 1200px */
+    padding: 15px max(50px, calc((100% - 1200px) / 2)); 
+    
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     position: relative;
     z-index: 10;
-    
-    /* 🌟 A SOLUÇÃO AQUI */
     box-sizing: border-box; 
     width: 100%; 
 }

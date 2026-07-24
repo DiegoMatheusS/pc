@@ -16,10 +16,20 @@
 
     <!-- Banner Principal -->
     <section class="banner">
-        <div class="banner-conteudo">
-            <h1>O PC dos seus sonhos começa aqui</h1>
-            <p>Simule a montagem em 3D, verifique medidas e organize o fluxo de ar antes de comprar.</p>
-            <a href="pcbuild.html" class="btn-construir">Construir meu pc</a>
+        <div class="banner-limite">
+            
+            <!-- Lado Esquerdo: Texto e Botão -->
+            <div class="banner-conteudo">
+                <h1>Monte seu PC Gamer<br><span class="destaque-texto">peça por peça em 3D</span></h1>
+                <p>Escolha cada componente, analise o fluxo de ar e tenha certeza da compatibilidade exata antes de montar a sua máquina real.</p>
+                <a href="pcbuild.html" class="btn-banner">Comece a Montar Seu PC</a>
+            </div>
+
+            <!-- Lado Direito: Palco da Placa de Vídeo 3D -->
+            <div class="banner-3d" id="gpu-banner-container">
+                <!-- O JavaScript vai injetar a Placa de Vídeo aqui dentro -->
+            </div>
+
         </div>
     </section>
 
@@ -39,8 +49,15 @@
 
     <!-- Rodapé -->
     <footer class="rodape">
-        <p>&copy; 2026 Meu PC 3D. O seu simulador de hardware.</p>
+        <p>&copy; 2026 PC Builder.</p>
     </footer>
+    <!-- Bibliotecas 3D para o Banner -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- O nosso script que vai criar a magia no banner -->
+    <script src="js/banner3d.js"></script>
     <script src="js/pcbuilderscript.js"></script>
 </body>
 </html>

@@ -7,47 +7,102 @@
 }
 
 body {
-    margin: 0; padding: 0;
-    width: 100%; height: 100%;
-    background-color: #f4f4f9; /* Fundo claro parecido com lojas online */
+    background-color: #f4f4f9; 
     color: #333333;
+    
+    /* 🌟 O TRUQUE PARA O RODAPÉ DESCER: */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Garante que a página tenha no mínimo o tamanho da tela toda */
 }
 
 
 
-/* --- BANNER --- */
+/* --- BANNER PRINCIPAL --- */
 .banner {
-    background: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%);
+    background: linear-gradient(135deg, #111217 0%, #1f2235 50%, #1a1025 100%);
     color: #ffffff;
-    text-align: center;
-    padding: 100px 20px;
+    padding: 100px 20px; 
+    min-height: 600px; /* Um pouco mais de altura para a placa girar à vontade */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative; /* Essencial para a placa flutuar em relação ao banner */
+    overflow: hidden; 
 }
 
-.banner-conteudo h1 {
-    font-size: 40px;
-    margin-bottom: 15px;
+.banner-limite {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: flex-start; /* Mantém apenas o texto no fluxo normal da página */
+    align-items: center;
 }
 
-.banner-conteudo p {
-    font-size: 18px;
-    margin-bottom: 30px;
-    color: #e0e0e0;
+.banner-conteudo {
+    max-width: 650px;
+    text-align: left;
+    position: relative;
+    z-index: 2; /* 🌟 TEXTO NO FUNDO (Nível 2) */
 }
 
-.btn-construir {
+/* Os textos do banner */
+.banner-conteudo h1 { font-size: 52px; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 4px 10px rgba(0,0,0,0.6); font-weight: 800; }
+.destaque-texto { color: #00e5ff; }
+.banner-conteudo p { font-size: 20px; margin-bottom: 40px; color: #d1d8e0; line-height: 1.5; text-shadow: 1px 1px 5px rgba(0,0,0,0.5); }
+
+/* O Botão precisa de atenção especial */
+.btn-banner {
     display: inline-block;
-    background-color: #1e90ff;
+    background-color: #00b85c;
     color: #ffffff;
-    padding: 15px 40px;
-    font-size: 18px;
-    font-weight: bold;
+    padding: 18px 45px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
     text-decoration: none;
-    border-radius: 5px;
-    transition: background-color 1s;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 184, 92, 0.3);
+    
+    /* 🌟 DEFENDE O BOTÃO: Fica acima da placa 3D para o clique funcionar! */
+    position: relative;
+    z-index: 20; 
 }
 
-.btn-construir:hover {
-    background-color: #6a79bf;
+.btn-banner:hover { background-color: #00d66b; transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0, 214, 107, 0.6); }
+
+/* --- A MÁGICA: O CONTAINER 3D GIGANTE --- */
+.banner-3d {
+    position: absolute;
+    top: -10%; /* Pode vazar um pouquinho para cima */
+    right: 0; /* Cola na margem direita */
+    width: 70%; /* 🌟 Aumentado para 70% da tela (invade a área do texto!) */
+    height: 120%; /* Mais alto que o próprio banner */
+    
+    /* 🌟 FICA ACIMA DO TEXTO (2), MAS ABAIXO DO BOTÃO (20) */
+    z-index: 10; 
+    cursor: grab;
+}
+
+.banner-3d:active { cursor: grabbing; }
+
+/* --- A ONDA BRANCA NO FUNDO --- */
+.onda-divisoria {
+    position: absolute;
+    bottom: -1px; /* Cola no chão do banner */
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    z-index: 1; /* Fica atrás do texto, mas na frente do fundo escuro */
+}
+
+.onda-divisoria svg {
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 90px; /* Altura da onda, pode diminuir se achar muito grande */
 }
 
 /* --- TEXTO COMPATIBILIDADE --- */
@@ -153,5 +208,29 @@ body {
     color: #888888;
     text-align: center;
     padding: 20px;
-    margin-top: 40px;
+    
+    /* 🌟 ISSO EMPURRA O RODAPÉ LÁ PARA O FUNDO DA TELA */
+    margin-top: auto; 
+}
+
+/* --- ÍCONE DE LOGIN NO RODAPÉ --- */
+.icone-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    color: #555555; /* Cor discreta para não chamar tanta atenção quanto os botões principais */
+    text-decoration: none;
+    transition: color 0.3s, transform 0.2s;
+}
+
+.icone-login svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.icone-login:hover {
+    color: #00b85c; /* Fica verde (ou azul) ao passar o mouse */
+    transform: scale(1.1); /* Dá uma leve crescidinha */
 }
