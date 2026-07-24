@@ -190,20 +190,20 @@ html, body {
    ========================================================================== */
 @media (max-width: 768px) {
     
-    /* 📱 1. O MENU INFERIOR VIRA GAVETA LATERAL (SIDEBAR) DE VERDADE */
+    /* 📱 1. O MENU INFERIOR VIRA GAVETA LATERAL */
     #menu-inferior {
         display: block !important; 
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
-        bottom: auto !important; /* Arranca a âncora que o prendia em baixo */
+        bottom: auto !important; 
         width: 250px !important;
         height: 100vh !important;
         max-height: 100vh !important;
-        transform: translateX(0) !important; /* Mata o alinhamento central do desktop */
+        transform: translateX(0) !important; 
         z-index: 4000 !important;
         padding: 20px 10px !important;
-        padding-top: 100px !important; /* Dá espaço para não bater no cabeçalho */
+        padding-top: 100px !important; 
         transition: transform 0.4s ease !important;
         background: rgba(15, 17, 21, 0.98) !important;
         border-right: 2px solid #00ffff !important;
@@ -214,68 +214,136 @@ html, body {
         overflow-y: auto !important;
     }
 
-    /* Esconde a gaveta deslizando ela totalmente para a esquerda */
     #menu-inferior.esconder-manual, 
     #menu-inferior.esconder-menu { 
         transform: translateX(-105%) !important; 
     }
 
-    /* Ajuste das caixas de hardware dentro da gaveta */
-    .grupo-hardware {
+    .grupo-hardware { width: 100% !important; margin-bottom: 15px !important; }
+
+    /* 🔎 2. CORREÇÃO DA BARRA DE PESQUISA (Fundo branco completo) */
+    #barra-pesquisa-container {
+        margin: 0 !important; /* 🌟 Remove o buraco à esquerda! */
+        padding: 10px 15px !important; /* Impede o texto de colar na borda */
         width: 100% !important;
-        margin-bottom: 15px !important;
+        box-sizing: border-box !important;
     }
 
-    /* 🔘 2. BOTÃO DE ESCONDER MENU (Canto Inferior Esquerdo) */
+    /* 🔘 3. BOTÃO DE ESCONDER MENU (Estreito e sem sobrepor) */
     #btn-toggle-menu {
         top: auto !important;
         bottom: 15px !important;
-        left: 15px !important; 
-        transform: none !important; /* Mata o alinhamento central */
+        left: 10px !important; 
+        transform: none !important; 
         z-index: 4100 !important;
         border-radius: 6px !important;
-        padding: 8px 12px !important;
-        font-size: 12px !important;
+        padding: 8px 10px !important; /* Mais fino */
+        font-size: 11px !important; /* Letra mais pequena */
         border: 1px solid #444 !important;
+        max-width: 110px !important; 
+        white-space: nowrap !important; /* Impede o texto de quebrar linha */
     }
 
-    /* 🚀 3. BOTÕES DE AÇÃO: Encolhidos e alinhados à direita! */
+    /* 🚀 4. BOTÕES DE AÇÃO (Pequenos e alinhados milimetricamente) */
     #btn-power, #btn-relatorio { 
         top: auto !important; 
         bottom: 15px !important; 
-        padding: 8px 12px !important; /* Encolhe o tamanho gigante */
-        font-size: 12px !important; /* Letra mais pequena */
+        padding: 8px 10px !important; 
+        font-size: 11px !important; 
         z-index: 4500 !important; 
         border-width: 1px !important;
+        white-space: nowrap !important;
     }
-    #btn-power { right: 15px !important; }
-    #btn-relatorio { right: 105px !important; } /* Fica coladinho ao Ligar PC */
+    #btn-power { right: 10px !important; }
+    
+    /* 🌟 O Relatório agora fica exatamente a 90px da direita, sem bater no Menu! */
+    #btn-relatorio { right: 90px !important; } 
 
-    /* ⚡ 4. PAINEL DE CONSUMO (Cima dos botões) */
+    /* ⚡ 5. PAINEL DE CONSUMO */
     #consumo-watts {
         bottom: 60px !important; 
         top: auto !important; 
-        right: 15px !important;
-        font-size: 14px !important; 
+        right: 10px !important;
+        font-size: 13px !important; 
         padding: 6px 12px !important;
         z-index: 2000 !important;
     }
 
-    /* 📋 5. LOGS DO SISTEMA: Mais pequenos e bem longe da pesquisa */
+   /* 📋 6. LOGS DO SISTEMA (Ancorados no fundo, longe do 3D) */
     #painel-logs {
         width: 200px !important; 
         left: auto !important; 
         right: 10px !important; 
-        top: 180px !important; /* Joga bem para baixo da barra de pesquisa */
+        top: auto !important; /* 🌟 Removemos a âncora do topo! */
+        bottom: 105px !important; /* 🌟 Colamos ele no fundo, logo acima da área de Watts */
         max-height: 20vh !important; 
         padding: 10px !important; 
         z-index: 3000 !important;
-        background: rgba(10, 10, 10, 0.7) !important;
+        background: rgba(15, 15, 15, 0.85) !important; /* Fundo um pouco mais escuro para ler bem */
+        border: 1px solid #333 !important;
     }
     #painel-logs h3 { font-size: 11px !important; margin-bottom: 4px !important; }
     .log-erro, .log-alerta, .log-sucesso { font-size: 10px !important; padding: 4px !important; margin-bottom: 4px !important; }
 }
 
+/* =========================================
+   🖨️ MÁGICA DA IMPRESSÃO (TELA INTEIRA E A4)
+   ========================================= */
+@media print {
+    /* 1. Esconder tudo o que não é o relatório (3D, Menus, Cabeçalho) */
+    body * { visibility: hidden; }
+    
+    /* 2. Tornar apenas o relatório visível */
+    #modal-relatorio, #modal-relatorio * { visibility: visible; }
+
+    /* 3. Remover o fundo preto e reposicionar a caixa no topo da folha A4 */
+    #modal-relatorio {
+        position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+        background: transparent; align-items: flex-start;
+    }
+
+    /* 4. Esticar a caixa, remover o scroll e os limites de altura */
+    .modal-conteudo {
+        position: relative; left: 0; top: 0; transform: none;
+        width: 100%; max-width: 100%; border: none; box-shadow: none;
+        background: transparent; padding: 0; max-height: none;
+    }
+    
+    #conteudo-relatorio {
+        overflow: visible; /* É ISTO QUE FAZ IMPRIMIR A FOLHA TODA! */
+        height: auto;
+    }
+
+    /* 5. Transformar as cores em Preto e Branco (Visual de Documento Oficial) */
+    .modal-conteudo h2 { color: #000; font-size: 24pt; margin-bottom: 30px;}
+    .relatorio-secao { background: transparent; border: 1px solid #ccc; border-left: 4px solid #333; page-break-inside: avoid; }
+    .relatorio-secao h3 { color: #000; border-bottom: 1px solid #ccc; }
+    .relatorio-item strong { color: #000; }
+    .relatorio-item span { color: #333; }
+
+    /* 6. Esconder botões inúteis no papel */
+    #fechar-modal, #btn-imprimir { display: none !important; }
+}
+
+/* 🖨️ BOTÃO DE IMPRIMIR PRESO NO FUNDO */
+#btn-imprimir {
+    width: 100%;
+    background-color: #00ffff;
+    color: #000;
+    border: none;
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    flex-shrink: 0; /* Protege o botão para ele nunca ser esmagado pelo texto */
+}
+
+#btn-imprimir:hover {
+    background-color: #00cccc;
+    transform: translateY(-2px);
+}
 
 
 
@@ -342,6 +410,16 @@ html, body {
 #lista-resultados li:hover {
     background-color: #f0f8ff; /* Azul bem clarinho ao passar o mouse */
     color: #1e90ff;
+}
+
+/* --- PAINEL FIXO NO TOPO --- */
+#ui-topo {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box; /* 🌟 Adicionado */
+    z-index: 50; 
 }
 
 
