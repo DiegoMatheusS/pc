@@ -1279,57 +1279,84 @@ if (btnToggle && menuPrincipalUI) {
 animar();
 })();
 
-// ==========================================================================
-// 8. GERADOR DE RELATÓRIO E PDF
-// ==========================================================================
-
-function obterNomePeca(idElemento) {
-    let el = document.getElementById(idElemento);
-    if (!el || el.value === "") return "Não Instalado";
-    return el.options[el.selectedIndex].text;
-}
-
-function abrirRelatorio() {
-    let btnUI = document.getElementById('btn-relatorio');
-    if (btnUI && btnUI.disabled) return; 
-
-    let consumoAtual = document.getElementById('consumo-watts') ? document.getElementById('consumo-watts').innerText.replace('Consumo: ', '') : '0 W';
-
-    let html = `
-        <div class="relatorio-secao">
-            <h3>🖥️ Componentes Principais</h3>
-            <div class="relatorio-item"><strong>Gabinete:</strong> <span>${obterNomePeca('gabinete')}</span></div>
-            <div class="relatorio-item"><strong>Placa-Mãe:</strong> <span>${obterNomePeca('placa-mae')}</span></div>
-            <div class="relatorio-item"><strong>Processador:</strong> <span>${obterNomePeca('processador')}</span></div>
-            <div class="relatorio-item"><strong>Placa de Vídeo:</strong> <span>${obterNomePeca('gpu')}</span></div>
-        </div>
-
-        <div class="relatorio-secao">
-            <h3>⚡ Memória e Armazenamento</h3>
-            <div class="relatorio-item"><strong>Memória RAM:</strong> <span>
-                Slot 1: ${obterNomePeca('ram1')}<br>
-                Slot 2: ${obterNomePeca('ram2')}<br>
-                Slot 3: ${obterNomePeca('ram3')}<br>
-                Slot 4: ${obterNomePeca('ram4')}
-            </span></div>
-            <div class="relatorio-item"><strong>Armazenamento Principal:</strong> <span>${obterNomePeca('armazenamento')}</span></div>
-        </div>
-
-        <div class="relatorio-secao">
-            <h3>❄️ Energia e Refrigeração</h3>
-            <div class="relatorio-item"><strong>Fonte de Alimentação:</strong> <span>${obterNomePeca('fonte')}</span></div>
-            <div class="relatorio-item"><strong>Cooler do Processador:</strong> <span>${obterNomePeca('cooler')}</span></div>
-            <div class="relatorio-item"><strong>Consumo de Pico Estimado:</strong> <span style="color: #e74c3c; font-weight: bold;">${consumoAtual}</span></div>
-        </div>
-    `;
+/* ==========================================================================
+   LÓGICA COMPLETA DO RELATÓRIO E MODAL
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', function() {
     
-    document.getElementById('conteudo-relatorio').innerHTML = html;
-    document.getElementById('modal-relatorio').style.display = 'block';
-}
+    const btnRelatorio = document.getElementById('btn-relatorio');
+    const modalRelatorio = document.getElementById('modal-relatorio');
+    const btnFecharModal = document.getElementById('fechar-modal');
+    const btnImprimir = document.getElementById('btn-imprimir');
+    const conteudoRelatorio = document.getElementById('conteudo-relatorio');
 
-document.getElementById('fechar-modal').onclick = () => document.getElementById('modal-relatorio').style.display = "none";
-window.onclick = (event) => { if (event.target == document.getElementById('modal-relatorio')) document.getElementById('modal-relatorio').style.display = "none"; }
-if(document.getElementById('btn-relatorio')) document.getElementById('btn-relatorio').addEventListener('click', abrirRelatorio);
+    if (btnRelatorio && modalRelatorio) {
+        btnRelatorio.addEventListener('click', function(event) {
+            event.preventDefault(); 
+            
+            // 1. GERAR O CONTEÚDO DINÂMICO COM BASE NAS PEÇAS SELECIONADAS
+            if (conteudoRelatorio) {
+                let htmlRelatorio = '<div style="display: flex; flex-direction: column; gap: 12px;">';
+                
+                // Pega todos os menus de seleção de hardware
+                const selects = document.querySelectorAll('#menu-inferior select');
+                
+                selects.forEach(select => {
+                    const grupo = select.closest('.grupo-hardware');
+                    const labelText = grupo ? grupo.querySelector('label').innerText : 'Componente';
+                    const valorSelecionado = select.options[select.selectedIndex].text;
+                    
+                    htmlRelatorio += `
+                        <div class="relatorio-secao" style="padding: 10px 15px; background: #f9f9fc; border-radius: 6px; border-left: 4px solid #1e90ff;">
+                            <h3 style="margin: 0 0 5px 0; font-size: 14px; color: #555;">${labelText}</h3>
+                            <p style="margin: 0; font-size: 15px; font-weight: bold; color: #111;">${valorSelecionado}</p>
+                        </div>
+                    `;
+                });
+
+                // 2. ADICIONAR O CONSUMO DE WATTS ESTIMADO
+                const consumoWatts = document.getElementById('consumo-watts');
+                if (consumoWatts) {
+                    htmlRelatorio += `
+                        <div class="relatorio-secao" style="padding: 10px 15px; background: #fffbe6; border-radius: 6px; border-left: 4px solid #f39c12;">
+                            <h3 style="margin: 0 0 5px 0; font-size: 14px; color: #b78103;">Consumo Total Estimado</h3>
+                            <p style="margin: 0; font-size: 15px; font-weight: bold; color: #8a6d3b;">${consumoWatts.innerText}</p>
+                        </div>
+                    `;
+                }
+
+                htmlRelatorio += '</div>';
+                conteudoRelatorio.innerHTML = htmlRelatorio;
+            }
+
+            // 3. EXIBIR O MODAL NA TELA
+            modalRelatorio.style.display = 'flex'; 
+        });
+    }
+
+    // Fechar clicando no 'X'
+    if (btnFecharModal) {
+        btnFecharModal.addEventListener('click', function() {
+            modalRelatorio.style.display = 'none';
+        });
+    }
+
+    // Fechar clicando fora da caixa branca
+    if (modalRelatorio) {
+        window.addEventListener('click', function(event) {
+            if (event.target === modalRelatorio) {
+                modalRelatorio.style.display = 'none';
+            }
+        });
+    }
+
+    // Acionar a impressão oficial
+    if (btnImprimir) {
+        btnImprimir.addEventListener('click', function() {
+            window.print(); 
+        });
+    }
+});
 
 // ==========================================================================
 // 🔍 SISTEMA DE PESQUISA INTELIGENTE (COM KITS VIRTUAIS)
@@ -1447,3 +1474,38 @@ function aplicarPecaPesquisada(valorDaPeca, menuDeOrigem, isKit) {
 
     verificarCompatibilidade(); 
 }
+
+/* ==========================================================================
+   FECHAR O MENU LATERAL (MOBILE) AO CLICAR FORA DELE
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', function() {
+    const menu = document.getElementById('menu-inferior');
+    const btnToggle = document.getElementById('btn-toggle-menu');
+
+    // Só avança se os elementos existirem na página
+    if (menu && btnToggle) {
+        
+        // Fica a ouvir todos os cliques no site inteiro
+        document.addEventListener('click', function(event) {
+            
+            // Só executa essa regra se estiver no telemóvel (tela menor ou igual a 768px)
+            if (window.innerWidth <= 768) {
+                
+                // Verifica se o clique foi FORA da gaveta e FORA do botão que abre a gaveta
+                const clicouForaDoMenu = !menu.contains(event.target);
+                const clicouForaDoBotao = !btnToggle.contains(event.target);
+                
+                // Verifica se o menu está ABERTO no momento
+                const menuAberto = !menu.classList.contains('esconder-manual') && !menu.classList.contains('esconder-menu');
+
+                // Se o menu estiver aberto e o utilizador tocou no meio da tela: FECHA!
+                if (menuAberto && clicouForaDoMenu && clicouForaDoBotao) {
+                    menu.classList.add('esconder-manual');
+                    
+                    // Se você altera o texto do botão de toggle, atualizamos aqui também
+                    btnToggle.innerHTML = '▲ Mostrar Menu'; 
+                }
+            }
+        });
+    }
+});
