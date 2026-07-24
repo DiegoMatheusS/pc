@@ -1262,28 +1262,44 @@ function animar() {
 const btnToggle = document.getElementById('btn-toggle-menu');
 const menuPrincipalUI = document.getElementById('menu-inferior');
 
+function atualizarTextoBotao() {
+    if (!btnToggle || !menuPrincipalUI) return;
+    
+    const estaEscondido = menuPrincipalUI.classList.contains('esconder-manual');
+    const ehCelular = window.innerWidth <= 768;
+
+    if (estaEscondido) {
+        // Se a gaveta fechou
+        btnToggle.innerHTML = ehCelular ? '▲ Mostrar Menu' : '▶ Mostrar';
+    } else {
+        // Se a gaveta abriu
+        btnToggle.innerHTML = ehCelular ? '▼ Esconder Menu' : '◀ Esconder';
+    }
+}
+
 if (btnToggle && menuPrincipalUI) {
+    // Configura o texto inicial correto ao carregar a página
+    atualizarTextoBotao();
+
     btnToggle.addEventListener('click', (evento) => {
         evento.stopPropagation(); 
         
         menuPrincipalUI.classList.toggle('esconder-manual');
         btnToggle.classList.toggle('botao-descido');
         
-        if (menuPrincipalUI.classList.contains('esconder-manual')) {
-            btnToggle.innerHTML = '▲ Mostrar Menu';
-        } else {
-            btnToggle.innerHTML = '▼ Esconder Menu';
-        }
+        atualizarTextoBotao();
     });
+
+    // Se o utilizador redimensionar a janela (virar o telemóvel de lado, etc.)
+    window.addEventListener('resize', atualizarTextoBotao);
 }
 animar();
 })();
 
 /* ==========================================================================
-   LÓGICA COMPLETA DO RELATÓRIO E MODAL
+   LÓGICA BLINDADA DO RELATÓRIO E MODAL
    ========================================================================== */
-document.addEventListener('DOMContentLoaded', function() {
-    
+function inicializarRelatorio() {
     const btnRelatorio = document.getElementById('btn-relatorio');
     const modalRelatorio = document.getElementById('modal-relatorio');
     const btnFecharModal = document.getElementById('fechar-modal');
@@ -1291,14 +1307,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const conteudoRelatorio = document.getElementById('conteudo-relatorio');
 
     if (btnRelatorio && modalRelatorio) {
-        btnRelatorio.addEventListener('click', function(event) {
+        btnRelatorio.onclick = function(event) {
             event.preventDefault(); 
             
-            // 1. GERAR O CONTEÚDO DINÂMICO COM BASE NAS PEÇAS SELECIONADAS
             if (conteudoRelatorio) {
                 let htmlRelatorio = '<div style="display: flex; flex-direction: column; gap: 12px;">';
-                
-                // Pega todos os menus de seleção de hardware
                 const selects = document.querySelectorAll('#menu-inferior select');
                 
                 selects.forEach(select => {
@@ -1314,7 +1327,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     `;
                 });
 
-                // 2. ADICIONAR O CONSUMO DE WATTS ESTIMADO
                 const consumoWatts = document.getElementById('consumo-watts');
                 if (consumoWatts) {
                     htmlRelatorio += `
@@ -1329,19 +1341,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 conteudoRelatorio.innerHTML = htmlRelatorio;
             }
 
-            // 3. EXIBIR O MODAL NA TELA
             modalRelatorio.style.display = 'flex'; 
-        });
+        };
     }
 
-    // Fechar clicando no 'X'
-    if (btnFecharModal) {
-        btnFecharModal.addEventListener('click', function() {
+    if (btnFecharModal && modalRelatorio) {
+        btnFecharModal.onclick = function() {
             modalRelatorio.style.display = 'none';
-        });
+        };
     }
 
-    // Fechar clicando fora da caixa branca
     if (modalRelatorio) {
         window.addEventListener('click', function(event) {
             if (event.target === modalRelatorio) {
@@ -1350,13 +1359,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Acionar a impressão oficial
     if (btnImprimir) {
-        btnImprimir.addEventListener('click', function() {
+        btnImprimir.onclick = function() {
             window.print(); 
-        });
+        };
     }
-});
+}
+
+// Executa imediatamente se o documento já estiver pronto, senão aguarda
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarRelatorio);
+} else {
+    inicializarRelatorio();
+}
 
 // ==========================================================================
 // 🔍 SISTEMA DE PESQUISA INTELIGENTE (COM KITS VIRTUAIS)
@@ -1501,9 +1516,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Se o menu estiver aberto e o utilizador tocou no meio da tela: FECHA!
                 if (menuAberto && clicouForaDoMenu && clicouForaDoBotao) {
                     menu.classList.add('esconder-manual');
-                    
-                    // Se você altera o texto do botão de toggle, atualizamos aqui também
-                    btnToggle.innerHTML = '▲ Mostrar Menu'; 
+                    btnToggle.classList.add('botao-descido'); // <--- Adicione esta linha!
+                    atualizarTextoBotao(); // <--- Troque o btnToggle.innerHTML... por isto
                 }
             }
         });

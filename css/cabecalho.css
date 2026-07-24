@@ -1,52 +1,66 @@
-/* --- CABEÇALHO GLOBAL --- */
-.cabecalho {
-    background-color: #ffffff;
-    color: #333333;
-    display: flex;
-    justify-content: flex-start;
-    gap: 60px;
-    align-items: center;
-    
-    /* 🌟 A MÁGICA DO ESPAÇAMENTO AQUI */
-    /* Empurra a logo para a frente e cria o espaço atrás alinhando com um limite de 1200px */
-    padding: 15px max(50px, calc((100% - 1200px) / 2)); 
-    
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    position: relative;
-    z-index: 10;
-    box-sizing: border-box; 
-    width: 100%; 
+/* --- CABEÇALHO GLOBAL BLINDADO --- */
+body {
+    margin: 0 !important; 
+    padding: 0 !important;
 }
 
+/* Força TODOS os elementos dentro do cabeçalho a não herdarem lixo do site */
+.cabecalho, .cabecalho * {
+    box-sizing: border-box !important;
+}
+
+.cabecalho {
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    gap: 120px !important;
+    align-items: center !important;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    
+    /* 🌟 A NOVA MÁGICA: Usa 'vw' (Viewport) em vez de '%'. 
+       50vw = Metade da tela exata. Subtrai 600px (metade do seu limite de 1200)
+       Isso cria o centro perfeito independentemente da página! */
+    padding: 1px max(30px, calc(50vw - 600px)) !important; 
+    
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+    position: relative !important;
+    z-index: 100000 !important; 
+    box-sizing: border-box !important; 
+    width: 100% !important; 
+    flex-shrink: 0 !important; 
+}
 .logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: #1e90ff;
+    font-size: 24px !important; /* 🌟 SEU TAMANHO DE FONTE DA LOGO */
+    font-weight: bold !important;
+    color: #1e90ff !important;
+    margin: 0 !important;
 }
 
 .menu ul {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    margin: 0;
-    padding: 0;
+    list-style: none !important;
+    display: flex !important;
+    gap: 30px !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .menu a {
-    color: #333333;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    transition: color 0.2s;
+    color: #333333 !important;
+    text-decoration: none !important;
+    font-size: 17px !important; /* 🌟 SEU TAMANHO DE FONTE DO MENU */
+    font-weight: 500 !important;
+    transition: color 0.2s; /* Transition não precisa de blindagem */
+    padding: 10px 15px !important; /* 🌟 PROTEGE O PADDING DO LINK */
 }
 
 .menu a:hover {
-    color: #1e90ff;
+    color: #1e90ff !important;
 }
 
 .menu a.destaque {
-    color: #1e90ff;
-    font-weight: bold;
+    color: #1e90ff !important;
+    font-weight: bold !important;
 }
 
 
@@ -104,6 +118,8 @@
     background-color: #eeeeee;
     margin: 8px 0;
 }
+
+
 
 /* Animação para não aparecer seco */
 @keyframes fadeIn {
