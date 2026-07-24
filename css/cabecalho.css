@@ -49,33 +49,123 @@
     font-weight: bold;
 }
 
+
+/* ==========================================================================
+   MENU DROPDOWN (MENU SUSPENSO "PEÇAS")
+   ========================================================================== */
+.menu-item-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-conteudo {
+    display: none; /* Esconde a caixa por padrão */
+    position: absolute;
+    top: 100%; /* Faz a caixa colar exatamente na base do botão */
+    left: 0;
+    background-color: #ffffff;
+    min-width: 260px; /* Largura idêntica à da sua imagem */
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.15); /* Sombra elegante */
+    border-radius: 6px;
+    border: 1px solid #eee;
+    z-index: 1000;
+    padding: 10px 0;
+}
+
+/* Quando o rato passa por cima da palavra "Peças", a caixa aparece! */
+.menu-item-dropdown:hover .dropdown-conteudo {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease-in-out; /* Dá aquele efeito de surgir suavemente */
+}
+
+/* Estilo de cada linha (cada peça) dentro da caixa */
+.dropdown-conteudo a {
+    color: #444444 !important;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 400 !important;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+/* Quando passa o rato em cima de uma opção específica */
+.dropdown-conteudo a:hover {
+    background-color: #f4f4f9;
+    color: #1e90ff !important; /* Fica azul como no seu layout */
+}
+
+/* A linha cinzenta divisória */
+.divisor-dropdown {
+    height: 1px;
+    background-color: #eeeeee;
+    margin: 8px 0;
+}
+
+/* Animação para não aparecer seco */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 /* ==========================================================================
    RESPONSIVIDADE DO CABEÇALHO (SMARTPHONES E TABLETS)
    ========================================================================== */
 @media (max-width: 768px) {
     .cabecalho {
-        flex-direction: column; /* Coloca a logo em cima e o menu embaixo */
-        gap: 15px; /* Reduz o espaço entre a logo e os botões */
-        padding: 15px 20px; /* Reduz o padding lateral para ganhar ecrã */
+        flex-direction: column; /* Logo em cima, menu embaixo */
+        gap: 15px; 
+        padding: 15px 20px; 
         justify-content: center;
     }
 
-    /* Transformamos o menu numa área deslizável (arrastar com o dedo) */
-    .menu {
-        width: 100%;
-        overflow-x: auto; /* Permite a rolagem horizontal */
-        -webkit-overflow-scrolling: touch; /* Deslize suave nos ecrãs táteis */
-    }
+    
 
     .menu ul {
-        justify-content: flex-start;
-        gap: 20px;
-        width: max-content; /* Força os itens a não se esmagarem para caber na tela */
-        padding: 5px 10px 10px 10px; /* Dá espaço para o toque do dedo */
+        display: flex;
+        flex-wrap: wrap; /* 🌟 A MÁGICA: Permite que os botões quebrem para a linha de baixo! */
+        justify-content: center; /* Deixa todos os botões centralizados e organizados */
+        gap: 15px 20px; /* 15px de espaço em cima/baixo, 20px nas laterais */
+        width: 100%; 
+        padding: 0;
+        margin: 0;
     }
 
-    /* Esconde a barra de rolagem cinzenta inestética, mantendo a função de rolar */
-    .menu::-webkit-scrollbar {
-        display: none;
+    .menu a {
+        font-size: 14px; /* Letra um pouquinho menor para caber bonito em 2 ou 3 linhas */
+        padding: 5px; /* Aumenta um pouco a área de clique do dedo */
+    }
+
+    /* 🌟 1. CORREÇÃO: O ponto (.) que faltava na classe! */
+    .menu-item-dropdown {
+        position: relative; 
+    }
+
+    .menu-item-dropdown:hover .dropdown-conteudo,
+    .menu-item-dropdown:focus-within .dropdown-conteudo {
+        position: absolute; 
+        top: 100%;
+        
+        /* 🌟 2. CORREÇÃO: Posicionamento sem pulos! */
+        left: -30px; /* Puxa a caixa um bocadinho para a esquerda para alinhar visualmente */
+        transform: none !important; /* Impede a briga com o código do PC */
+        animation: none; /* No telemóvel, abrir a caixa de forma instantânea tira a sensação de lentidão */
+        
+        min-width: 220px; /* Um bocadinho mais estreito para garantir que não sai fora do ecrã */
+        box-shadow: 0px 10px 30px rgba(0,0,0,0.4); 
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #ffffff;
+        padding: 5px 0;
+        margin-top: 5px; 
+        z-index: 9999; 
+    }
+    
+    .dropdown-conteudo a {
+        font-size: 14px;
+        padding: 12px 20px; 
     }
 }
